@@ -1,26 +1,125 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   Matrona Francisca Carrillo — Design tokens
+   Paleta extraída de sus publicaciones en redes sociales
+   ============================================================ */
+@theme {
+  /* --- Rosas --- */
+  --color-rosa-50:  #FDF2F4;
+  --color-rosa-100: #FBE4E8;
+  --color-rosa-200: #F5C6CE;
+  --color-rosa-300: #EFA8B5;
+
+  /* --- Magenta (acento principal) --- */
+  --color-magenta-400: #EC4899;
+  --color-magenta-500: #E5308F;
+  --color-magenta-600: #C41E75;
+  --color-magenta-700: #9E1A5F;
+
+  /* --- Coral (acento secundario) --- */
+  --color-coral-400: #E36A5C;
+  --color-coral-500: #D94A3D;
+  --color-coral-600: #B83A2E;
+
+  /* --- Neutros --- */
+  --color-carbon:     #2E2A2B;
+  --color-gris:       #6B6264;
+  --color-gris-claro: #E8DFE1;
+
+  /* --- Verde (confirmaciones / disponibilidad) --- */
+  --color-exito-50:  #E9F7EF;
+  --color-exito-500: #23A757;
+  --color-exito-600: #1B8146;
+
+  /* --- Tipografía --- */
+  --font-titulo: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-cuerpo: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Manuscrita: el segundo nivel de sus títulos en Instagram */
+  --font-mano: var(--font-caveat), "Segoe Script", "Brush Script MT", cursive;
+
+  /* --- Sombras --- */
+  --shadow-suave:  0 2px 12px rgba(46,42,43,.07);
+  --shadow-media:  0 6px 24px rgba(196,30,117,.10);
+  --shadow-fuerte: 0 16px 48px rgba(196,30,117,.16);
+
+  /* --- Animaciones --- */
+  --animate-aparecer: aparecer .35s cubic-bezier(.4,0,.2,1);
+  --animate-latido:   latido 2s ease-in-out infinite;
+  --animate-brillo:       brillo 4s ease-in-out infinite;
+  --animate-brillo-lento: brillo 6.5s ease-in-out infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes brillo {
+  0%, 100% { opacity: .35; transform: scale(.85); }
+  50%      { opacity: 1;   transform: scale(1); }
+}
+@keyframes latido {
+  0%,100% { box-shadow: 0 0 0 0 rgba(35,167,87,.5); }
+  50%     { box-shadow: 0 0 0 6px rgba(35,167,87,0); }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---------- Base ---------- */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+  /* Blindaje: ningún hijo puede desplazar la página a los lados.
+     Safari de iOS propaga el scroll de contenedores internos al body
+     si no se recorta explícitamente aquí. */
+  overflow-x: clip;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: clip;
+  max-width: 100vw;
+  background: var(--color-rosa-50);
+  color: var(--color-carbon);
+  font-family: var(--font-cuerpo);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.65;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* Foco accesible y consistente */
+:focus-visible {
+  outline: 2px solid var(--color-magenta-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection { background: var(--color-rosa-200); color: var(--color-magenta-700); }
+
+/* Scrollbar sutil */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--color-rosa-50); }
+::-webkit-scrollbar-thumb { background: var(--color-rosa-200); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-rosa-300); }
+
+/* Carrusel deslizable sin barra visible (el scroll sigue funcionando) */
+.sin-barra {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* Edge antiguo */
+  overscroll-behavior-x: contain; /* no encadena el scroll al documento */
+  -webkit-overflow-scrolling: touch;
+}
+.sin-barra::-webkit-scrollbar {   /* Chrome, Safari */
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
