@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CONTACTO } from "@/lib/datos";
+import { CONTACTO, SEDES } from "@/lib/datos";
 
 const IconoUbicacion = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -27,19 +27,8 @@ const IconoInstagram = () => (
   </svg>
 );
 
-/** ¿Está dentro del horario de atención ahora mismo? */
-function estaAbierta(): boolean {
-  const ahora = new Date();
-  const dia = ahora.getDay(); // 0 = domingo
-  const hora = ahora.getHours() + ahora.getMinutes() / 60;
-  if (dia === 0) return false;
-  if (dia === 6) return hora >= 10 && hora < 14;
-  if (dia === 5) return hora >= 9 && hora < 15;
-  return hora >= 9 && hora < 19;
-}
-
 export default function Contacto() {
-  const [horarios, setHorarios] = useState(false);
+  const [sedeActiva, setSedeActiva] = useState(SEDES[0].id);
   const [verMapa, setVerMapa] = useState(false);
   // En escritorio el mapa se monta solo; en móvil espera un toque.
   // `hidden` no basta: el navegador descarga el iframe igual.
@@ -51,12 +40,10 @@ export default function Contacto() {
     mq.addEventListener("change", set);
     return () => mq.removeEventListener("change", set);
   }, []);
-  // Se calcula al montar, en el cliente: evita desajuste de hidratación
-  const [abiertaAhora, setAbiertaAhora] = useState(false);
-  useEffect(() => setAbiertaAhora(estaAbierta()), []);
+  const sede = SEDES.find((x) => x.id === sedeActiva) ?? SEDES[0];
 
-  // Recuadro del mapa alrededor de la consulta
-  const { lat, lng } = CONTACTO.coordenadas;
+  // Recuadro del mapa alrededor de la sede elegida
+  const { lat, lng } = sede.coordenadas;
   const d = 0.012;
   const bbox = [lng - d, lat - d, lng + d, lat + d].join(",");
   const mapaSrc =
@@ -85,17 +72,50 @@ export default function Contacto() {
           {/* Datos */}
           <div className="space-y-3 md:space-y-4">
             <div className="rounded-2xl border border-gris-claro bg-white p-4 shadow-suave md:rounded-3xl md:p-6">
-              <div className="flex items-start gap-3 md:mb-4 md:gap-4">
+              {/* Selector de sede */}
+              <div
+                role="group"
+                aria-label="Elegir lugar de atención"
+                className="mb-4 flex gap-2"
+              >
+                {SEDES.map((x) => (
+                  <button
+                    key={x.id}
+                    type="button"
+                    onClick={() => {
+                      setSedeActiva(x.id);
+                      setVerMapa(false);
+                    }}
+                    aria-pressed={sedeActiva === x.id}
+                    className={`min-h-11 flex-1 rounded-full border-2 px-3 text-[0.88rem] font-semibold transition-colors ${
+                      sedeActiva === x.id
+                        ? "border-magenta-500 bg-magenta-500 text-white"
+                        : "border-gris-claro bg-white text-carbon hover:border-magenta-500"
+                    }`}
+                  >
+                    {x.ciudad}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-start gap-3 md:gap-4">
                 <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-rosa-100 text-magenta-600 md:size-11 md:rounded-xl">
                   <IconoUbicacion />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <h3 className="mb-0.5 text-[0.98rem] md:mb-1 md:text-base">Consulta</h3>
-                  <p className="text-[0.88rem] leading-snug text-gris md:mb-2 md:text-[0.9rem]">
-                    {CONTACTO.direccion} · {CONTACTO.comuna}
+                  <h3 className="mb-0.5 text-[0.98rem] md:text-base">
+                    {sede.centro}
+                  </h3>
+                  <p className="text-[0.88rem] leading-snug text-gris md:text-[0.9rem]">
+                    {sede.direccion}
                   </p>
+                  {sede.referencia && (
+                    <p className="mt-0.5 text-[0.83rem] text-gris/85">
+                      {sede.referencia}
+                    </p>
+                  )}
                   <a
-                    href={CONTACTO.mapaUrl}
+                    href={sede.mapaUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex min-h-11 items-center text-[0.86rem] font-semibold text-magenta-600 underline md:text-[0.88rem]"
@@ -105,54 +125,22 @@ export default function Contacto() {
                 </div>
               </div>
 
-              {/* Horarios: colapsados en móvil, siempre visibles en escritorio */}
-              <div className="border-t border-gris-claro pt-3 md:flex md:items-start md:gap-4 md:pt-4">
-                <span className="hidden size-11 shrink-0 place-items-center rounded-xl bg-rosa-100 text-magenta-600 md:grid">
-                  <IconoReloj />
-                </span>
-                <div className="flex-1">
-                  <button
-                    type="button"
-                    onClick={() => setHorarios((v) => !v)}
-                    aria-expanded={horarios}
-                    className="flex min-h-11 w-full items-center justify-between gap-3 text-left md:pointer-events-none md:min-h-0"
-                  >
-                    <span className="flex items-center gap-3 md:gap-0">
-                      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-rosa-100 text-magenta-600 md:hidden">
-                        <IconoReloj />
-                      </span>
-                      <span>
-                        <span className="block font-titulo text-[0.98rem] font-bold md:text-base">
-                          Horarios
-                        </span>
-                        <span className="text-[0.82rem] text-gris md:hidden">
-                          {abiertaAhora ? "Abierta ahora" : "Ver horarios de atención"}
-                        </span>
-                      </span>
-                    </span>
-                    <svg
-                      width="15" height="15" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="3" strokeLinecap="round"
-                      aria-hidden
-                      className={`shrink-0 text-magenta-600 transition-transform md:hidden ${horarios ? "rotate-180" : ""}`}
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </button>
-
-                  <dl className={`space-y-1 text-[0.86rem] md:mt-2 md:block md:text-[0.88rem] ${horarios ? "mt-3 block" : "hidden"}`}>
-                    {CONTACTO.horarios.map((h) => (
-                      <div key={h.dia} className="flex justify-between gap-3">
-                        <dt className="text-gris">{h.dia}</dt>
-                        <dd className="font-semibold">{h.hora}</dd>
-                      </div>
-                    ))}
-                  </dl>
+              <div className="border-t border-gris-claro pt-3 md:pt-4">
+                <div className="flex items-start gap-3 md:gap-4">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-rosa-100 text-magenta-600 md:size-11 md:rounded-xl">
+                    <IconoReloj />
+                  </span>
+                  <div className="flex-1">
+                    <h3 className="mb-0.5 text-[0.98rem] md:text-base">Horarios</h3>
+                    <p className="text-[0.88rem] leading-relaxed text-gris">
+                      Abro agenda en días específicos de cada semana. Revisa la
+                      disponibilidad al momento de reservar tu hora.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* WhatsApp e Instagram: lado a lado en móvil */}
             <div className="grid grid-cols-2 gap-3 md:grid-cols-1 md:gap-4">
               <a
                 href={wa}
@@ -194,7 +182,7 @@ export default function Contacto() {
           <div className="overflow-hidden rounded-2xl border border-gris-claro bg-white shadow-suave md:min-h-[24rem] md:rounded-3xl">
             {verMapa || esEscritorio ? (
               <iframe
-                title="Ubicación de la consulta"
+                title={`Ubicación en ${sede.ciudad}`}
                 src={mapaSrc}
                 className="h-64 w-full border-0 md:size-full md:min-h-[24rem]"
                 loading="lazy"
@@ -208,7 +196,7 @@ export default function Contacto() {
                   className="flex min-h-11 w-full items-center justify-center gap-2 p-4 font-titulo text-[0.9rem] font-semibold text-magenta-600 md:hidden"
                 >
                   <IconoUbicacion />
-                  Ver mapa de la consulta
+                  Ver mapa de {sede.ciudad}
                 </button>
               </>
             )}

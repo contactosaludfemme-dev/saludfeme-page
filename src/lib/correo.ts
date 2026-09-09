@@ -11,7 +11,7 @@
  *   4. Cambiar MODO_DEMO a false
  */
 
-import { CONTACTO, precioCLP } from "./datos";
+import { CONTACTO, SEDES, precioCLP } from "./datos";
 import { fechaLarga } from "./calendario";
 
 export const MODO_DEMO = true;
@@ -53,12 +53,12 @@ function envoltorio(titulo: string, cuerpo: string): string {
 <body style="margin:0;padding:24px;background:#FDF2F4;font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:${CARBON};">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.06);">
     <tr><td style="background:linear-gradient(135deg,${M},#D94A3D);padding:28px 32px;">
-      <p style="margin:0;color:#fff;font-size:20px;font-weight:700;">Matrona ${CONTACTO.nombre}</p>
-      <p style="margin:4px 0 0;color:rgba(255,255,255,.85);font-size:13px;">Salud sexual y reproductiva</p>
+      <p style="margin:0;color:#fff;font-size:20px;font-weight:700;">${CONTACTO.marca}</p>
+      <p style="margin:4px 0 0;color:rgba(255,255,255,.85);font-size:13px;">Matrona ${CONTACTO.nombre}</p>
     </td></tr>
     <tr><td style="padding:32px;">${cuerpo}</td></tr>
     <tr><td style="background:#FDF2F4;padding:20px 32px;text-align:center;font-size:12px;color:#6B6264;">
-      <p style="margin:0 0 6px;">${CONTACTO.direccion}, ${CONTACTO.comuna}</p>
+      <p style="margin:0 0 6px;">${SEDES.map((s) => `${s.centro}, ${s.ciudad}`).join(" · ")}</p>
       <p style="margin:0;">${CONTACTO.telefonoDisplay} · ${CONTACTO.email}</p>
     </td></tr>
   </table>
@@ -84,7 +84,10 @@ export function correoPaciente(d: DatosCorreo) {
   const meet = d.meetUrl
     ? `<p style="margin:0 0 16px;font-size:15px;">Tu consulta es <strong>online</strong>. Conéctate desde este enlace a la hora agendada:</p>
        <p style="margin:0 0 20px;"><a href="${esc(d.meetUrl)}" style="color:${M};font-weight:600;">${esc(d.meetUrl)}</a></p>`
-    : `<p style="margin:0 0 20px;font-size:15px;">Te espero en <strong>${CONTACTO.direccion}</strong>, ${CONTACTO.comuna}. Llega unos minutos antes.</p>`;
+    : (() => {
+        const sede = SEDES.find((s) => d.modalidad.includes(s.ciudad)) ?? SEDES[0];
+        return `<p style="margin:0 0 20px;font-size:15px;">Te espero en <strong>${esc(sede.centro)}</strong>, ${esc(sede.direccion)}, ${esc(sede.ciudad)}. Llega unos minutos antes.</p>`;
+      })();
 
   return {
     para: d.paciente.email,

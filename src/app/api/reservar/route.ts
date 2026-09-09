@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { crearEvento } from "@/lib/google-calendar";
 import { enviarCorreos } from "@/lib/correo";
-import { SERVICIOS } from "@/lib/datos";
+import { SERVICIOS, duracionDe, precioDe } from "@/lib/datos";
 import { bloquesDelDia } from "@/lib/calendario";
 import { estaTomada, tomar, liberar } from "@/lib/reservas";
 import {
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
   }
 
   // Revalidación de disponibilidad en el servidor (evita reservas dobles)
-  const enHorario = bloquesDelDia(body.fecha, servicio!.duracion).some(
+  const enHorario = bloquesDelDia(body.fecha, duracionDe(servicio!, body.modalidad)).some(
     (b) => b.hora === body.hora && b.libre
   );
   if (!enHorario || estaTomada(body.fecha, body.hora)) {
@@ -91,7 +91,7 @@ export async function POST(req: Request) {
   try {
     const evento = await crearEvento({
       servicio: servicio!.nombre,
-      duracionMin: servicio!.duracion,
+      duracionMin: duracionDe(servicio!, body.modalidad),
       fecha: body.fecha,
       hora: body.hora,
       paciente,
@@ -103,11 +103,11 @@ export async function POST(req: Request) {
     const correos = await enviarCorreos({
       paciente,
       servicio: servicio!.nombre,
-      precio: servicio!.precio,
+      precio: precioDe(servicio!, body.modalidad),
       modalidad: body.modalidad,
       fecha: body.fecha,
       hora: body.hora,
-      duracionMin: servicio!.duracion,
+      duracionMin: duracionDe(servicio!, body.modalidad),
       meetUrl: evento.meetUrl,
       codigoReserva: codigo,
     });

@@ -1,7 +1,8 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import { Servicios, Modalidades, SobreMi, Testimonios } from "@/components/Secciones";
-import Programas from "@/components/Programas";
+import {
+  Servicios, Areas, Modalidades, SobreMi, Testimonios, Cierre,
+} from "@/components/Secciones";
 import Preguntas from "@/components/Preguntas";
 import BlogHome from "@/components/BlogHome";
 import Contacto from "@/components/Contacto";
@@ -15,14 +16,15 @@ export default function Inicio() {
       <Header />
       <main id="contenido">
         <Hero />
+        <Areas />
         <Servicios />
-        <Programas />
         <Modalidades />
         <SobreMi />
         <Testimonios />
         <BlogHome />
         <Preguntas />
         <Contacto />
+        <Cierre />
       </main>
       <Footer />
       <BotonWhatsApp />

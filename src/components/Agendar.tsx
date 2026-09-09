@@ -2,7 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Calendario from "./Calendario";
-import { SERVICIOS, precioCLP, CONTACTO, type Servicio } from "@/lib/datos";
+import {
+  SERVICIOS, SEDES, precioCLP, duracionDe, precioDe,
+  CONTACTO, type Servicio,
+} from "@/lib/datos";
 import {
   claveFecha, fechaLarga, tieneCupo, bloquesDelDia,
   VENTANA_DIAS, type Bloque,
@@ -12,7 +15,7 @@ import { normalizarTelefono, emailValido, nombreValido, LIMITES } from "@/lib/va
 const PASOS = ["Servicio", "Fecha y hora", "Tus datos", "Confirmación"];
 
 const ETIQUETA_MODALIDAD: Record<string, string> = {
-  presencial: "Presencial en consulta",
+  presencial: "Presencial",
   online: "Online (videollamada)",
 };
 
@@ -48,6 +51,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
     const h = new Date();
     return new Date(h.getFullYear(), h.getMonth(), 1);
   });
+  const [sede, setSede] = useState(SEDES[0].id);
   const [dia, setDia] = useState<string | null>(null);
   const [hora, setHora] = useState<string | null>(null);
   const [bloques, setBloques] = useState<Bloque[]>([]);
@@ -78,10 +82,10 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
       const fecha = new Date(año, m, d);
       if (fecha > limite) break;
       const clave = claveFecha(fecha);
-      if (tieneCupo(clave, servicio.duracion)) set.add(clave);
+      if (tieneCupo(clave, duracionDe(servicio, modalidad))) set.add(clave);
     }
     return set;
-  }, [mes, servicio]);
+  }, [mes, servicio, modalidad]);
 
   /* Carga los bloques del día elegido desde la API */
   useEffect(() => {
@@ -90,7 +94,9 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
     setCargandoHoras(true);
     setHora(null);
 
-    fetch(`/api/disponibilidad?fecha=${dia}&servicio=${servicio.id}`)
+    fetch(
+      `/api/disponibilidad?fecha=${dia}&servicio=${servicio.id}&modalidad=${modalidad}`
+    )
       .then((r) => {
         if (!r.ok) throw new Error("respuesta no válida");
         return r.json();
@@ -105,7 +111,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
         // Respaldo local: muestra el horario base, pero advierte que puede
         // no reflejar reservas recientes.
         if (vigente) {
-          setBloques(bloquesDelDia(dia, servicio.duracion));
+          setBloques(bloquesDelDia(dia, duracionDe(servicio, modalidad)));
           setAvisoHoras(
             "No pudimos verificar la disponibilidad en línea. Confirmaremos tu hora por correo."
           );
@@ -116,7 +122,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
       });
 
     return () => { vigente = false; };
-  }, [dia, servicio]);
+  }, [dia, servicio, modalidad]);
 
   function elegirServicio(s: Servicio) {
     setServicio(s);
@@ -151,7 +157,10 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
           servicioId: servicio.id,
           fecha: dia,
           hora,
-          modalidad: ETIQUETA_MODALIDAD[modalidad],
+          modalidad:
+            modalidad === "presencial"
+              ? `Presencial · ${SEDES.find((x) => x.id === sede)?.ciudad}`
+              : ETIQUETA_MODALIDAD[modalidad],
           ...form,
         }),
       });
@@ -242,14 +251,15 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                       <span className="min-w-0 flex-1">
                         <span className="block font-titulo font-semibold">{s.nombre}</span>
                         <span className="block truncate text-[0.83rem] text-gris">
-                          {s.duracion} min ·{" "}
-                          {s.modalidades
-                            .map((m) => ETIQUETA_MODALIDAD[m].split(" ")[0])
-                            .join(" · ")}
+                          {s.precioNota
+                            ? "Valor variable"
+                            : s.modalidades.includes("online")
+                              ? "Presencial u online"
+                              : "Solo presencial"}
                         </span>
                       </span>
                       <span className="whitespace-nowrap font-titulo font-bold text-magenta-600">
-                        {precioCLP(s.precio)}
+                        {s.precioNota ? `Desde ${precioCLP(s.precio)}` : precioCLP(s.precio)}
                       </span>
                     </button>
                   ))}
@@ -262,7 +272,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
               <div className="animate-aparecer">
                 <h3 className="text-xl">Elige fecha y hora</h3>
                 <p className="mb-5 text-[0.93rem] text-gris">
-                  {servicio.nombre} · {servicio.duracion} minutos
+                  {servicio.nombre} · {duracionDe(servicio, modalidad)} minutos
                 </p>
 
                 <div className="mb-5 flex items-center gap-2 rounded-xl border border-exito-500/25 bg-exito-50 px-4 py-3 text-[0.84rem] text-exito-600">
@@ -289,6 +299,34 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                           }`}
                         >
                           {ETIQUETA_MODALIDAD[m]}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                )}
+
+                {modalidad === "presencial" && (
+                  <fieldset className="mb-5">
+                    <legend className="mb-2 font-titulo text-[0.9rem] font-semibold">
+                      ¿Dónde prefieres atenderte?
+                    </legend>
+                    <div className="flex flex-wrap gap-2">
+                      {SEDES.map((x) => (
+                        <button
+                          key={x.id}
+                          type="button"
+                          onClick={() => setSede(x.id)}
+                          aria-pressed={sede === x.id}
+                          className={`min-h-11 rounded-full border-2 px-4 text-left text-[0.85rem] font-semibold transition-colors ${
+                            sede === x.id
+                              ? "border-magenta-500 bg-magenta-500 text-white"
+                              : "border-gris-claro bg-white text-carbon hover:border-magenta-500"
+                          }`}
+                        >
+                          {x.ciudad}
+                          <span className={`ml-1.5 font-normal ${sede === x.id ? "text-white/80" : "text-gris"}`}>
+                            {x.centro}
+                          </span>
                         </button>
                       ))}
                     </div>
@@ -386,8 +424,13 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                     {[
                       ["Servicio", servicio.nombre],
                       ["Fecha", fechaLarga(dia)],
-                      ["Hora", `${hora} hrs (${servicio.duracion} min)`],
-                      ["Modalidad", ETIQUETA_MODALIDAD[modalidad]],
+                      ["Hora", `${hora} hrs (${duracionDe(servicio, modalidad)} min)`],
+                      [
+                        "Modalidad",
+                        modalidad === "presencial"
+                          ? `Presencial · ${SEDES.find((x) => x.id === sede)?.ciudad}`
+                          : ETIQUETA_MODALIDAD[modalidad],
+                      ],
                     ].map(([k, v]) => (
                       <div key={k} className="flex justify-between gap-4">
                         <dt className="text-gris">{k}</dt>
@@ -397,7 +440,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                     <div className="flex justify-between gap-4 border-t border-gris-claro pt-2">
                       <dt className="text-gris">Valor</dt>
                       <dd className="font-titulo text-lg font-bold text-magenta-600">
-                        {precioCLP(servicio.precio)}
+                        {precioCLP(precioDe(servicio, modalidad))}
                       </dd>
                     </div>
                   </dl>
@@ -539,10 +582,11 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                 <span aria-hidden className="mx-auto mb-5 grid size-16 place-items-center rounded-full bg-exito-50 text-3xl">
                   ✓
                 </span>
-                <h3 className="text-2xl">¡Tu hora está confirmada!</h3>
+                <h3 className="text-2xl">¡Tu hora está reservada!</h3>
                 <p className="mx-auto mt-2 max-w-md text-[0.95rem] text-gris">
-                  Te envié la confirmación a <strong>{form.email}</strong> con la
-                  invitación a tu calendario. Nos vemos pronto 🌸
+                  Te envié un correo a <strong>{form.email}</strong>. Te
+                  contactaré a la brevedad para coordinar el pago por
+                  transferencia y confirmar tu hora. 🩷
                 </p>
 
                 <div className="mx-auto mt-6 max-w-md rounded-2xl bg-rosa-50 p-5 text-left">
@@ -552,7 +596,12 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                       ["Servicio", servicio.nombre],
                       ["Fecha", fechaLarga(dia)],
                       ["Hora", `${hora} hrs`],
-                      ["Modalidad", ETIQUETA_MODALIDAD[modalidad]],
+                      [
+                        "Modalidad",
+                        modalidad === "presencial"
+                          ? `Presencial · ${SEDES.find((x) => x.id === sede)?.ciudad}`
+                          : ETIQUETA_MODALIDAD[modalidad],
+                      ],
                     ].map(([k, v]) => (
                       <div key={k} className="flex justify-between gap-4">
                         <dt className="text-gris">{k}</dt>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { obtenerDisponibilidad } from "@/lib/google-calendar";
-import { SERVICIOS } from "@/lib/datos";
+import { SERVICIOS, duracionDe } from "@/lib/datos";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +9,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const fecha = searchParams.get("fecha");
   const servicioId = searchParams.get("servicio");
+  const modalidad = searchParams.get("modalidad") ?? "presencial";
 
   if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
     return NextResponse.json({ error: "Fecha inválida" }, { status: 400 });
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const bloques = await obtenerDisponibilidad(fecha, servicio.duracion);
+    const bloques = await obtenerDisponibilidad(fecha, duracionDe(servicio, modalidad));
     return NextResponse.json({ fecha, bloques });
   } catch {
     return NextResponse.json(

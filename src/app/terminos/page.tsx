@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PaginaLegal from "@/components/PaginaLegal";
-import { CONTACTO } from "@/lib/datos";
+import { CONTACTO, SEDES } from "@/lib/datos";
 
 export const metadata: Metadata = {
   title: "Términos y condiciones",
@@ -38,40 +38,44 @@ export default function Terminos() {
 
       <H>1. Servicios</H>
       <P>
-        Este sitio permite conocer y agendar atenciones de matronería prestadas
-        por {CONTACTO.nombre}, matrona titulada, en modalidad presencial o de
-        telemedicina, según el servicio elegido.
+        Este sitio permite conocer y pre-agendar atenciones de matronería
+        prestadas por {CONTACTO.nombre}, matrona titulada, en{" "}
+        {SEDES.map((s) => s.ciudad).join(" y ")} o por telemedicina, según el
+        servicio elegido.
       </P>
 
       <H>2. Agendamiento</H>
       <UL items={[
-        "La hora queda confirmada una vez recibida la confirmación por correo electrónico.",
-        "Los horarios mostrados reflejan la disponibilidad real del calendario profesional.",
+        "La reserva es una pre-agenda: la hora queda confirmada solo una vez recibido el comprobante del pago anticipado.",
+        "Los horarios mostrados reflejan la disponibilidad real de la agenda profesional.",
         "Es responsabilidad de la paciente entregar datos de contacto correctos y vigentes.",
         "Se recomienda llegar cinco minutos antes de la hora agendada.",
       ]} />
 
       <H>3. Cancelaciones y cambios</H>
       <UL items={[
-        "Puedes cancelar o reagendar sin costo hasta 24 horas antes de tu cita.",
-        "Con menos de 24 horas de aviso, se cobra el 50% del valor de la atención.",
-        "La inasistencia sin aviso se cobra en su totalidad.",
+        "Puedes reprogramar o cancelar sin costo hasta 24 horas antes de tu cita.",
+        "Con menos de 24 horas de aviso, se retiene el 50% del valor de la consulta, porque el horario reservado para ti no puede reasignarse a otra paciente y existen costos operativos asociados.",
+        "Al realizar el pago para reservar la hora, se entiende aceptada esta política.",
         "Si debo cancelar por razones de fuerza mayor, te reagendaré con prioridad o te devolveré el 100% de lo pagado.",
       ]} />
 
       <H>4. Valores y pagos</H>
       <UL items={[
         "Los valores publicados están en pesos chilenos e incluyen impuestos.",
-        "Puedes pagar online al reservar o directamente en la consulta.",
-        "La atención es particular. Se emite boleta por cada atención.",
-        "Los programas de acompañamiento tienen una vigencia de doce meses desde el primer encuentro.",
+        "El pago se realiza por transferencia electrónica, de forma anticipada.",
+        "La atención es particular: no cuento con convenio Fonasa ni Isapre.",
+        "Se considera control hasta 60 días después de la atención; pasado ese plazo corresponde agendar como primera consulta.",
+        "La revisión de exámenes es gratuita hasta 7 días corridos desde la entrega de las órdenes.",
+
       ]} />
 
       <H>5. Atención por telemedicina</H>
       <P>
         La atención online es apta para consejerías, seguimiento e interpretación
         de exámenes. Si durante la consulta se determina que requieres examen
-        físico, se coordinará una atención presencial y se descontará lo ya pagado.
+        físico o un procedimiento, se coordinará una atención presencial en
+        Talca o Linares.
       </P>
 
       <H>6. Alcance de la atención</H>
@@ -90,6 +94,11 @@ export default function Terminos() {
       </P>
 
       <H>8. Modificaciones</H>
+      <P>
+        No realizo ecografías en consulta, pero sí entrego la orden
+        correspondiente. Los procedimientos de inserción de implante o
+        dispositivo intrauterino requieren una consejería previa obligatoria.
+      </P>
       <P>
         Estos términos pueden actualizarse. La versión vigente es siempre la
         publicada en esta página, con su fecha de última actualización.

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins, Inter, Caveat } from "next/font/google";
 import "./globals.css";
-import { CONTACTO, SITIO_URL as SITIO } from "@/lib/datos";
+import { CONTACTO, SEDES, SITIO_URL as SITIO } from "@/lib/datos";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -27,16 +27,19 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITIO),
   title: {
-    default: `${CONTACTO.nombre} — Matrona en ${CONTACTO.comuna.split(",")[0]}`,
-    template: `%s | Matrona ${CONTACTO.nombre}`,
+    default: `${CONTACTO.marca} — Matrona en Talca y Linares`,
+    template: `%s | ${CONTACTO.marca}`,
   },
   description:
-    "Matrona en Talca. Control prenatal, control ginecológico y PAP, consejería en anticoncepción, preparación para el parto y asesoría en lactancia. Agenda tu hora online.",
+    "Matrona en Talca y Linares. Salud ginecológica, sexología, anticoncepción, control de embarazo, climaterio y procedimientos. Atención online a todo Chile.",
   keywords: [
     "matrona Talca",
-    "matrona Región del Maule",
+    "matrona Linares",
+    "sexóloga Talca",
+    "inserción DIU Talca",
+    "implante anticonceptivo Talca",
     "control prenatal",
-    "PAP Talca",
+    "control ginecológico Talca",
     "asesoría lactancia",
     "preparación para el parto",
     "consejería anticoncepción",
@@ -46,10 +49,10 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_CL",
     url: SITIO,
-    siteName: `Matrona ${CONTACTO.nombre}`,
-    title: `${CONTACTO.nombre} — Matrona en ${CONTACTO.comuna.split(",")[0]}`,
+    siteName: CONTACTO.marca,
+    title: `${CONTACTO.marca} — Matrona en Talca y Linares`,
     description:
-      "Acompañamiento integral en salud sexual y reproductiva. Agenda tu hora online en menos de un minuto.",
+      "Tu salud, tu espacio, tus decisiones. Atención en Talca, Linares y online.",
   },
   robots: { index: true, follow: true },
   alternates: { canonical: SITIO },
@@ -66,41 +69,22 @@ function DatosEstructurados() {
   const json = {
     "@context": "https://schema.org",
     "@type": "MedicalBusiness",
-    name: `Matrona ${CONTACTO.nombre}`,
+    name: CONTACTO.marca,
     description:
-      "Atención de matronería: control prenatal, control ginecológico, anticoncepción, preparación para el parto y lactancia.",
+      "Atención de matronería: salud ginecológica, sexología, anticoncepción, control de embarazo, climaterio y procedimientos.",
     url: SITIO,
     telephone: CONTACTO.telefono,
     email: CONTACTO.email,
-    address: {
+    address: SEDES.map((sede) => ({
       "@type": "PostalAddress",
-      streetAddress: CONTACTO.direccion,
-      addressLocality: "Talca",
+      streetAddress: sede.direccion,
+      addressLocality: sede.ciudad,
       addressRegion: "Región del Maule",
       addressCountry: "CL",
-    },
+    })),
+    areaServed: SEDES.map((s) => s.ciudad),
     medicalSpecialty: "Obstetric",
     priceRange: "$$",
-    openingHoursSpecification: [
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday"],
-        opens: "09:00",
-        closes: "19:00",
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: "Friday",
-        opens: "09:00",
-        closes: "15:00",
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: "Saturday",
-        opens: "10:00",
-        closes: "14:00",
-      },
-    ],
   };
   return (
     <script

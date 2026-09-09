@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PaginaLegal from "@/components/PaginaLegal";
-import { CONTACTO } from "@/lib/datos";
+import { CONTACTO, SEDES } from "@/lib/datos";
 
 export const metadata: Metadata = {
   title: "Política de privacidad",
@@ -46,9 +46,9 @@ export default function Privacidad() {
 
       <H>1. Responsable del tratamiento</H>
       <P>
-        {CONTACTO.nombre}, matrona, con consulta en {CONTACTO.direccion},{" "}
-        {CONTACTO.comuna}. Puedes contactarme en {CONTACTO.email} o al{" "}
-        {CONTACTO.telefonoDisplay}.
+        {CONTACTO.nombre}, matrona, con consulta en{" "}
+        {SEDES.map((s) => `${s.centro}, ${s.ciudad}`).join(" y ")}. Puedes
+        contactarme en {CONTACTO.email} o al {CONTACTO.telefonoDisplay}.
       </P>
 
       <H>2. Qué datos recolectamos</H>

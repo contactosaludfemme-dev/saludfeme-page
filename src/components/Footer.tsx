@@ -1,4 +1,4 @@
-import { CONTACTO } from "@/lib/datos";
+import { CONTACTO, SEDES } from "@/lib/datos";
 import LogoSaludFemme from "./LogoSaludFemme";
 
 export default function Footer() {
@@ -21,8 +21,8 @@ export default function Footer() {
               </span>
             </div>
             <p className="hidden max-w-sm text-[0.88rem] leading-relaxed md:block">
-              Acompañamiento integral en salud sexual y reproductiva, con enfoque
-              respetado y decisión informada.
+              Un espacio de atención cercano, respetuoso y sin juicios, enfocado
+              en la salud integral de la mujer.
             </p>
             <p className="text-[0.8rem] text-white/50 md:mt-3">{CONTACTO.registro}</p>
           </div>
@@ -32,7 +32,7 @@ export default function Footer() {
             <ul className="grid grid-cols-2 gap-x-4 text-[0.88rem] md:grid-cols-1 md:space-y-2">
               {[
                 ["#servicios", "Servicios"],
-                ["#programas", "Acompañamiento"],
+                ["#modalidades", "Modalidades"],
                 ["#sobre-mi", "Sobre mí"],
                 ["#preguntas", "Preguntas frecuentes"],
                 ["/blog", "Blog"],
@@ -53,11 +53,15 @@ export default function Footer() {
           <div>
             <h2 className="mb-2 font-titulo text-[0.95rem] text-white md:mb-3">Contacto</h2>
             <ul className="text-[0.88rem] md:space-y-2">
-              <li className="hidden md:block">{CONTACTO.direccion}</li>
-              <li className="hidden md:block">{CONTACTO.comuna}</li>
-              <li className="md:hidden">
-                {CONTACTO.direccion} · {CONTACTO.comuna}
-              </li>
+              {SEDES.map((sede) => (
+                <li key={sede.id}>
+                  <strong className="font-semibold text-white/90">
+                    {sede.ciudad}
+                  </strong>{" "}
+                  · {sede.centro}
+                </li>
+              ))}
+              <li>Online a todo Chile</li>
               <li>
                 <a
                   href={`https://wa.me/${CONTACTO.telefono.replace(/\D/g, "")}`}
@@ -92,7 +96,7 @@ export default function Footer() {
             acude al servicio de urgencia más cercano o llama al <strong>131</strong>.
           </p>
           <div className="flex flex-col items-center justify-between gap-3 text-[0.8rem] sm:flex-row">
-            <p>© {año} {CONTACTO.nombre}. Todos los derechos reservados.</p>
+            <p>© {año} {CONTACTO.marca}. Todos los derechos reservados.</p>
             <nav aria-label="Legal" className="flex gap-4">
               <a
                 href="/privacidad"

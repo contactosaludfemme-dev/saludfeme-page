@@ -7,225 +7,332 @@
 export const SITIO_URL = "https://saludfemme.cl";
 
 export const CONTACTO = {
+  marca: "Salud Femme",
   nombre: "Francisca Carrillo",
   profesion: "Matrona",
-  registro: "Reg. Superintendencia de Salud N° 123456", // DEMO: reemplazar
+  registro: "Reg. Superintendencia de Salud N° 632549",
   telefono: "+56988213371",
   telefonoDisplay: "+56 9 8821 3371",
-  email: "contacto@saludfemme.cl", // DEMO: confirmar correo real
+  email: "contacto@saludfemme.cl", // PENDIENTE: confirmar correo real
   instagram: "saludfemme.matrona",
-  direccion: "1 Sur 1234, Of. 502", // DEMO: confirmar dirección real
-  comuna: "Talca, Región del Maule",
-  mapaUrl: "https://maps.google.com/?q=1+Sur+1234+Talca+Chile",
-  /** Coordenadas del centro de Talca — ajustar a la ubicación exacta. */
-  coordenadas: { lat: -35.4264, lng: -71.6554 },
-  horarios: [
-    { dia: "Lunes a Jueves", hora: "09:00 – 19:00" },
-    { dia: "Viernes", hora: "09:00 – 15:00" },
-    { dia: "Sábado", hora: "10:00 – 14:00" },
-    { dia: "Domingo y festivos", hora: "Cerrado" },
-  ],
+  lema: "Tu salud, tu espacio, tus decisiones.",
 } as const;
+
+export type Sede = {
+  id: string;
+  ciudad: string;
+  centro: string;
+  direccion: string;
+  mapaUrl: string;
+  coordenadas: { lat: number; lng: number };
+  referencia?: string;
+};
+
+export const SEDES: Sede[] = [
+  {
+    id: "talca",
+    ciudad: "Talca",
+    centro: "Centro Kuyentun",
+    direccion: "Edificio Espacio Talca, 2 Sur con 2 Oriente, piso 13, of. 1315",
+    mapaUrl:
+      "https://maps.google.com/?q=Edificio+Espacio+Talca+2+Sur+2+Oriente+Talca",
+    coordenadas: { lat: -35.4269, lng: -71.6554 },
+  },
+  {
+    id: "linares",
+    ciudad: "Linares",
+    centro: "Fix Salud",
+    direccion: "Av. León Bustos esquina Mariano Latorre #24",
+    referencia: "A pasos de Espacio Urbano",
+    mapaUrl:
+      "https://maps.google.com/?q=Mariano+Latorre+24+Linares+Chile",
+    coordenadas: { lat: -35.8464, lng: -71.5931 },
+  },
+];
+
+/** Modalidades con su duración y valor base. */
+export const MODALIDADES_ATENCION = [
+  {
+    id: "presencial",
+    icono: "🏥",
+    nombre: "Presencial",
+    duracion: 60,
+    precio: 30000,
+    descripcion: "En Talca o Linares, en un espacio confidencial y cómodo.",
+  },
+  {
+    id: "online",
+    icono: "💻",
+    nombre: "Telemedicina",
+    duracion: 45,
+    precio: 25000,
+    descripcion: "Por videollamada, a todo Chile.",
+  },
+  {
+    id: "control",
+    icono: "🔁",
+    nombre: "Control",
+    duracion: 20,
+    precio: 20000,
+    descripcion:
+      "Presencial u online, hasta 60 días después de tu primera atención.",
+  },
+] as const;
+
+/** Cifras de trayectoria mostradas en el hero. */
+export const TRAYECTORIA_CIFRAS = [
+  { num: "+6", lbl: "años de experiencia" },
+  { num: "+1.000", lbl: "atenciones realizadas" },
+  { num: "+200", lbl: "testimonios recibidos" },
+];
+
+/** Áreas de atención, para el resumen rápido. */
+export const AREAS = [
+  { icono: "🌸", nombre: "Salud ginecológica" },
+  { icono: "💗", nombre: "Salud sexual y sexología" },
+  { icono: "🌷", nombre: "Anticoncepción" },
+  { icono: "🤰", nombre: "Control prenatal" },
+  { icono: "🌺", nombre: "Climaterio y menopausia" },
+  { icono: "✨", nombre: "Procedimientos y Plasmapen" },
+];
+
+export const CATEGORIAS = [
+  "Consultas y controles",
+  "Anticoncepción",
+  "Salud sexual",
+  "Procedimientos",
+] as const;
+
+export type Categoria = (typeof CATEGORIAS)[number];
 
 export type Servicio = {
   id: string;
   nombre: string;
   icono: string;
+  categoria: Categoria;
   descripcion: string;
-  incluye: string[];
   precio: number;
-  duracion: number; // minutos
+  /** Valor distinto según modalidad, cuando aplica. */
+  precioOnline?: number;
+  /** Texto libre cuando el valor no es fijo. */
+  precioNota?: string;
+  duracion?: number;
   modalidades: ("presencial" | "online")[];
+  /** Advertencia o requisito que la paciente debe conocer antes de agendar. */
+  aviso?: string;
 };
 
 export const SERVICIOS: Servicio[] = [
-  {
-    id: "control-prenatal",
-    nombre: "Control prenatal",
-    icono: "🤰",
-    descripcion:
-      "Seguimiento integral de tu embarazo, con acompañamiento cercano en cada etapa y resolución de todas tus dudas.",
-    incluye: [
-      "Control de peso y presión arterial",
-      "Medición de altura uterina",
-      "Auscultación de latidos fetales",
-      "Solicitud e interpretación de exámenes",
-      "Educación según semana de gestación",
-    ],
-    precio: 35000,
-    duracion: 45,
-    modalidades: ["presencial", "online"],
-  },
+  // ---------- Consultas y controles ----------
   {
     id: "control-ginecologico",
-    nombre: "Control ginecológico y PAP",
+    nombre: "Control ginecológico",
     icono: "🌸",
+    categoria: "Consultas y controles",
     descripcion:
-      "Control preventivo anual en un espacio de confianza, sin juicios y a tu ritmo.",
-    incluye: [
-      "Anamnesis y examen físico",
-      "Toma de Papanicolau (PAP)",
-      "Examen físico de mamas",
-      "Consejería en salud sexual",
-      "Entrega e interpretación de resultados",
-    ],
+      "Evaluación de tu salud ginecológica, con orientación e indicación de exámenes cuando corresponda.",
     precio: 30000,
-    duracion: 40,
-    modalidades: ["presencial"],
+    modalidades: ["presencial", "online"],
+    aviso: "No incluye el procesamiento de exámenes por el laboratorio.",
   },
   {
-    id: "anticoncepcion",
-    nombre: "Consejería en anticoncepción",
-    icono: "💊",
+    id: "control-embarazo",
+    nombre: "Control de embarazo",
+    icono: "🤰",
+    categoria: "Consultas y controles",
     descripcion:
-      "Elegimos juntas el método que mejor se adapta a tu cuerpo, tu etapa y tu proyecto de vida.",
-    incluye: [
-      "Evaluación de antecedentes de salud",
-      "Revisión de todos los métodos disponibles",
-      "Inserción de DIU o implante (valor aparte)",
-      "Control post-inserción incluido",
-      "Seguimiento de efectos adversos",
-    ],
-    precio: 28000,
-    duracion: 40,
+      "Seguimiento de tu embarazo con acompañamiento cercano en cada etapa.",
+    precio: 30000,
+    modalidades: ["presencial", "online"],
+    aviso: "No realizo ecografías, pero entrego la orden en la consulta.",
+  },
+  {
+    id: "control-preconcepcional",
+    nombre: "Control preconcepcional",
+    icono: "🌱",
+    categoria: "Consultas y controles",
+    descripcion:
+      "Preparación de tu salud antes de buscar un embarazo: exámenes, suplementación y resolución de dudas.",
+    precio: 30000,
     modalidades: ["presencial", "online"],
   },
   {
-    id: "preparacion-parto",
-    nombre: "Preparación para el parto",
-    icono: "🧘‍♀️",
-    descripcion:
-      "Llega al parto con información, herramientas y confianza. Sesiones personalizadas para ti y tu acompañante.",
-    incluye: [
-      "Fisiología del trabajo de parto",
-      "Técnicas de respiración y relajación",
-      "Manejo del dolor sin fármacos",
-      "Construcción de tu plan de parto",
-      "Rol del acompañante",
-    ],
-    precio: 40000,
-    duracion: 60,
-    modalidades: ["presencial", "online"],
-  },
-  {
-    id: "postparto-lactancia",
-    nombre: "Control postparto y lactancia",
+    id: "control-diada",
+    nombre: "Control díada",
     icono: "🤱",
+    categoria: "Consultas y controles",
     descripcion:
-      "Acompañamiento en el puerperio y asesoría especializada en lactancia materna, cuando más lo necesitas.",
-    incluye: [
-      "Evaluación de recuperación postparto",
-      "Revisión de técnica y acople",
-      "Manejo de grietas y dolor",
-      "Evaluación de aumento de peso del bebé",
-      "Apoyo emocional en el puerperio",
-    ],
-    precio: 38000,
-    duracion: 60,
+      "Evaluación conjunta de madre, recién nacido y lactancia materna, con tiempo suficiente para revisarlo todo.",
+    precio: 45000,
+    duracion: 90,
     modalidades: ["presencial"],
   },
   {
     id: "climaterio",
-    nombre: "Salud en climaterio",
+    nombre: "Salud en climaterio y menopausia",
     icono: "🌺",
+    categoria: "Consultas y controles",
     descripcion:
-      "Acompañamiento en la perimenopausia y menopausia para vivir esta etapa con bienestar.",
-    incluye: [
-      "Evaluación de síntomas climatéricos",
-      "Consejería en salud ósea",
-      "Manejo de bochornos e insomnio",
-      "Salud sexual en esta etapa",
-      "Derivación oportuna si se requiere",
-    ],
-    precio: 32000,
-    duracion: 45,
+      "Acompañamiento en esta etapa: manejo de síntomas, salud ósea y bienestar general.",
+    precio: 30000,
     modalidades: ["presencial", "online"],
+  },
+  {
+    id: "ciclo-menstrual",
+    nombre: "Educación en ciclo menstrual",
+    icono: "🌙",
+    categoria: "Consultas y controles",
+    descripcion:
+      "Entender tu ciclo, reconocer sus fases y saber qué es normal y qué no.",
+    precio: 30000,
+    modalidades: ["presencial", "online"],
+  },
+  {
+    id: "evaluacion-examenes",
+    nombre: "Evaluación de resultados de exámenes",
+    icono: "📋",
+    categoria: "Consultas y controles",
+    descripcion:
+      "Revisión de tus resultados con indicaciones, educación y derivación cuando corresponda.",
+    precio: 20000,
+    modalidades: ["presencial", "online"],
+    aviso:
+      "La revisión es gratuita dentro de los 7 días corridos desde que se entregó la orden.",
+  },
+
+  // ---------- Anticoncepción ----------
+  {
+    id: "consejeria-anticonceptivos",
+    nombre: "Consejería en anticonceptivos",
+    icono: "🌷",
+    categoria: "Anticoncepción",
+    descripcion:
+      "Elegimos juntas el método que mejor se adapta a tu cuerpo, tu etapa y tu proyecto de vida.",
+    precio: 30000,
+    modalidades: ["presencial", "online"],
+  },
+  {
+    id: "consejeria-implante-diu",
+    nombre: "Consejería de implante o DIU",
+    icono: "📌",
+    categoria: "Anticoncepción",
+    descripcion:
+      "Coordinamos la fecha, los exámenes necesarios y la compra del anticonceptivo antes de la inserción.",
+    precio: 20000,
+    modalidades: ["presencial", "online"],
+    aviso: "Obligatoria antes de agendar una inserción.",
+  },
+  {
+    id: "insercion-implante",
+    nombre: "Inserción de implante anticonceptivo",
+    icono: "💉",
+    categoria: "Anticoncepción",
+    descripcion: "Implanon o Jadelle, en consulta y con anestesia local.",
+    precio: 55000,
+    modalidades: ["presencial"],
+    aviso: "No incluye el implante. Requiere consejería previa.",
+  },
+  {
+    id: "extraccion-implante",
+    nombre: "Extracción de implante anticonceptivo",
+    icono: "💉",
+    categoria: "Anticoncepción",
+    descripcion: "Retiro de Implanon o Jadelle.",
+    precio: 55000,
+    modalidades: ["presencial"],
+  },
+  {
+    id: "insercion-diu",
+    nombre: "Inserción de dispositivo intrauterino",
+    icono: "📌",
+    categoria: "Anticoncepción",
+    descripcion: "T de cobre, Asertia o Mirena.",
+    precio: 60000,
+    modalidades: ["presencial"],
+    aviso: "No incluye el dispositivo. Requiere consejería previa.",
+  },
+  {
+    id: "extraccion-diu",
+    nombre: "Extracción de dispositivo intrauterino",
+    icono: "📌",
+    categoria: "Anticoncepción",
+    descripcion: "T de cobre, Asertia, Mirena o Kyleena.",
+    precio: 35000,
+    modalidades: ["presencial"],
+  },
+  {
+    id: "control-anticonceptivos",
+    nombre: "Control de anticonceptivos",
+    icono: "🔁",
+    categoria: "Anticoncepción",
+    descripcion:
+      "Seguimiento posterior a la indicación: implantes, DIU, píldoras, anillo, inyecciones o parche.",
+    precio: 20000,
+    modalidades: ["presencial", "online"],
+  },
+  {
+    id: "inyeccion-anticonceptiva",
+    nombre: "Administración de inyección anticonceptiva",
+    icono: "💉",
+    categoria: "Anticoncepción",
+    descripcion: "Intramuscular o subcutánea.",
+    precio: 20000,
+    modalidades: ["presencial"],
+  },
+
+  // ---------- Salud sexual ----------
+  {
+    id: "consejeria-sexologia",
+    nombre: "Consejería individual en sexología",
+    icono: "💗",
+    categoria: "Salud sexual",
+    descripcion:
+      "Un espacio para conversar sobre tu sexualidad sin prejuicios, desde una mirada profesional e integral.",
+    precio: 40000,
+    modalidades: ["presencial", "online"],
+  },
+  {
+    id: "infecciones",
+    nombre: "Consejería en infecciones vulvovaginales e ITS",
+    icono: "🔬",
+    categoria: "Salud sexual",
+    descripcion:
+      "Evaluación de síntomas, indicación de tratamiento y orientación sobre prevención.",
+    precio: 30000,
+    modalidades: ["presencial", "online"],
+  },
+  {
+    id: "lactancia",
+    nombre: "Consejería en lactancia materna",
+    icono: "🤱",
+    categoria: "Salud sexual",
+    descripcion:
+      "Revisión de técnica y acople, manejo del dolor y acompañamiento en el proceso.",
+    precio: 40000,
+    precioOnline: 30000,
+    modalidades: ["presencial", "online"],
+  },
+
+  // ---------- Procedimientos ----------
+  {
+    id: "plasmapen",
+    nombre: "Plasmapen",
+    icono: "✨",
+    categoria: "Procedimientos",
+    descripcion:
+      "Eliminación de verrugas genitales. Rápido, con resultados inmediatos y bajo anestesia local.",
+    precio: 35000,
+    precioNota: "Desde $35.000 · varía según la cantidad de lesiones",
+    modalidades: ["presencial"],
   },
 ];
 
-export type Programa = {
-  id: string;
-  nombre: string;
-  icono: string;
-  /** Ritmo del acompañamiento, en lenguaje humano. */
-  ritmo: string;
-  /** Una línea que resume el programa en la vista colapsada. */
-  resumen: string;
-  /** Cómo se vive el proceso, en primera persona (al desplegar). */
-  relato: string;
-  incluye: string[];
-  precio: number;
-  /** Suma de las sesiones por separado, para dar contexto al valor. */
-  precioSuelto: number;
-};
-
-export const PROGRAMAS: Programa[] = [
-  {
-    id: "acompanamiento-embarazo",
-    nombre: "Acompañamiento durante el embarazo",
-    icono: "🤰",
-    ritmo: "8 encuentros · desde tu primer control hasta después del parto",
-    resumen:
-      "Todo tu embarazo acompañado, con WhatsApp directo entre controles.",
-    relato:
-      "Nos vemos una vez al mes, y en las últimas semanas cada quince días. " +
-      "Entre control y control me escribes cuando lo necesites: para eso está " +
-      "el WhatsApp directo. Llegamos juntas al parto con tu plan escrito y " +
-      "todas tus dudas conversadas.",
-    incluye: [
-      "8 controles prenatales de 45 minutos",
-      "Una sesión de preparación para el parto",
-      "Tu plan de parto por escrito",
-      "WhatsApp directo entre controles",
-      "Control postparto incluido",
-    ],
-    precio: 240000,
-    precioSuelto: 280000,
-  },
-  {
-    id: "acompanamiento-parto",
-    nombre: "Preparación para tu parto",
-    icono: "🧘‍♀️",
-    ritmo: "5 encuentros · desde la semana 28",
-    resumen:
-      "Para llegar al parto con información y tu acompañante preparado.",
-    relato:
-      "Cinco sesiones para llegar al parto sabiendo qué esperar y qué puedes " +
-      "decidir. Tu acompañante participa en todas: cuando los dos entienden " +
-      "lo que viene, el día del parto se vive muy distinto. Quedamos en " +
-      "contacto directo hasta que nazca.",
-    incluye: [
-      "5 sesiones de 60 minutos",
-      "Participación de tu acompañante",
-      "Fisiología del parto y manejo del dolor",
-      "Tu plan de parto por escrito",
-      "Contacto directo hasta el parto",
-    ],
-    precio: 170000,
-    precioSuelto: 200000,
-  },
-  {
-    id: "acompanamiento-lactancia",
-    nombre: "Acompañamiento en lactancia",
-    icono: "🤱",
-    ritmo: "4 encuentros · durante los primeros dos meses",
-    resumen:
-      "Acompañamiento en los primeros dos meses, cuando más se necesita.",
-    relato:
-      "Nos vemos por primera vez dentro de la primera semana, que es cuando " +
-      "más se necesita, y después según cómo vayan tú y tu bebé. Revisamos el " +
-      "acople, el peso y lo que te esté costando, sin apuro. Entre sesiones " +
-      "me escribes cuando surja una duda.",
-    incluye: [
-      "4 sesiones de 60 minutos",
-      "Primera sesión dentro de la primera semana",
-      "Evaluación de técnica y acople",
-      "Seguimiento del peso de tu bebé",
-      "WhatsApp directo entre sesiones",
-    ],
-    precio: 130000,
-    precioSuelto: 152000,
-  },
+/** Notas generales que aplican a todos los servicios. */
+export const NOTAS_SERVICIOS = [
+  "No realizo ecografías, pero entrego la orden para hacerlas en la consulta.",
+  "Para inserción de implante o DIU debes agendar primero una consejería, donde coordinamos fecha, exámenes y la compra del anticonceptivo.",
+  "La revisión de exámenes es gratuita hasta 7 días corridos desde la entrega de las órdenes. Pasado ese plazo, corresponde agendar un control o consulta.",
+  "Se considera control hasta 60 días después de la atención. Pasado ese tiempo, debes agendar como primera consulta.",
 ];
 
 export const MODALIDADES = [
@@ -250,71 +357,95 @@ export const MEDIOS_PAGO = [
   "Efectivo en consulta",
 ];
 
-export const TESTIMONIOS = [
-  {
-    nombre: "Camila R.",
-    servicio: "Control prenatal",
-    texto:
-      "Francisca me acompañó durante todo mi embarazo. Nunca sentí que una pregunta fuera tonta. Llegué al parto tranquila y segura, y eso se lo debo a ella.",
-    estrellas: 5,
-  },
-  {
-    nombre: "Daniela M.",
-    servicio: "Asesoría en lactancia",
-    texto:
-      "Estaba a punto de rendirme con la lactancia por el dolor. En una sesión corrigió el acople y todo cambió. Ojalá la hubiera contactado antes.",
-    estrellas: 5,
-  },
-  {
-    nombre: "Josefa V.",
-    servicio: "Consejería anticonceptiva",
-    texto:
-      "Por primera vez alguien me explicó todas las opciones sin apurarme ni presionarme. Me sentí escuchada y respetada de verdad.",
-    estrellas: 5,
-  },
-  {
-    nombre: "Antonia P.",
-    servicio: "Preparación para el parto",
-    texto:
-      "Las sesiones con mi pareja fueron clave. Él llegó al parto sabiendo cómo apoyarme. Recomiendo a Francisca con los ojos cerrados.",
-    estrellas: 5,
-  },
-];
+/**
+ * Testimonios de pacientes.
+ * PENDIENTE: Francisca menciona +200 testimonios recibidos. Cargar aquí los
+ * que autorice publicar, con su consentimiento por escrito.
+ * Mientras la lista esté vacía, la sección no se muestra.
+ */
+export const TESTIMONIOS: {
+  nombre: string;
+  servicio: string;
+  texto: string;
+  estrellas: number;
+}[] = [];
 
 export const FAQS = [
   {
-    p: "¿Qué debo llevar a mi primera consulta?",
-    r: "Tu carnet de identidad, carnet de control prenatal si ya lo tienes, exámenes previos y la lista de medicamentos que estés tomando. Si vienes por control ginecológico, evita la consulta durante tu menstruación.",
+    p: "¿Cómo puedo agendar?",
+    r: "Puedes pre-agendar tu consulta directamente en esta página. Luego finalizamos el agendamiento por correo o WhatsApp con el comprobante de pago.",
   },
   {
-    p: "¿La atención es particular? ¿Cómo puedo pagar?",
-    r: "Sí, la atención es particular. Puedes reservar y pagar online al momento de agendar con Webpay, tarjeta de crédito o débito, o pagar directamente en la consulta el día de tu cita. Los valores de cada servicio están publicados en esta página.",
+    p: "¿Cómo se paga?",
+    r: "Por transferencia electrónica. Tu hora queda confirmada una vez que recibo el comprobante del pago anticipado.",
   },
   {
-    p: "¿Desde qué semana de embarazo puedo empezar los controles?",
-    r: "Puedes venir desde que tienes el test positivo. Lo ideal es iniciar el control prenatal antes de las 12 semanas para solicitar los primeros exámenes a tiempo.",
+    p: "¿Atiendes presencialmente?",
+    r: "Sí, en Talca (Centro Kuyentun, Edificio Espacio Talca) y en Linares (Fix Salud, Av. León Bustos esquina Mariano Latorre #24).",
   },
   {
-    p: "¿Puedo venir acompañada?",
-    r: "Por supuesto. Tu pareja, madre, amiga o quien tú elijas es siempre bienvenida. En las sesiones de preparación para el parto, la participación del acompañante es muy recomendable.",
+    p: "¿Realizas consultas online?",
+    r: "Sí, a todo Chile. La telemedicina dura 45 minutos y tiene un valor de $25.000.",
   },
   {
-    p: "¿Puedo llevar a mi bebé a la consulta?",
-    r: "Por supuesto. En los controles postparto y en las sesiones de lactancia es lo esperable: necesito ver a tu bebé para evaluar el acople y su peso. La consulta está preparada para recibirlos a los dos.",
+    p: "¿Atiendes por Fonasa?",
+    r: "No cuento con convenio Fonasa. La atención es solo particular.",
+  },
+  {
+    p: "¿Realizas ecografías en tu consulta?",
+    r: "No realizo ecografías, pero sí entrego la orden para que te las hagas.",
+  },
+  {
+    p: "¿Desde qué edad atiendes pacientes?",
+    r: "Desde los 10 años, para control adolescente y educación en ciclo menstrual.",
+  },
+  {
+    p: "¿Puedo asistir acompañada a la consulta?",
+    r: "Sí, con tu persona significativa o tu pareja, respetando siempre el espacio de tu atención.",
+  },
+  {
+    p: "¿La consulta incluye examen físico?",
+    r: "Depende del motivo de consulta y de la prestación solicitada. Nada se realiza sin tu consentimiento explícito.",
+  },
+  {
+    p: "¿Cuánto plazo tengo para agendar como control y no como primera consulta?",
+    r: "Tienes 60 días desde tu atención. Pasado ese plazo, corresponde agendar como primera consulta.",
+  },
+  {
+    p: "¿Revisas los exámenes solicitados de manera gratuita?",
+    r: "Sí, dentro de un plazo de 7 días corridos desde que se entregó la orden. Pasado ese tiempo, debes agendar un control o consulta según corresponda.",
   },
   {
     p: "¿Qué pasa si necesito cancelar o cambiar mi hora?",
-    r: "Puedes cancelar o reagendar desde el correo de confirmación que recibes, hasta 24 horas antes de la cita, sin costo. Si cancelas con menos de 24 horas, se cobra el 50% del valor.",
+    r: "Puedes reprogramar o cancelar hasta 24 horas antes. Con menos de 24 horas de aviso se retiene el 50% del valor, porque ese horario ya no puede reasignarse a otra paciente.",
   },
   {
-    p: "¿Puedes recetar medicamentos?",
-    r: "Como matrona estoy facultada para recetar anticonceptivos, ácido fólico, vitaminas y algunos tratamientos del área. Para otros casos te derivo oportunamente al médico correspondiente.",
+    p: "¿Qué debo llevar a mi primera consulta?",
+    r: "Tu carnet de identidad, exámenes previos si los tienes y la lista de medicamentos que estés tomando.",
   },
   {
-    p: "¿La consulta online sirve igual que la presencial?",
-    r: "Para consejerías, resolución de dudas, interpretación de exámenes y seguimiento de lactancia funciona muy bien. Para controles que requieren examen físico (PAP, altura uterina, inserción de DIU) necesitamos vernos presencialmente.",
+    p: "¿Necesito consejería antes de ponerme un implante o DIU?",
+    r: "Sí, es obligatoria. En ella coordinamos la fecha del procedimiento, los exámenes si son necesarios y la compra previa del anticonceptivo.",
   },
 ];
+
+/**
+ * Duración real de una atención.
+ * La define la modalidad (60 min presencial, 45 online), salvo que el
+ * servicio declare la suya — como el control díada, de 90 minutos.
+ */
+export function duracionDe(servicio: Servicio, modalidad: string): number {
+  if (servicio.duracion) return servicio.duracion;
+  return modalidad === "online" ? 45 : 60;
+}
+
+/** Valor de una atención según la modalidad elegida. */
+export function precioDe(servicio: Servicio, modalidad: string): number {
+  if (modalidad === "online" && servicio.precioOnline) {
+    return servicio.precioOnline;
+  }
+  return servicio.precio;
+}
 
 /** Formatea un monto en pesos chilenos. */
 export function precioCLP(monto: number): string {

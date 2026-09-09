@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useAgenda } from "./AgendaProvider";
 import {
-  SERVICIOS, MODALIDADES, MEDIOS_PAGO,
-  TESTIMONIOS, CONTACTO, precioCLP,
+  SERVICIOS, CATEGORIAS, NOTAS_SERVICIOS, MODALIDADES_ATENCION,
+  AREAS, TESTIMONIOS, CONTACTO, precioCLP, type Servicio,
 } from "@/lib/datos";
 
 /* ---------- Encabezado reutilizable ---------- */
@@ -28,112 +28,115 @@ function Encabezado({
 
 /* ---------- Servicios ---------- */
 export function Servicios() {
+  const [categoria, setCategoria] = useState<string>(CATEGORIAS[0]);
+  const visibles = SERVICIOS.filter((s) => s.categoria === categoria);
+
   return (
     <section id="servicios" className="bg-rosa-50 py-16 lg:py-24">
-      <div className="mx-auto max-w-6xl px-5">
+      <div className="mx-auto max-w-5xl px-5">
         <Encabezado
-          eyebrow="Qué hago"
+          eyebrow="En qué puedo ayudarte"
           titulo="Servicios"
-          texto="Atención integral en salud sexual y reproductiva, con el tiempo que cada consulta merece."
+          texto="Atenciones personalizadas en un espacio confidencial, con orientación, evaluación de síntomas e indicación de tratamientos."
         />
-        <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
-          {SERVICIOS.map((s) => (
+
+        {/* Filtro por categoría */}
+        <div
+          role="group"
+          aria-label="Filtrar por categoría"
+          className="sin-barra -mx-5 mb-6 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0"
+        >
+          {CATEGORIAS.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCategoria(c)}
+              aria-pressed={categoria === c}
+              className={`min-h-11 shrink-0 whitespace-nowrap rounded-full border-2 px-4 text-[0.86rem] font-semibold transition-colors ${
+                categoria === c
+                  ? "border-magenta-500 bg-magenta-500 text-white"
+                  : "border-gris-claro bg-white text-gris hover:border-magenta-500 hover:text-magenta-600"
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2 md:gap-4">
+          {visibles.map((s) => (
             <TarjetaServicio key={s.id} servicio={s} />
           ))}
+        </div>
+
+        {/* Reglas que aplican a todas las atenciones */}
+        <div className="mt-8 rounded-2xl border border-gris-claro bg-white p-5 md:p-6">
+          <p className="mb-3 font-titulo text-[0.95rem] font-bold">
+            Antes de agendar, ten presente
+          </p>
+          <ul className="space-y-2.5">
+            {NOTAS_SERVICIOS.map((n) => (
+              <li key={n} className="relative pl-6 text-[0.88rem] leading-relaxed text-gris">
+                <span aria-hidden className="absolute left-0 top-[0.15rem] text-magenta-500">
+                  •
+                </span>
+                {n}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
   );
 }
 
-/**
- * En móvil el detalle va colapsado (la lista completa hacía la sección
- * interminable); desde `md` se muestra todo, como en escritorio.
- */
-function TarjetaServicio({ servicio: s }: { servicio: (typeof SERVICIOS)[number] }) {
+function TarjetaServicio({ servicio: s }: { servicio: Servicio }) {
   const { abrir } = useAgenda();
-  const [abierto, setAbierto] = useState(false);
 
   return (
-    <article className="flex flex-col rounded-3xl border border-gris-claro bg-white p-5 shadow-suave transition-all hover:border-rosa-200 hover:shadow-media md:p-6 md:hover:-translate-y-1">
-      {/* Cabecera: en móvil en fila, en escritorio apilada */}
-      <div className="flex items-start gap-3 md:block">
+    <article className="flex flex-col rounded-2xl border border-gris-claro bg-white p-4 shadow-suave transition-all hover:border-rosa-200 hover:shadow-media md:p-5">
+      <div className="flex items-start gap-3">
         <span
           aria-hidden
-          className="grid size-11 shrink-0 place-items-center rounded-xl bg-rosa-100 text-xl md:mb-4 md:size-14 md:rounded-2xl md:text-2xl"
+          className="grid size-10 shrink-0 place-items-center rounded-xl bg-rosa-100 text-lg"
         >
           {s.icono}
         </span>
         <div className="min-w-0 flex-1">
-          <h3 className="text-[1.02rem] md:mb-2 md:text-lg">{s.nombre}</h3>
-          {/* Precio y duración visibles de inmediato en móvil */}
-          <p className="mt-0.5 flex items-baseline gap-2 md:hidden">
-            <span className="font-titulo text-[1.05rem] font-bold text-magenta-600">
-              {precioCLP(s.precio)}
-            </span>
-            <span className="text-[0.8rem] text-gris">· {s.duracion} min</span>
+          <h3 className="text-[0.98rem] leading-snug">{s.nombre}</h3>
+          <p className="mt-0.5 font-titulo text-[1.02rem] font-bold text-magenta-600">
+            {s.precioNota ?? precioCLP(s.precio)}
+            {s.precioOnline && (
+              <span className="ml-1.5 text-[0.8rem] font-normal text-gris">
+                presencial · {precioCLP(s.precioOnline)} online
+              </span>
+            )}
           </p>
         </div>
       </div>
 
-      {/* Descripción: siempre en escritorio, solo al desplegar en móvil */}
-      <p
-        className={`text-[0.9rem] text-gris md:mb-4 md:block md:text-[0.93rem] ${
-          abierto ? "mt-3 block" : "hidden"
-        }`}
-      >
+      <p className="mt-3 flex-1 text-[0.88rem] leading-relaxed text-gris">
         {s.descripcion}
       </p>
 
-      {/* Detalle */}
-      <ul
-        className={`space-y-2 md:mb-5 md:block ${abierto ? "mt-3 block" : "hidden"}`}
-      >
-        {s.incluye.map((i) => (
-          <li key={i} className="relative pl-6 text-[0.86rem] text-gris">
-            <span aria-hidden className="absolute left-0 font-bold text-magenta-500">
-              ✓
-            </span>
-            {i}
-          </li>
-        ))}
-      </ul>
+      {s.aviso && (
+        <p className="mt-3 rounded-lg bg-rosa-50 px-3 py-2 text-[0.8rem] leading-snug text-gris">
+          {s.aviso}
+        </p>
+      )}
 
-      {/* Botón de detalle, solo en móvil */}
-      <button
-        type="button"
-        onClick={() => setAbierto((v) => !v)}
-        aria-expanded={abierto}
-        className="mt-2 -ml-1 flex min-h-11 w-fit items-center gap-1.5 px-1 text-[0.85rem] font-semibold text-magenta-600 md:hidden"
-      >
-        {abierto ? "Ver menos" : "Ver qué incluye"}
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          aria-hidden
-          className={`transition-transform ${abierto ? "rotate-180" : ""}`}
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </button>
-
-      {/* Precio en escritorio */}
-      <div className="mt-auto hidden items-baseline justify-between gap-3 border-t border-gris-claro pt-4 md:flex">
-        <span className="font-titulo text-xl font-bold text-magenta-600">
-          {precioCLP(s.precio)}
+      <div className="mt-3 flex items-center gap-2 text-[0.78rem] text-gris">
+        {s.duracion && <span>{s.duracion} min</span>}
+        {s.duracion && <span aria-hidden>·</span>}
+        <span>
+          {s.modalidades.includes("online") ? "Presencial u online" : "Solo presencial"}
         </span>
-        <span className="text-[0.82rem] text-gris">{s.duracion} min</span>
       </div>
 
       <button
         type="button"
         onClick={() => abrir(s.id)}
-        className="mt-4 rounded-full border-2 border-magenta-500 py-2.5 text-center font-titulo text-[0.9rem] font-semibold text-magenta-600 transition-colors hover:bg-magenta-500 hover:text-white"
+        className="mt-3 rounded-full border-2 border-magenta-500 py-2.5 text-center font-titulo text-[0.88rem] font-semibold text-magenta-600 transition-colors hover:bg-magenta-500 hover:text-white"
       >
         Agendar
       </button>
@@ -144,46 +147,85 @@ function TarjetaServicio({ servicio: s }: { servicio: (typeof SERVICIOS)[number]
 /* ---------- Modalidades y formas de pago ---------- */
 export function Modalidades() {
   return (
-    <section className="bg-rosa-100 py-20 lg:py-24">
-      <div className="mx-auto max-w-6xl px-5">
+    <section id="modalidades" className="bg-rosa-100 py-16 lg:py-24">
+      <div className="mx-auto max-w-5xl px-5">
         <Encabezado
           eyebrow="Cómo nos vemos"
           titulo="Modalidades de atención"
-          texto="Elige la que mejor se acomode a tu momento. Ambas con la misma dedicación."
+          texto="Elige la que mejor se acomode a tu momento. Todas con la misma dedicación."
         />
-        <div className="mx-auto grid max-w-3xl gap-6 sm:grid-cols-2">
-          {MODALIDADES.map((m) => (
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          {MODALIDADES_ATENCION.map((m) => (
             <article
-              key={m.nombre}
-              className="rounded-3xl border border-gris-claro bg-white p-6 text-center shadow-suave transition-all hover:-translate-y-1 hover:shadow-media"
+              key={m.id}
+              className="rounded-2xl border border-gris-claro bg-white p-5 text-center shadow-suave transition-all hover:-translate-y-1 hover:shadow-media md:rounded-3xl md:p-6"
             >
-              <span aria-hidden className="mb-3 block text-4xl">{m.icono}</span>
-              <h3 className="mb-2 text-lg">{m.nombre}</h3>
-              <p className="text-[0.9rem] text-gris">{m.descripcion}</p>
+              <span aria-hidden className="mb-2 block text-3xl md:text-4xl">
+                {m.icono}
+              </span>
+              <h3 className="mb-1 text-[1.05rem]">{m.nombre}</h3>
+              <p className="font-titulo text-xl font-bold text-magenta-600">
+                {precioCLP(m.precio)}
+              </p>
+              <p className="mb-2 text-[0.8rem] text-coral-500">{m.duracion} minutos</p>
+              <p className="text-[0.87rem] leading-relaxed text-gris">
+                {m.descripcion}
+              </p>
             </article>
           ))}
         </div>
 
-        <div className="mx-auto mt-10 max-w-3xl rounded-3xl border border-gris-claro bg-white p-6 text-center shadow-suave sm:p-7">
+        <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-gris-claro bg-white p-5 text-center shadow-suave md:rounded-3xl md:p-7">
           <p className="mb-2 font-titulo text-[1.05rem] font-bold text-carbon">
             Atención particular
           </p>
-          <p className="mx-auto max-w-xl text-[0.93rem] leading-relaxed text-gris">
-            Reserva y paga tu hora online al momento de agendar, o paga
-            directamente en la consulta el día de tu cita.
+          <p className="mx-auto max-w-xl text-[0.92rem] leading-relaxed text-gris">
+            El pago se realiza por <strong>transferencia electrónica</strong>.
+            Tu hora queda confirmada una vez recibido el comprobante.
           </p>
-
-          <ul className="mt-5 flex flex-wrap justify-center gap-2.5">
-            {MEDIOS_PAGO.map((m) => (
-              <li
-                key={m}
-                className="rounded-full border border-gris-claro bg-rosa-50 px-4 py-2 text-[0.85rem] font-semibold text-gris"
-              >
-                {m}
-              </li>
-            ))}
-          </ul>
+          <p className="mx-auto mt-3 max-w-xl text-[0.85rem] leading-relaxed text-gris">
+            No cuento con convenio Fonasa ni Isapre.
+          </p>
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Áreas de atención ---------- */
+export function Areas() {
+  const { abrir } = useAgenda();
+
+  return (
+    <section className="bg-white py-14 lg:py-16">
+      <div className="mx-auto max-w-4xl px-5 text-center">
+        <span className="mb-2 inline-block font-titulo text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-coral-500">
+          En qué puedo ayudarte
+        </span>
+        <h2 className="mb-7 text-[clamp(1.6rem,3vw,2.1rem)]">
+          Áreas de atención
+        </h2>
+
+        <ul className="flex flex-wrap justify-center gap-2.5">
+          {AREAS.map((a) => (
+            <li
+              key={a.nombre}
+              className="flex items-center gap-2 rounded-full border border-gris-claro bg-rosa-50 px-4 py-2 text-[0.88rem] font-semibold text-carbon"
+            >
+              <span aria-hidden>{a.icono}</span>
+              {a.nombre}
+            </li>
+          ))}
+        </ul>
+
+        <button
+          type="button"
+          onClick={() => abrir()}
+          className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-full bg-magenta-500 px-7 font-titulo font-semibold text-white shadow-media transition-all hover:-translate-y-0.5 hover:bg-magenta-600"
+        >
+          Agendar mi hora
+        </button>
       </div>
     </section>
   );
@@ -191,11 +233,22 @@ export function Modalidades() {
 
 /* ---------- Sobre mí ---------- */
 const TRAYECTORIA = [
-  { t: "Matrona, Universidad de Chile", s: "Titulada con distinción · 2014" },
-  { t: "Diplomado en Lactancia Materna", s: "Pontificia Universidad Católica · 2017" },
-  { t: "Diplomado en Salud Sexual y Reproductiva", s: "Universidad de Santiago · 2019" },
-  { t: "Formación en parto respetado", s: "Certificación internacional · 2021" },
-  { t: "Consulta propia en Talca", s: "Desde 2020 · +1.200 mujeres atendidas" },
+  {
+    t: "Matrona · Licenciada en Obstetricia y Puericultura",
+    s: "Universidad Autónoma de Chile · Aprobada con distinción, 2020",
+  },
+  {
+    t: "Especialización internacional en Sexología",
+    s: "Centro Integrato di Sessuologia Il Ponte",
+  },
+  { t: "Diplomado en Sexualidad", s: "" },
+  { t: "Diplomado en Recién Nacido de Alto Riesgo", s: "" },
+  { t: "Diplomado en Salud Familiar", s: "" },
+  { t: "Diplomado en Gestión de Calidad en Salud", s: "" },
+  {
+    t: "Más de 6 años de experiencia",
+    s: "En servicio público y privado",
+  },
 ];
 
 export function SobreMi() {
@@ -218,19 +271,25 @@ export function SobreMi() {
             Quién te acompaña
           </span>
           <h2 className="text-[clamp(1.8rem,3.6vw,2.5rem)]">
-            Hola, soy {CONTACTO.nombre}
+            Soy {CONTACTO.nombre}
           </h2>
           <p className="mt-4 text-gris">
-            Llevo más de diez años acompañando a mujeres en los momentos más
-            importantes de su vida. Elegí la matronería porque creo que la salud
-            sexual y reproductiva se vive mejor cuando una se siente escuchada,
-            informada y respetada.
+            Matrona y creadora de {CONTACTO.marca}. Mi propósito es acompañar a
+            las mujeres en las distintas etapas de su vida, entregando una
+            atención cercana, respetuosa y personalizada.
           </p>
           <p className="text-gris">
-            En mi consulta no hay apuro. Cada control dura lo que tiene que durar,
-            porque las preguntas importan tanto como los exámenes. Trabajo desde
-            el enfoque del parto respetado y la decisión informada: mi rol es
-            darte toda la información para que tú decidas sobre tu cuerpo.
+            Me interesa abordar la salud femenina desde una mirada integral,
+            considerando no solo la salud física, sino también la educación, la
+            sexualidad y el bienestar de cada mujer. Cuento con especialización
+            en Sexología, formación que me permite abordar estos temas con una
+            mirada respetuosa y libre de prejuicios.
+          </p>
+          <p className="text-gris">
+            Quiero que encuentres un espacio donde puedas preguntar, conversar y
+            tomar decisiones sobre tu salud con información clara y sin juicios.
+            Porque cuidar nuestra salud también significa sentirnos escuchadas,
+            comprendidas y protagonistas de nuestras propias decisiones. 🩷
           </p>
 
           <ul className="mt-7 space-y-0">
@@ -244,7 +303,9 @@ export function SobreMi() {
                   <span aria-hidden className="absolute left-[5px] top-5 h-full w-px bg-gris-claro" />
                 )}
                 <strong className="block font-titulo text-[0.98rem]">{item.t}</strong>
-                <span className="text-[0.88rem] text-gris">{item.s}</span>
+                {item.s && (
+                  <span className="text-[0.88rem] text-gris">{item.s}</span>
+                )}
               </li>
             ))}
           </ul>
@@ -254,8 +315,54 @@ export function SobreMi() {
   );
 }
 
+/* ---------- Cierre ---------- */
+export function Cierre() {
+  const { abrir } = useAgenda();
+  const wa = `https://wa.me/${CONTACTO.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
+    "Hola Francisca, quiero agendar una hora 🩷"
+  )}`;
+
+  return (
+    <section className="bg-gradient-to-br from-magenta-600 to-coral-500 py-16 lg:py-20">
+      <div className="mx-auto max-w-2xl px-5 text-center">
+        <h2 className="text-[clamp(1.7rem,3.4vw,2.3rem)] text-white">
+          ¿Hablamos? 🩷
+        </h2>
+        <p className="mx-auto mt-3 max-w-lg text-[1rem] leading-relaxed text-white/85">
+          Si tienes una duda, necesitas orientación o simplemente quieres
+          comenzar a cuidar más de tu salud, estoy aquí para acompañarte.
+        </p>
+
+        <div className="mt-7 flex flex-wrap justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => abrir()}
+            className="min-h-11 rounded-full bg-white px-7 font-titulo font-semibold text-magenta-600 shadow-fuerte transition-transform hover:-translate-y-0.5"
+          >
+            Agendar mi hora
+          </button>
+          <a
+            href={wa}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 items-center rounded-full border-2 border-white/40 px-6 font-titulo font-semibold text-white transition-colors hover:border-white hover:bg-white/10"
+          >
+            WhatsApp
+          </a>
+        </div>
+
+        <p className="mt-8 font-mano text-[1.5rem] leading-tight text-white">
+          Tu salud. Tu espacio. Tus decisiones. 🩷
+        </p>
+      </div>
+    </section>
+  );
+}
+
 /* ---------- Testimonios ---------- */
 export function Testimonios() {
+  if (TESTIMONIOS.length === 0) return null;
+
   return (
     <section
       id="testimonios"

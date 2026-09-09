@@ -1,13 +1,8 @@
 "use client";
 
-import { CONTACTO } from "@/lib/datos";
+import { CONTACTO, TRAYECTORIA_CIFRAS } from "@/lib/datos";
 import { useAgenda } from "./AgendaProvider";
 
-const STATS = [
-  { num: "+10", lbl: "años de experiencia" },
-  { num: "+1.200", lbl: "mujeres acompañadas" },
-  { num: "+300", lbl: "partos acompañados" },
-];
 
 /** Destello decorativo, como los de sus publicaciones. */
 function Destello({
@@ -99,25 +94,28 @@ export default function Hero() {
 
           {/* Mayúsculas + manuscrita, como en sus artes */}
           <h1 className="text-white">
-            <span className="block font-titulo text-[clamp(2.3rem,5.6vw,4rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em]">
-              Mucho más
+            <span className="block font-titulo text-[clamp(2.1rem,5.2vw,3.7rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em]">
+              Tu salud, tu espacio,
             </span>
-            <span className="block font-titulo text-[clamp(2.3rem,5.6vw,4rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em] text-rosa-200">
-              que una consulta
-            </span>
-            <span className="relative mt-2 inline-block font-mano text-[clamp(2.4rem,5.4vw,3.9rem)] font-bold leading-[1] text-white">
-              tu matrona de confianza
+            <span className="relative mt-1 inline-block font-mano text-[clamp(2.5rem,5.8vw,4.2rem)] font-bold leading-[1] text-white">
+              tus decisiones
               <Destello className="absolute -right-5 -top-2 size-5 text-rosa-200" />
             </span>
           </h1>
 
           <p className="mt-6 max-w-[44ch] text-[1.06rem] leading-relaxed text-white/85">
-            Soy {CONTACTO.nombre}, matrona en {CONTACTO.comuna.split(",")[0]}.
-            Embarazo, salud ginecológica, anticoncepción y lactancia — con el
-            tiempo que cada consulta merece y sin juicios.
+            Soy {CONTACTO.nombre}, matrona y creadora de {CONTACTO.marca}. Un
+            espacio de atención cercano, respetuoso y sin juicios, enfocado en
+            la salud integral de la mujer.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.9rem] font-semibold text-rosa-200">
+            <span>📍 Talca</span>
+            <span>📍 Linares</span>
+            <span>💻 Online a todo Chile</span>
+          </p>
+
+          <div className="mt-7 flex flex-wrap gap-3">
             <button
               type="button"
               onClick={() => abrir()}
@@ -142,7 +140,7 @@ export default function Hero() {
           </div>
 
           <dl className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-3 border-t border-white/20 pt-6">
-            {STATS.map((s, i) => (
+            {TRAYECTORIA_CIFRAS.map((s, i) => (
               <div key={s.lbl} className="flex items-center gap-7">
                 <div>
                   <dt className="sr-only">{s.lbl}</dt>
@@ -155,7 +153,7 @@ export default function Hero() {
                     </span>
                   </dd>
                 </div>
-                {i < STATS.length - 1 && (
+                {i < TRAYECTORIA_CIFRAS.length - 1 && (
                   <span aria-hidden className="hidden h-8 w-px bg-white/20 sm:block" />
                 )}
               </div>
