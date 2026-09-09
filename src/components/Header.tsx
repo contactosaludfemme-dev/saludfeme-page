@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CONTACTO, TESTIMONIOS } from "@/lib/datos";
+import { CONTACTO } from "@/lib/datos";
 import { useAgenda } from "./AgendaProvider";
 import LogoSaludFemme from "./LogoSaludFemme";
 
@@ -9,6 +9,7 @@ const ENLACES = [
   { href: "#servicios", texto: "Servicios" },
   { href: "#modalidades", texto: "Modalidades" },
   { href: "#sobre-mi", texto: "Sobre mí" },
+  { href: "#testimonios", texto: "Testimonios" },
   { href: "#preguntas", texto: "Preguntas" },
   { href: "/blog", texto: "Blog" },
   { href: "#contacto", texto: "Contacto" },

@@ -34,6 +34,7 @@ export default function Footer() {
                 ["#servicios", "Servicios"],
                 ["#modalidades", "Modalidades"],
                 ["#sobre-mi", "Sobre mí"],
+                ["#testimonios", "Testimonios"],
                 ["#preguntas", "Preguntas frecuentes"],
                 ["/blog", "Blog"],
                 ["#agendar", "Agendar hora"],

@@ -371,56 +371,61 @@ export function Testimonios() {
       <div className="mx-auto max-w-6xl px-5">
         <div className="mb-8 text-center">
           <span className="mb-2 inline-block font-titulo text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-rosa-200">
-            Lo que dicen
+            Lo que dicen mis pacientes
           </span>
           <h2 className="text-[clamp(1.7rem,3.2vw,2.2rem)] text-white">
             Testimonios
           </h2>
-          <p className="mt-2 text-[0.92rem] text-rosa-100">
-            Publicados con la autorización expresa de cada paciente.
+          <p className="mx-auto mt-2 max-w-lg text-[0.92rem] text-rosa-100">
+            Publicados con autorización y sin identificar a quienes los
+            escribieron.
           </p>
         </div>
       </div>
 
-      {/* Carrusel horizontal: una fila, se desliza con el dedo o la rueda */}
+      {/* Carrusel: se desliza con el dedo o la rueda */}
       <div
-        className="sin-barra flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 lg:justify-center"
+        className="sin-barra flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3"
         role="region"
         aria-label="Testimonios de pacientes"
         tabIndex={0}
       >
-        {TESTIMONIOS.map((t) => (
+        {TESTIMONIOS.map((t, i) => (
           <figure
-            key={t.nombre}
-            className="flex w-[19rem] shrink-0 snap-center flex-col rounded-2xl bg-white/95 p-5 shadow-media backdrop-blur-sm"
+            key={i}
+            className="flex w-[19rem] shrink-0 snap-center flex-col rounded-2xl bg-white/95 p-5 shadow-media backdrop-blur-sm sm:w-[21rem]"
           >
-            <div
-              aria-label={`${t.estrellas} de 5 estrellas`}
-              className="mb-2 text-[0.9rem] text-coral-500"
+            <span
+              aria-hidden
+              className="mb-2 font-mano text-3xl leading-none text-magenta-500"
             >
-              {"★".repeat(t.estrellas)}
-              <span className="text-gris-claro">{"★".repeat(5 - t.estrellas)}</span>
-            </div>
+              &ldquo;
+            </span>
             <blockquote className="mb-4 flex-1 text-[0.92rem] leading-relaxed text-carbon">
-              “{t.texto}”
+              {t.texto}
             </blockquote>
-            <figcaption className="flex items-center gap-3 border-t border-gris-claro pt-3">
-              <span
-                aria-hidden
-                className="grid size-9 shrink-0 place-items-center rounded-full bg-rosa-100 font-titulo text-[0.9rem] font-bold text-magenta-600"
-              >
-                {t.nombre.charAt(0)}
-              </span>
-              <span className="min-w-0">
-                <strong className="block truncate font-titulo text-[0.88rem]">
-                  {t.nombre}
-                </strong>
-                <span className="text-[0.78rem] text-gris">{t.servicio}</span>
-              </span>
-            </figcaption>
+
+            {(t.contexto || t.ciudad) && (
+              <figcaption className="flex flex-wrap gap-2 border-t border-gris-claro pt-3">
+                {t.contexto && (
+                  <span className="rounded-full bg-rosa-50 px-2.5 py-1 text-[0.74rem] font-semibold text-magenta-600">
+                    {t.contexto}
+                  </span>
+                )}
+                {t.ciudad && (
+                  <span className="rounded-full bg-rosa-50 px-2.5 py-1 text-[0.74rem] font-semibold text-coral-500">
+                    {t.ciudad}
+                  </span>
+                )}
+              </figcaption>
+            )}
           </figure>
         ))}
       </div>
+
+      <p className="mx-auto mt-6 max-w-lg px-5 text-center text-[0.86rem] text-rosa-100">
+        {TESTIMONIOS.length} de las más de 200 experiencias que he recibido.
+      </p>
     </section>
   );
 }

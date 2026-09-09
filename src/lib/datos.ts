@@ -358,17 +358,109 @@ export const MEDIOS_PAGO = [
 ];
 
 /**
- * Testimonios de pacientes.
- * PENDIENTE: Francisca menciona +200 testimonios recibidos. Cargar aquí los
- * que autorice publicar, con su consentimiento por escrito.
- * Mientras la lista esté vacía, la sección no se muestra.
+ * Testimonios reales de pacientes, recopilados por Francisca.
+ *
+ * Se publican sin nombre: varios mencionan diagnósticos concretos y
+ * vincularlos a una persona identificable expondría datos de salud.
+ * `contexto` describe el motivo de consulta solo cuando no permite
+ * identificar a nadie.
  */
-export const TESTIMONIOS: {
-  nombre: string;
-  servicio: string;
+export type Testimonio = {
   texto: string;
-  estrellas: number;
-}[] = [];
+  contexto?: string;
+  ciudad?: string;
+};
+
+export const TESTIMONIOS: Testimonio[] = [
+  {
+    texto:
+      "Me dejé estar tres años sin chequeos, normalizando síntomas. Cuando llegué donde Francisca, indagó con mucho respeto y me motivó a llevar mis exámenes al día. Gracias a eso llegamos a un diagnóstico y me dio opciones de tratamiento. En pocos días sentí que volví a ser yo. Hasta mis hijos me dicen que me ven más feliz y descansada.",
+    contexto: "Diagnóstico y tratamiento",
+  },
+  {
+    texto:
+      "Nunca me habían tratado así en consulta. Había tenido muy malas experiencias antes. Es muy cercana, te explica todo con paciencia y los procedimientos los hace con mucho tacto: te va explicando lo que va a pasar, pide permiso, pregunta si algo duele y para si es necesario. Siento como si me estuviera atendiendo una amiga.",
+    contexto: "Control ginecológico",
+  },
+  {
+    texto:
+      "Me explicó todo de forma muy clara y sencilla, incluso con dibujos, y llevó distintos métodos anticonceptivos para mostrarme cómo funcionaba cada uno. Pudimos elegir juntas el que mejor se adaptaba a mi estilo de vida. He podido preguntar cualquier inquietud sin sentir vergüenza.",
+    contexto: "Consejería en anticonceptivos",
+    ciudad: "Linares",
+  },
+  {
+    texto:
+      "No negaré que tenía mucho miedo. Pero desde que uno entra a su consulta, su saludo ya te hace sentir comodidad y tranquilidad. Se da el tiempo de escuchar con mucho respeto y aclara todas las dudas. Su paciencia es admirable. Se preocupa de que uno se vaya sin dudas.",
+    contexto: "Primera consulta",
+  },
+  {
+    texto:
+      "Desde el primer día me hizo sentir en un espacio seguro y muy acogedor. Siempre está atenta a cada duda, tanto en la consulta como después por mensaje, porque siempre se nos queda algo por preguntar. Es súper puntual y busca la forma de acomodar horarios.",
+  },
+  {
+    texto:
+      "Busqué muchos doctores y nunca encontraron una solución. Al llegar a ella fue el término del problema: me confirmó que sí encontraríamos salida y me apoyó siempre en mi frustración. Llevo años atendiéndome con ella, tanto que vi todo mi embarazo a su lado.",
+    contexto: "Infecciones recurrentes y embarazo",
+  },
+  {
+    texto:
+      "En cada consulta demuestra profesionalismo, dedicación y una gran calidad humana. Se toma el tiempo de responder todas mis dudas con claridad y paciencia. Cada atención tiene un ambiente de respeto y contención, lo que genera un espacio verdaderamente seguro.",
+  },
+  {
+    texto:
+      "Llegué a través de una publicación en Instagram y desde el primer momento ha sido una experiencia excelente. Se toma el tiempo de escuchar, explicar cada proceso con claridad y resolver todas mis dudas. Siempre me entrega información actualizada y recomendaciones basadas en evidencia.",
+  },
+  {
+    texto:
+      "Antes de consultar me sentía insegura y con varias dudas, pero desde el primer momento me hizo sentir escuchada, contenida y en total confianza. Su forma tan amorosa y respetuosa de atender marca una diferencia enorme. Se nota su vocación y el cariño con el que hace su trabajo.",
+  },
+  {
+    texto:
+      "Llevo alrededor de tres años atendiéndome con Francisca. Te hace sentir en un espacio completamente seguro, donde puedes expresar todas tus dudas y en ningún momento te hace sentir mal por no saber. Ha sido el lugar más cómodo y de confianza durante estos años.",
+  },
+  {
+    texto:
+      "Antes había tenido malas experiencias, así que llegué con cierta inseguridad. Pero me encontré con una atención cercana, respetuosa y muy profesional. Me sentí realmente escuchada y acompañada. Agradezco poder contar con una atención tan humana y de calidad acá.",
+    ciudad: "Linares",
+  },
+  {
+    texto:
+      "Hacía mucho tiempo no iba a una matrona, y de hecho nunca me había hecho el examen del PAP. Resolvió todas mis dudas con paciencia y profesionalismo. No me sentí cuestionada ni incómoda, lo cual valoro mucho.",
+    contexto: "Control ginecológico y PAP",
+  },
+  {
+    texto:
+      "Ha sido de las mejores atenciones que he tenido. Llegué a ella por Instagram y me encanta la atención: se da el tiempo de responder dudas, explica de forma clara y que uno pueda entender. Siempre está dispuesta y disponible.",
+  },
+  {
+    texto:
+      "Una profesional muy preocupada de su paciente, que responde cada pregunta y duda que tengas en mente, siempre atenta a que esté todo bien. La recomiendo, es muy dedicada en su especialidad.",
+  },
+  {
+    texto:
+      "Es una excelente profesional: cercana, humana, que conecta con sus pacientes. Muy respetuosa, preocupada y delicada, que es fundamental en su trabajo. Llevaba tiempo buscando una atención como la de ella y estoy feliz.",
+  },
+  {
+    texto:
+      "Siempre he tenido malas experiencias con algunas matronas, pero Fran es totalmente diferente. Muy cariñosa y amable; uno realmente se siente en confianza y tranquila, porque responde todas las dudas de una forma muy amable.",
+  },
+  {
+    texto:
+      "Acudí por recomendación de una amiga y la verdad es que es muy buena profesional. Te hace sentir muy cómoda y segura en todo momento. Es muy buena en lo que hace y se nota que tiene mucha vocación.",
+  },
+  {
+    texto:
+      "Es una profesional muy cercana, explica todo claramente y resuelve con paciencia todas las dudas. Totalmente recomendada.",
+  },
+  {
+    texto:
+      "Han sido unas atenciones muy gratas, me he sentido súper cómoda y en confianza. Gracias por todo.",
+  },
+  {
+    texto:
+      "Muy clara en las explicaciones, mucha empatía con las dudas que nos complican.",
+  },
+];
 
 export const FAQS = [
   {
