@@ -8,7 +8,7 @@ export default function CabeceraSimple() {
     <header className="sticky top-0 z-40 border-b border-gris-claro bg-rosa-50/92 backdrop-blur-md">
       <div className="mx-auto flex min-h-[4.5rem] max-w-4xl items-center justify-between gap-4 px-5">
         <Link href="/" className="flex items-center gap-3">
-          <LogoSaludFemme className="h-10 w-auto" />
+          <LogoSaludFemme className="h-10 sm:h-11" />
           <span className="hidden flex-col border-l border-gris-claro pl-3 leading-tight sm:flex">
             <span className="font-titulo text-[0.95rem] font-bold text-carbon">
               {CONTACTO.nombre}

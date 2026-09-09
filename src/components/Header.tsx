@@ -45,7 +45,7 @@ export default function Header() {
     >
       <div className="mx-auto flex min-h-[4.75rem] max-w-6xl items-center justify-between gap-6 px-5">
         <a href="#inicio" className="flex shrink-0 items-center gap-3">
-          <LogoSaludFemme className="h-10 w-auto shrink-0" />
+          <LogoSaludFemme className="h-11 shrink-0 sm:h-12" />
           <span className="hidden flex-col border-l border-gris-claro pl-3 leading-tight xl:flex">
             <span className="whitespace-nowrap font-titulo text-[0.85rem] font-bold text-carbon">
               {CONTACTO.nombre}

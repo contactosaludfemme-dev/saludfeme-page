@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAgenda } from "./AgendaProvider";
 import {
   SERVICIOS, CATEGORIAS, NOTAS_SERVICIOS, MODALIDADES_ATENCION,
@@ -361,6 +361,43 @@ export function Cierre() {
 
 /* ---------- Testimonios ---------- */
 export function Testimonios() {
+  const pista = useRef<HTMLDivElement>(null);
+  const [pagina, setPagina] = useState(0);
+  const [porPagina, setPorPagina] = useState(4);
+
+  // Cuántas tarjetas caben según el ancho
+  useEffect(() => {
+    const calcular = () => {
+      const w = window.innerWidth;
+      setPorPagina(w >= 1024 ? 4 : w >= 768 ? 2 : 1);
+    };
+    calcular();
+    window.addEventListener("resize", calcular);
+    return () => window.removeEventListener("resize", calcular);
+  }, []);
+
+  const paginas = Math.ceil(TESTIMONIOS.length / porPagina);
+
+  // Mantiene la página en rango al cambiar el tamaño
+  useEffect(() => {
+    setPagina((p) => Math.min(p, Math.max(0, paginas - 1)));
+  }, [paginas]);
+
+  function irA(n: number) {
+    const el = pista.current;
+    if (!el) return;
+    const destino = Math.max(0, Math.min(n, paginas - 1));
+    el.scrollTo({ left: destino * el.clientWidth, behavior: "smooth" });
+    setPagina(destino);
+  }
+
+  // Sigue la página cuando se desliza con el dedo
+  function alDeslizar() {
+    const el = pista.current;
+    if (!el) return;
+    setPagina(Math.round(el.scrollLeft / el.clientWidth));
+  }
+
   if (TESTIMONIOS.length === 0) return null;
 
   return (
@@ -381,51 +418,114 @@ export function Testimonios() {
             escribieron.
           </p>
         </div>
-      </div>
 
-      {/* Carrusel: se desliza con el dedo o la rueda */}
-      <div
-        className="sin-barra flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3"
-        role="region"
-        aria-label="Testimonios de pacientes"
-        tabIndex={0}
-      >
-        {TESTIMONIOS.map((t, i) => (
-          <figure
-            key={i}
-            className="flex w-[19rem] shrink-0 snap-center flex-col rounded-2xl bg-white/95 p-5 shadow-media backdrop-blur-sm sm:w-[21rem]"
-          >
-            <span
-              aria-hidden
-              className="mb-2 font-mano text-3xl leading-none text-magenta-500"
+        {/* Pista paginada: cada bloque ocupa el ancho completo */}
+        <div
+          ref={pista}
+          onScroll={alDeslizar}
+          className="sin-barra flex snap-x snap-mandatory overflow-x-auto"
+          role="region"
+          aria-label="Testimonios de pacientes"
+          tabIndex={0}
+        >
+          {Array.from({ length: paginas }, (_, i) => (
+            <div
+              key={i}
+              className="grid w-full shrink-0 snap-start auto-rows-fr grid-cols-1 gap-4 px-0.5 md:grid-cols-2 lg:grid-cols-4"
             >
-              &ldquo;
-            </span>
-            <blockquote className="mb-4 flex-1 text-[0.92rem] leading-relaxed text-carbon">
-              {t.texto}
-            </blockquote>
+              {TESTIMONIOS.slice(i * porPagina, (i + 1) * porPagina).map((t, j) => (
+                <figure
+                  key={j}
+                  className="flex h-full flex-col rounded-2xl bg-white/95 p-5 shadow-media backdrop-blur-sm"
+                >
+                  <span
+                    aria-hidden
+                    className="mb-1 font-mano text-3xl leading-none text-magenta-500"
+                  >
+                    &ldquo;
+                  </span>
+                  <blockquote className="flex-1 text-[0.88rem] leading-relaxed text-carbon">
+                    {t.texto}
+                  </blockquote>
 
-            {(t.contexto || t.ciudad) && (
-              <figcaption className="flex flex-wrap gap-2 border-t border-gris-claro pt-3">
-                {t.contexto && (
-                  <span className="rounded-full bg-rosa-50 px-2.5 py-1 text-[0.74rem] font-semibold text-magenta-600">
-                    {t.contexto}
-                  </span>
-                )}
-                {t.ciudad && (
-                  <span className="rounded-full bg-rosa-50 px-2.5 py-1 text-[0.74rem] font-semibold text-coral-500">
-                    {t.ciudad}
-                  </span>
-                )}
-              </figcaption>
-            )}
-          </figure>
-        ))}
+                  {(t.contexto || t.ciudad) && (
+                    <figcaption className="mt-4 flex flex-wrap gap-1.5 border-t border-gris-claro pt-3">
+                      {t.contexto && (
+                        <span className="rounded-full bg-rosa-50 px-2.5 py-1 text-[0.72rem] font-semibold text-magenta-600">
+                          {t.contexto}
+                        </span>
+                      )}
+                      {t.ciudad && (
+                        <span className="rounded-full bg-rosa-50 px-2.5 py-1 text-[0.72rem] font-semibold text-coral-500">
+                          {t.ciudad}
+                        </span>
+                      )}
+                    </figcaption>
+                  )}
+                </figure>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* Controles */}
+        <div className="mt-6 flex items-center justify-center gap-4">
+          <button
+            type="button"
+            onClick={() => irA(pagina - 1)}
+            disabled={pagina === 0}
+            aria-label="Testimonios anteriores"
+            className="grid size-11 place-items-center rounded-full border-2 border-white/40 text-white transition-colors hover:enabled:bg-white/15 disabled:opacity-30"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden>
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+
+          {/* Con muchas páginas los puntos se vuelven ilegibles: se muestra
+              el contador y solo una ventana de puntos alrededor de la actual. */}
+          {paginas <= 8 ? (
+            <div className="flex gap-2" role="tablist" aria-label="Páginas de testimonios">
+              {Array.from({ length: paginas }, (_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  role="tab"
+                  aria-selected={pagina === i}
+                  aria-label={`Página ${i + 1} de ${paginas}`}
+                  onClick={() => irA(i)}
+                  className={`h-2 rounded-full transition-all ${
+                    pagina === i ? "w-6 bg-white" : "w-2 bg-white/40 hover:bg-white/70"
+                  }`}
+                />
+              ))}
+            </div>
+          ) : (
+            <p
+              aria-live="polite"
+              className="min-w-[4.5rem] text-center font-titulo text-[0.9rem] font-semibold tabular-nums text-white"
+            >
+              {pagina + 1} / {paginas}
+            </p>
+          )}
+
+          <button
+            type="button"
+            onClick={() => irA(pagina + 1)}
+            disabled={pagina >= paginas - 1}
+            aria-label="Testimonios siguientes"
+            className="grid size-11 place-items-center rounded-full border-2 border-white/40 text-white transition-colors hover:enabled:bg-white/15 disabled:opacity-30"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden>
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+
+        <p className="mt-5 text-center text-[0.85rem] text-rosa-100">
+          {TESTIMONIOS.length} de las más de 200 experiencias que he recibido.
+        </p>
       </div>
-
-      <p className="mx-auto mt-6 max-w-lg px-5 text-center text-[0.86rem] text-rosa-100">
-        {TESTIMONIOS.length} de las más de 200 experiencias que he recibido.
-      </p>
     </section>
   );
 }

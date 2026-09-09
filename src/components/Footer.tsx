@@ -10,7 +10,7 @@ export default function Footer() {
         <div className="grid gap-6 md:grid-cols-[1.4fr_1fr_1fr] md:gap-10">
           <div>
             <div className="mb-4 flex items-center gap-3">
-              <LogoSaludFemme claro className="h-12 w-auto" />
+              <LogoSaludFemme claro className="h-12" />
               <span className="min-w-0 border-l border-white/20 pl-3">
                 <strong className="block font-titulo text-[0.95rem] text-white md:text-base">
                   {CONTACTO.nombre}
