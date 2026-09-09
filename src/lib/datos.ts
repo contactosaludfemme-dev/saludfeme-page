@@ -13,7 +13,7 @@ export const CONTACTO = {
   registro: "Reg. Superintendencia de Salud N° 632549",
   telefono: "+56988213371",
   telefonoDisplay: "+56 9 8821 3371",
-  email: "contacto@saludfemme.cl", // PENDIENTE: confirmar correo real
+  email: "contacto.saludfemme@gmail.com",
   instagram: "saludfemme.matrona",
   lema: "Tu salud, tu espacio, tus decisiones.",
 } as const;

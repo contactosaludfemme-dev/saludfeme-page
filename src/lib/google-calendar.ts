@@ -18,6 +18,8 @@
 
 import { bloquesDelDia, ZONA, type Bloque } from "./calendario";
 import { tomadasDelDia } from "./reservas";
+// Usados por el código de producción de más abajo:
+// import { calcularBloques, aIntervalos, esBloqueDisponible } from "./disponibilidad";
 
 export const MODO_DEMO = true;
 
@@ -47,21 +49,26 @@ export async function obtenerDisponibilidad(
     );
   }
 
-  /* PRODUCCIÓN:
+  /* PRODUCCIÓN — la disponibilidad sale de su propio calendario:
+
   const calendar = await clienteCalendario();
-  const { data } = await calendar.freebusy.query({
-    requestBody: {
-      timeMin: `${fecha}T00:00:00-04:00`,
-      timeMax: `${fecha}T23:59:59-04:00`,
-      timeZone: ZONA,
-      items: [{ id: process.env.GOOGLE_CALENDAR_ID! }],
-    },
+  const { data } = await calendar.events.list({
+    calendarId: process.env.GOOGLE_CALENDAR_ID!,
+    timeMin: `${fecha}T00:00:00-04:00`,
+    timeMax: `${fecha}T23:59:59-04:00`,
+    singleEvents: true,        // expande los eventos que se repiten
+    orderBy: "startTime",
+    timeZone: ZONA,
   });
-  const ocupados = data.calendars?.[process.env.GOOGLE_CALENDAR_ID!]?.busy ?? [];
-  return bloquesDelDia(fecha, duracionMin).map((b) => ({
-    ...b,
-    libre: b.libre && !chocaCon(b.hora, duracionMin, fecha, ocupados),
-  }));
+
+  const eventos = data.items ?? [];
+
+  // Los que ella tituló "DISPONIBLE" abren horas; el resto las bloquea
+  const abiertos = aIntervalos(eventos.filter((e) => esBloqueDisponible(e.summary)));
+  const ocupados = aIntervalos(eventos.filter((e) => !esBloqueDisponible(e.summary)));
+
+  const anticipacion = new Date(Date.now() + 12 * 3600_000);
+  return calcularBloques(abiertos, ocupados, duracionMin, 30, anticipacion);
   */
   throw new Error("Google Calendar no configurado");
 }

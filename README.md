@@ -44,6 +44,22 @@ frecuentes. Cambiar un precio o agregar un servicio es editar ese archivo.
 Hay tres integraciones simuladas. Cada una tiene un flag `MODO_DEMO` y el
 código de producción comentado justo debajo.
 
+### Cómo se administra la agenda
+
+**No hay panel de administración, y es a propósito.** Francisca abre sus horas
+creando eventos titulados `DISPONIBLE` en su propio Google Calendar
+(`contacto.saludfemme@gmail.com`). El sitio lee ese calendario, parte los
+bloques según la duración del servicio y ofrece las horas resultantes. Todo lo
+demás en su calendario cuenta como ocupado.
+
+La lógica vive en `src/lib/disponibilidad.ts`. La guía para ella está en
+[COMO-ABRIR-HORAS.md](COMO-ABRIR-HORAS.md).
+
+Si más adelante prefiere un panel propio, habría que agregar autenticación,
+una base de datos para los bloques y una interfaz de edición — más código y
+otra herramienta que mantener, cuando la app de calendario que ya usa hace lo
+mismo.
+
 ### 1. Google Calendar (`src/lib/google-calendar.ts`)
 
 Hoy la disponibilidad se genera con reglas locales. Para conectar el

@@ -1,10 +1,34 @@
 /**
  * Capa de disponibilidad.
  *
- * DEMO: la disponibilidad se genera con reglas locales determinísticas.
- * PRODUCCIÓN: reemplazar `obtenerDisponibilidad` por una llamada a
- * Google Calendar API (freebusy.query) — ver src/lib/google-calendar.ts.
+ * CÓMO FUNCIONA EN PRODUCCIÓN
+ * Francisca no necesita un panel de administración: su propio Google
+ * Calendar cumple ese rol. Para abrir horas, crea en su calendario un
+ * evento cuyo título empiece con "DISPONIBLE" (ver PREFIJO_DISPONIBLE).
+ *
+ *   Ejemplo — abre el martes de 15:00 a 19:00:
+ *     Título: DISPONIBLE
+ *     Martes 15:00 – 19:00
+ *
+ * El sitio parte ese bloque en horas según la duración del servicio y las
+ * ofrece. Todo lo demás de su calendario (reuniones, citas ya tomadas, lo
+ * personal) queda automáticamente fuera.
+ *
+ * Ventajas de este modelo:
+ *  - Usa la app que ya tiene en el celular, sin aprender nada nuevo
+ *  - Puede repetir un bloque semanalmente con la recurrencia de Google
+ *  - Si le sale un imprevisto, borra el bloque y desaparece del sitio
+ *  - No hay contraseñas ni panel que mantener
+ *
+ * DEMO: mientras MODO_DEMO esté activo en google-calendar.ts, la
+ * disponibilidad se genera con las reglas de respaldo de este archivo.
  */
+
+/**
+ * Prefijo que Francisca escribe en el título del evento para abrir horas.
+ * No distingue mayúsculas ni tildes.
+ */
+export const PREFIJO_DISPONIBLE = "DISPONIBLE";
 
 export const ZONA = "America/Santiago";
 
