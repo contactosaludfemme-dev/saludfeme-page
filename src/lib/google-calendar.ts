@@ -1,27 +1,42 @@
 /**
- * Integración con Google Calendar API — capa de producción.
+ * Integración con Google Calendar.
  *
- * ESTADO: modo DEMO. Las funciones simulan la respuesta de Google.
- * Para activarlo de verdad:
+ * CÓMO SE ADMINISTRA LA AGENDA
+ * Francisca abre horas creando eventos titulados "DISPONIBLE" en el
+ * calendario de contacto.saludfemme@gmail.com. Este módulo los lee, los
+ * parte según la duración del servicio y descuenta lo que ya esté ocupado.
  *
- *   1. npm install googleapis
- *   2. Google Cloud Console → crear proyecto → habilitar Google Calendar API
- *   3. Crear credenciales OAuth 2.0 (tipo "Aplicación web")
- *      → URI de redirección: https://TU-DOMINIO/api/google/callback
- *   4. Completar .env.local (ver .env.example)
- *   5. Visitar /api/google/auth una vez con la cuenta de la matrona para
- *      obtener el refresh_token y guardarlo en GOOGLE_REFRESH_TOKEN
- *   6. Cambiar MODO_DEMO a false
+ * MODO DEMO vs. REAL
+ * Si faltan las credenciales (GOOGLE_REFRESH_TOKEN y compañía), el sitio
+ * sigue funcionando con disponibilidad simulada. En cuanto se configuran,
+ * pasa a usar el calendario real sin tocar el código.
  *
- * El refresh_token es de larga duración: se autoriza una sola vez.
+ * Para conectarlo:
+ *   1. Google Cloud Console → nuevo proyecto → habilitar Google Calendar API
+ *   2. Credenciales OAuth 2.0 (aplicación web), con esta URI de redirección:
+ *        https://TU-DOMINIO/api/google/callback
+ *   3. Cargar en Vercel: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
+ *      GOOGLE_REDIRECT_URI y GOOGLE_CALENDAR_ID
+ *   4. Visitar /api/google/auth con la sesión de Salud Femme abierta
+ *   5. Guardar el GOOGLE_REFRESH_TOKEN que entrega y redesplegar
  */
 
 import { bloquesDelDia, ZONA, type Bloque } from "./calendario";
 import { tomadasDelDia } from "./reservas";
-// Usados por el código de producción de más abajo:
-// import { calcularBloques, aIntervalos, esBloqueDisponible } from "./disponibilidad";
+import { estaAutorizado, clienteCalendario } from "./google-auth";
+import {
+  calcularBloques,
+  aIntervalos,
+  esBloqueDisponible,
+} from "./disponibilidad";
 
-export const MODO_DEMO = true;
+/** Anticipación mínima para reservar, en horas. */
+const ANTICIPACION_HORAS = 12;
+
+/** ¿Está funcionando contra el calendario real? */
+export function usaCalendarioReal(): boolean {
+  return estaAutorizado();
+}
 
 type Cita = {
   servicio: string;
@@ -32,74 +47,83 @@ type Cita = {
   modalidad: string;
 };
 
+/** Suma minutos a "YYYY-MM-DDTHH:mm:00" respetando la hora local. */
+function sumarMinutos(fecha: string, hora: string, minutos: number): string {
+  const [y, m, d] = fecha.split("-").map(Number);
+  const [hh, mm] = hora.split(":").map(Number);
+  const t = new Date(y, m - 1, d, hh, mm);
+  t.setMinutes(t.getMinutes() + minutos);
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${t.getFullYear()}-${p(t.getMonth() + 1)}-${p(t.getDate())}T${p(
+    t.getHours()
+  )}:${p(t.getMinutes())}:00`;
+}
+
 /**
- * Consulta los bloques libres de un día.
- * PRODUCCIÓN: usa calendar.freebusy.query sobre el calendario de la matrona
- * y resta los intervalos ocupados del horario de atención.
+ * Horas ofrecibles de un día.
+ * Con el calendario conectado salen de sus bloques "DISPONIBLE"; sin él,
+ * de las reglas de respaldo.
  */
 export async function obtenerDisponibilidad(
   fecha: string,
   duracionMin: number
 ): Promise<Bloque[]> {
-  if (MODO_DEMO) {
-    // Descuenta las reservas ya hechas durante esta sesión de demo
+  if (!usaCalendarioReal()) {
+    // Respaldo: horario genérico menos lo reservado en esta sesión
     const tomadas = tomadasDelDia(fecha);
     return bloquesDelDia(fecha, duracionMin).map((b) =>
       tomadas.has(b.hora) ? { ...b, libre: false } : b
     );
   }
 
-  /* PRODUCCIÓN — la disponibilidad sale de su propio calendario:
-
-  const calendar = await clienteCalendario();
+  const calendar = clienteCalendario();
   const { data } = await calendar.events.list({
-    calendarId: process.env.GOOGLE_CALENDAR_ID!,
+    calendarId: process.env.GOOGLE_CALENDAR_ID || "primary",
     timeMin: `${fecha}T00:00:00-04:00`,
     timeMax: `${fecha}T23:59:59-04:00`,
-    singleEvents: true,        // expande los eventos que se repiten
+    singleEvents: true, // expande los eventos que se repiten
     orderBy: "startTime",
     timeZone: ZONA,
   });
 
   const eventos = data.items ?? [];
+  const abiertos = aIntervalos(
+    eventos.filter((e) => esBloqueDisponible(e.summary))
+  );
+  const ocupados = aIntervalos(
+    eventos.filter((e) => !esBloqueDisponible(e.summary))
+  );
 
-  // Los que ella tituló "DISPONIBLE" abren horas; el resto las bloquea
-  const abiertos = aIntervalos(eventos.filter((e) => esBloqueDisponible(e.summary)));
-  const ocupados = aIntervalos(eventos.filter((e) => !esBloqueDisponible(e.summary)));
-
-  const anticipacion = new Date(Date.now() + 12 * 3600_000);
-  return calcularBloques(abiertos, ocupados, duracionMin, 30, anticipacion);
-  */
-  throw new Error("Google Calendar no configurado");
+  const desde = new Date(Date.now() + ANTICIPACION_HORAS * 3600_000);
+  return calcularBloques(abiertos, ocupados, duracionMin, 30, desde);
 }
 
 /**
- * Crea el evento en el calendario e invita a la paciente.
- * Devuelve el ID del evento y el enlace de Google Meet si es online.
+ * Crea el evento de la cita en el calendario e invita a la paciente.
+ * En modo demo devuelve datos simulados.
  */
 export async function crearEvento(
   cita: Cita
 ): Promise<{ eventoId: string; meetUrl?: string; htmlLink?: string }> {
-  if (MODO_DEMO) {
+  if (!usaCalendarioReal()) {
     const id = `demo_${cita.fecha.replace(/-/g, "")}_${cita.hora.replace(":", "")}`;
     return {
       eventoId: id,
-      meetUrl:
-        cita.modalidad === "online"
-          ? `https://meet.google.com/demo-${id.slice(-6)}`
-          : undefined,
+      meetUrl: cita.modalidad.toLowerCase().includes("online")
+        ? `https://meet.google.com/demo-${id.slice(-6)}`
+        : undefined,
       htmlLink: `https://calendar.google.com/calendar/event?eid=${id}`,
     };
   }
 
-  /* PRODUCCIÓN:
-  const calendar = await clienteCalendario();
+  const calendar = clienteCalendario();
+  const esOnline = cita.modalidad.toLowerCase().includes("online");
   const inicio = `${cita.fecha}T${cita.hora}:00`;
-  const fin = sumarMinutos(inicio, cita.duracionMin);
+  const fin = sumarMinutos(cita.fecha, cita.hora, cita.duracionMin);
 
   const { data } = await calendar.events.insert({
-    calendarId: process.env.GOOGLE_CALENDAR_ID!,
-    conferenceDataVersion: cita.modalidad === "online" ? 1 : 0,
+    calendarId: process.env.GOOGLE_CALENDAR_ID || "primary",
+    conferenceDataVersion: esOnline ? 1 : 0,
     sendUpdates: "all", // Google envía la invitación a la paciente
     requestBody: {
       summary: `${cita.servicio} — ${cita.paciente.nombre}`,
@@ -108,21 +132,24 @@ export async function crearEvento(
         `Teléfono: ${cita.paciente.telefono}\n` +
         `Email: ${cita.paciente.email}\n` +
         `Modalidad: ${cita.modalidad}\n\n` +
-        `Motivo/notas: ${cita.paciente.notas || "—"}`,
+        `Motivo de consulta: ${cita.paciente.notas || "—"}\n\n` +
+        `Reservado desde el sitio web.`,
       start: { dateTime: inicio, timeZone: ZONA },
-      end:   { dateTime: fin,    timeZone: ZONA },
-      attendees: [{ email: cita.paciente.email, displayName: cita.paciente.nombre }],
+      end: { dateTime: fin, timeZone: ZONA },
+      attendees: [
+        { email: cita.paciente.email, displayName: cita.paciente.nombre },
+      ],
       reminders: {
         useDefault: false,
         overrides: [
-          { method: "email", minutes: 24 * 60 }, // recordatorio 24h antes
+          { method: "email", minutes: 24 * 60 }, // recordatorio 24 h antes
           { method: "popup", minutes: 60 },
         ],
       },
-      ...(cita.modalidad === "online" && {
+      ...(esOnline && {
         conferenceData: {
           createRequest: {
-            requestId: `${Date.now()}`,
+            requestId: `sf-${Date.now()}`,
             conferenceSolutionKey: { type: "hangoutsMeet" },
           },
         },
@@ -135,28 +162,6 @@ export async function crearEvento(
     meetUrl: data.hangoutLink ?? undefined,
     htmlLink: data.htmlLink ?? undefined,
   };
-  */
-  throw new Error("Google Calendar no configurado");
 }
-
-/* PRODUCCIÓN — cliente autenticado:
-import { google } from "googleapis";
-
-async function clienteCalendario() {
-  const auth = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
-  );
-  auth.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
-  return google.calendar({ version: "v3", auth });
-}
-
-function sumarMinutos(iso: string, min: number): string {
-  const d = new Date(iso);
-  d.setMinutes(d.getMinutes() + min);
-  return d.toISOString().slice(0, 19);
-}
-*/
 
 export type { Cita };

@@ -1,20 +1,22 @@
 /**
  * Envío de correos transaccionales.
  *
- * ESTADO: modo DEMO — los correos se registran en consola y se devuelven
- * al cliente para mostrarlos en pantalla.
+ * Se activa solo si hay credenciales de Resend. Sin ellas, los correos se
+ * registran en consola y se muestran en pantalla al confirmar la reserva.
  *
- * Para activar en producción:
+ * Para activarlo:
  *   1. npm install resend
  *   2. Crear cuenta en resend.com y verificar el dominio
- *   3. Completar RESEND_API_KEY y EMAIL_DESDE en .env.local
- *   4. Cambiar MODO_DEMO a false
+ *   3. Cargar RESEND_API_KEY y EMAIL_DESDE en las variables de entorno
  */
 
 import { CONTACTO, SEDES, precioCLP } from "./datos";
 import { fechaLarga } from "./calendario";
 
-export const MODO_DEMO = true;
+/** Envía de verdad solo si hay credenciales de Resend configuradas. */
+export function envioActivo(): boolean {
+  return Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_DESDE);
+}
 
 export type DatosCorreo = {
   paciente: { nombre: string; email: string; telefono: string; notas?: string };
@@ -136,20 +138,33 @@ export async function enviarCorreos(d: DatosCorreo) {
   const paciente = correoPaciente(d);
   const matrona = correoMatrona(d);
 
-  if (MODO_DEMO) {
-    console.log("[DEMO] Correo a paciente →", paciente.para, "|", paciente.asunto);
-    console.log("[DEMO] Correo a matrona  →", matrona.para, "|", matrona.asunto);
+  if (!envioActivo()) {
+    console.log("[SIN ENVÍO] Correo a paciente →", paciente.para, "|", paciente.asunto);
+    console.log("[SIN ENVÍO] Correo a matrona  →", matrona.para, "|", matrona.asunto);
     return { enviados: false, paciente, matrona };
   }
 
-  /* PRODUCCIÓN:
-  const { Resend } = await import("resend");
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  await Promise.all([
-    resend.emails.send({ from: process.env.EMAIL_DESDE!, to: paciente.para, subject: paciente.asunto, html: paciente.html }),
-    resend.emails.send({ from: process.env.EMAIL_DESDE!, to: matrona.para,  subject: matrona.asunto,  html: matrona.html  }),
-  ]);
-  return { enviados: true, paciente, matrona };
-  */
-  throw new Error("Resend no configurado");
+  try {
+    const { Resend } = await import("resend");
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    await Promise.all([
+      resend.emails.send({
+        from: process.env.EMAIL_DESDE!,
+        to: paciente.para,
+        subject: paciente.asunto,
+        html: paciente.html,
+      }),
+      resend.emails.send({
+        from: process.env.EMAIL_DESDE!,
+        to: matrona.para,
+        subject: matrona.asunto,
+        html: matrona.html,
+      }),
+    ]);
+    return { enviados: true, paciente, matrona };
+  } catch (e) {
+    // Un fallo de correo no debe tumbar la reserva: ya quedó agendada
+    console.error("[CORREO] No se pudo enviar:", e);
+    return { enviados: false, paciente, matrona };
+  }
 }

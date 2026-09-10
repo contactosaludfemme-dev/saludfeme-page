@@ -60,7 +60,26 @@ una base de datos para los bloques y una interfaz de edición — más código y
 otra herramienta que mantener, cuando la app de calendario que ya usa hace lo
 mismo.
 
-### 1. Google Calendar (`src/lib/google-calendar.ts`)
+### 1. Google Calendar
+
+El flujo OAuth está implementado. Los pasos para activarlo están en
+[CONECTAR-CALENDARIO.md](CONECTAR-CALENDARIO.md).
+
+Rutas involucradas:
+
+| Ruta | Para qué |
+|---|---|
+| `/api/google/auth` | Inicia la autorización (se visita una vez) |
+| `/api/google/callback` | Recibe la respuesta de Google y entrega el token |
+| `/api/google/estado` | Muestra qué integraciones están activas |
+
+Sin credenciales el sitio funciona con disponibilidad simulada; en cuanto se
+configuran, pasa al calendario real sin tocar código.
+
+<details>
+<summary>Detalle de la implementación</summary>
+
+
 
 Hoy la disponibilidad se genera con reglas locales. Para conectar el
 calendario real:
@@ -81,6 +100,8 @@ npm install googleapis
 Al activarlo: la disponibilidad sale de su calendario real vía `freebusy.query`,
 el evento se crea automáticamente, la paciente recibe la invitación, y para
 consultas online se genera un enlace de Google Meet.
+
+</details>
 
 ### 2. Correos (`src/lib/correo.ts`)
 
