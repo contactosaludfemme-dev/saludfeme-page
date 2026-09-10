@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Calendario from "./Calendario";
 import {
   SERVICIOS, SEDES, precioCLP, duracionDe, precioDe,
@@ -68,23 +68,52 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
 
   /* Días con cupo del mes visible — se calcula en cliente para evitar
      un ida y vuelta por cada día. La hora exacta se revalida en el servidor. */
-  const diasConCupo = useMemo(() => {
-    const set = new Set<string>();
-    if (!servicio) return set;
+  /* Días con cupo del mes visible. Se consultan al servidor porque la
+     disponibilidad real vive en el calendario de Francisca, no en reglas
+     que el navegador pueda calcular. */
+  const [diasConCupo, setDiasConCupo] = useState<Set<string>>(new Set());
+  const [cargandoMes, setCargandoMes] = useState(false);
 
-    const año = mes.getFullYear();
-    const m = mes.getMonth();
-    const total = new Date(año, m + 1, 0).getDate();
-    const limite = new Date();
-    limite.setDate(limite.getDate() + VENTANA_DIAS);
-
-    for (let d = 1; d <= total; d++) {
-      const fecha = new Date(año, m, d);
-      if (fecha > limite) break;
-      const clave = claveFecha(fecha);
-      if (tieneCupo(clave, duracionDe(servicio, modalidad))) set.add(clave);
+  useEffect(() => {
+    if (!servicio) {
+      setDiasConCupo(new Set());
+      return;
     }
-    return set;
+    let vigente = true;
+    setCargandoMes(true);
+
+    const clave = `${mes.getFullYear()}-${String(mes.getMonth() + 1).padStart(2, "0")}`;
+    fetch(
+      `/api/dias-disponibles?mes=${clave}&servicio=${servicio.id}&modalidad=${modalidad}`
+    )
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d) => {
+        if (vigente) setDiasConCupo(new Set(d.dias ?? []));
+      })
+      .catch(() => {
+        // Respaldo local: mejor mostrar algo que un mes en blanco
+        if (!vigente) return;
+        const set = new Set<string>();
+        const año = mes.getFullYear();
+        const m = mes.getMonth();
+        const total = new Date(año, m + 1, 0).getDate();
+        const limite = new Date();
+        limite.setDate(limite.getDate() + VENTANA_DIAS);
+        for (let d = 1; d <= total; d++) {
+          const fecha = new Date(año, m, d);
+          if (fecha > limite) break;
+          const c = claveFecha(fecha);
+          if (tieneCupo(c, duracionDe(servicio, modalidad))) set.add(c);
+        }
+        setDiasConCupo(set);
+      })
+      .finally(() => {
+        if (vigente) setCargandoMes(false);
+      });
+
+    return () => {
+      vigente = false;
+    };
   }, [mes, servicio, modalidad]);
 
   /* Carga los bloques del día elegido desde la API */
@@ -331,6 +360,13 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                       ))}
                     </div>
                   </fieldset>
+                )}
+
+                {!cargandoMes && diasConCupo.size === 0 && (
+                  <p className="mb-4 rounded-xl bg-rosa-50 p-4 text-center text-[0.88rem] leading-relaxed text-gris">
+                    No hay horas abiertas para este mes. Prueba el mes
+                    siguiente o escríbeme por WhatsApp y lo coordinamos.
+                  </p>
                 )}
 
                 <Calendario
