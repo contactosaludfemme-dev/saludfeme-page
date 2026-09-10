@@ -6,7 +6,26 @@
  * Todo lo demás en su calendario cuenta como ocupado.
  */
 
-import { PREFIJO_DISPONIBLE, type Bloque } from "./calendario";
+import { PREFIJO_DISPONIBLE, ZONA, type Bloque } from "./calendario";
+
+/**
+ * Hora y minutos de un instante, en horario de Chile.
+ *
+ * El servidor de Vercel corre en UTC, así que `getHours()` devolvería la
+ * hora equivocada: un bloque de las 13:00 en Talca se leería como 16:00.
+ * Hay que resolverlo con la zona horaria explícita.
+ */
+function horaEnChile(d: Date): { h: number; m: number } {
+  const partes = new Intl.DateTimeFormat("en-US", {
+    timeZone: ZONA,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(d);
+  const h = Number(partes.find((p) => p.type === "hour")?.value ?? 0);
+  const m = Number(partes.find((p) => p.type === "minute")?.value ?? 0);
+  return { h: h === 24 ? 0 : h, m };
+}
 
 export type Intervalo = { inicio: Date; fin: Date };
 
@@ -54,9 +73,8 @@ export function calcularBloques(
       // La atención completa debe caber dentro del bloque abierto
       if (fin > abierto.fin) break;
 
-      const hora = `${String(cursor.getHours()).padStart(2, "0")}:${String(
-        cursor.getMinutes()
-      ).padStart(2, "0")}`;
+      const { h, m } = horaEnChile(cursor);
+      const hora = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 
       if (!vistos.has(hora)) {
         vistos.add(hora);

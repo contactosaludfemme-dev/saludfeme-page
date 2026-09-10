@@ -32,6 +32,23 @@ export const PREFIJO_DISPONIBLE = "DISPONIBLE";
 
 export const ZONA = "America/Santiago";
 
+/**
+ * Offset horario de Chile en una fecha dada, como "-03:00" o "-04:00".
+ * No es fijo: cambia con el horario de verano, así que no se puede
+ * escribir a mano en las consultas al calendario.
+ */
+export function offsetChile(fecha: string): string {
+  const d = new Date(`${fecha}T12:00:00Z`);
+  const nombre = new Intl.DateTimeFormat("en-US", {
+    timeZone: ZONA,
+    timeZoneName: "longOffset",
+  })
+    .formatToParts(d)
+    .find((p) => p.type === "timeZoneName")?.value; // "GMT-03:00"
+  const m = nombre?.match(/GMT([+-]\d{2}:\d{2})/);
+  return m ? m[1] : "-04:00";
+}
+
 /** Horario de atención por día de la semana (0 = domingo). */
 const HORARIO: Record<number, { desde: number; hasta: number } | null> = {
   0: null,                          // domingo cerrado
@@ -67,12 +84,26 @@ const FERIADOS = new Set([
   "2027-12-08", "2027-12-25",
 ]);
 
-/** Devuelve "YYYY-MM-DD" de una fecha, en hora local. */
+/** Devuelve "YYYY-MM-DD" de una fecha, en hora local del navegador. */
 export function claveFecha(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${dd}`;
+}
+
+/**
+ * "YYYY-MM-DD" del día en Chile.
+ * En el servidor (UTC) `claveFecha` daría el día equivocado para eventos
+ * de la tarde: las 21:00 en Talca ya son del día siguiente en UTC.
+ */
+export function claveFechaChile(d: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: ZONA,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
 }
 
 /** Parsea "YYYY-MM-DD" a Date local (evita el desfase UTC de new Date(str)). */

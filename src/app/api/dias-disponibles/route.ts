@@ -3,7 +3,7 @@ import { SERVICIOS, duracionDe } from "@/lib/datos";
 import { usaCalendarioReal } from "@/lib/google-calendar";
 import { clienteCalendario } from "@/lib/google-auth";
 import { esBloqueDisponible, aIntervalos, calcularBloques } from "@/lib/disponibilidad";
-import { claveFecha, tieneCupo, ZONA, VENTANA_DIAS } from "@/lib/calendario";
+import { claveFecha, claveFechaChile, tieneCupo, ZONA, offsetChile, VENTANA_DIAS } from "@/lib/calendario";
 
 export const dynamic = "force-dynamic";
 
@@ -53,8 +53,8 @@ export async function GET(req: Request) {
     const calendar = clienteCalendario();
     const { data } = await calendar.events.list({
       calendarId: process.env.GOOGLE_CALENDAR_ID || "primary",
-      timeMin: `${mes}-01T00:00:00-04:00`,
-      timeMax: `${mes}-${String(ultimoDia).padStart(2, "0")}T23:59:59-04:00`,
+      timeMin: `${mes}-01T00:00:00${offsetChile(`${mes}-01`)}`,
+      timeMax: `${mes}-${String(ultimoDia).padStart(2, "0")}T23:59:59${offsetChile(`${mes}-01`)}`,
       singleEvents: true,
       orderBy: "startTime",
       timeZone: ZONA,
@@ -69,7 +69,7 @@ export async function GET(req: Request) {
     for (const ev of eventos) {
       const inicio = ev.start?.dateTime;
       if (!inicio) continue;
-      const clave = claveFecha(new Date(inicio));
+      const clave = claveFechaChile(new Date(inicio));
       if (!porDia.has(clave)) porDia.set(clave, { abiertos: [], ocupados: [] });
       const grupo = porDia.get(clave)!;
       if (esBloqueDisponible(ev.summary)) grupo.abiertos.push(ev);

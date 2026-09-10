@@ -21,7 +21,7 @@
  *   5. Guardar el GOOGLE_REFRESH_TOKEN que entrega y redesplegar
  */
 
-import { bloquesDelDia, ZONA, type Bloque } from "./calendario";
+import { bloquesDelDia, ZONA, offsetChile, type Bloque } from "./calendario";
 import { tomadasDelDia } from "./reservas";
 import { estaAutorizado, clienteCalendario } from "./google-auth";
 import {
@@ -79,8 +79,8 @@ export async function obtenerDisponibilidad(
   const calendar = clienteCalendario();
   const { data } = await calendar.events.list({
     calendarId: process.env.GOOGLE_CALENDAR_ID || "primary",
-    timeMin: `${fecha}T00:00:00-04:00`,
-    timeMax: `${fecha}T23:59:59-04:00`,
+    timeMin: `${fecha}T00:00:00${offsetChile(fecha)}`,
+    timeMax: `${fecha}T23:59:59${offsetChile(fecha)}`,
     singleEvents: true, // expande los eventos que se repiten
     orderBy: "startTime",
     timeZone: ZONA,
