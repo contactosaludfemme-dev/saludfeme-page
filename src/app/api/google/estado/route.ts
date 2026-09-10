@@ -12,7 +12,29 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const calendarioListo = estaAutorizado();
 
+  // Diagnóstico: qué variables llegan al proceso, sin revelar sus valores
+  const variables = Object.fromEntries(
+    [
+      "GOOGLE_CLIENT_ID",
+      "GOOGLE_CLIENT_SECRET",
+      "GOOGLE_REDIRECT_URI",
+      "GOOGLE_CALENDAR_ID",
+      "GOOGLE_REFRESH_TOKEN",
+      "RESEND_API_KEY",
+      "EMAIL_DESDE",
+    ].map((n) => {
+      const v = process.env[n];
+      return [
+        n,
+        v
+          ? `presente (${v.length} caracteres, empieza con "${v.slice(0, 6)}…")`
+          : "AUSENTE",
+      ];
+    })
+  );
+
   return NextResponse.json({
+    variables,
     calendario: {
       credenciales: estaConfigurado(),
       autorizado: calendarioListo,
