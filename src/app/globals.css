@@ -13,7 +13,14 @@
   --color-rosa-400: #FD4DB9;
   --color-rosa-500: #FD2BAC;
   --color-rosa-600: #E8038F;
+  --color-rosa-650: #C4027A;  /* manuscrita sobre fondo rosa claro */
   --color-rosa-700: #AB026A;
+
+  /* --- Vino: el titular sobre fondo rosa. El rojo del logo pesa
+         demasiado en textos largos y compite con el fondo. --- */
+  --color-vino-600: #8A1038;
+  --color-vino-700: #6B0A2E;
+  --color-vino-800: #4E0721;
 
   /* --- Rosas suaves del fondo de sus publicaciones --- */
   --color-fondo-rosa:  #F8B2D0;
