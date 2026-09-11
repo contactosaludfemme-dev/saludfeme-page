@@ -53,7 +53,7 @@ export default function Hero() {
   return (
     <section
       id="inicio"
-      className="relative overflow-hidden bg-gradient-to-br from-coral-500 via-magenta-500 to-magenta-600 py-16 lg:py-20"
+      className="relative overflow-hidden bg-[linear-gradient(135deg,var(--color-rojo-500)_0%,var(--color-rojo-600)_30%,var(--color-rosa-600)_72%,var(--color-rosa-700)_100%)] py-16 lg:py-20"
     >
       {/* Textura de puntos y manchas suaves */}
       <div
@@ -66,11 +66,19 @@ export default function Hero() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-32 -top-40 size-[34rem] rounded-full bg-white/10 blur-3xl"
+        className="pointer-events-none absolute -right-32 -top-40 size-[34rem] rounded-full bg-[radial-gradient(circle,rgba(253,77,185,.55),transparent_70%)] blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-44 -left-32 size-[28rem] rounded-full bg-rosa-200/20 blur-3xl"
+        className="pointer-events-none absolute -bottom-44 -left-32 size-[28rem] rounded-full bg-[radial-gradient(circle,rgba(253,13,14,.45),transparent_70%)] blur-3xl"
+      />
+
+      {/* Velo sobre la mitad del texto: el rojo y el rosa de la marca son
+          tan saturados que el blanco no alcanzaría contraste de lectura.
+          Oscurece lo justo sin apagar el color. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(100deg,rgba(90,0,10,.34)_0%,rgba(90,0,10,.22)_42%,transparent_72%)]"
       />
 
       {/* Destellos decorativos, como los de sus publicaciones */}
@@ -94,7 +102,7 @@ export default function Hero() {
 
           {/* Mayúsculas + manuscrita, como en sus artes */}
           <h1 className="text-white">
-            <span className="block font-titulo text-[clamp(2.1rem,5.2vw,3.7rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em]">
+            <span className="block font-titulo text-[clamp(2.1rem,5.2vw,3.7rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em] drop-shadow-[0_2px_12px_rgba(120,0,20,.25)]">
               Tu salud, tu espacio,
             </span>
             <span className="relative mt-1 inline-block font-mano text-[clamp(2.5rem,5.8vw,4.2rem)] font-bold leading-[1] text-white">
@@ -103,13 +111,13 @@ export default function Hero() {
             </span>
           </h1>
 
-          <p className="mt-6 max-w-[44ch] text-[1.06rem] leading-relaxed text-white/85">
+          <p className="mt-6 max-w-[44ch] text-[1.06rem] leading-relaxed text-white">
             Soy {CONTACTO.nombre}, matrona y creadora de {CONTACTO.marca}. Un
             espacio de atención cercano, respetuoso y sin juicios, enfocado en
             la salud integral de la mujer.
           </p>
 
-          <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.9rem] font-semibold text-rosa-200">
+          <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.9rem] font-semibold text-white">
             <span>📍 Talca</span>
             <span>📍 Linares</span>
             <span>💻 Online a todo Chile</span>
@@ -119,7 +127,7 @@ export default function Hero() {
             <button
               type="button"
               onClick={() => abrir()}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-titulo font-semibold text-magenta-600 shadow-fuerte transition-transform hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-titulo font-semibold text-rojo-600 shadow-fuerte transition-all hover:-translate-y-0.5 hover:bg-rosa-50"
             >
               Agendar mi hora
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden>
@@ -148,7 +156,7 @@ export default function Hero() {
                     <span className="block font-titulo text-[1.7rem] font-bold leading-none text-white">
                       {s.num}
                     </span>
-                    <span className="mt-1 block text-[0.78rem] text-white/70">
+                    <span className="mt-1 block text-[0.78rem] text-white/90">
                       {s.lbl}
                     </span>
                   </dd>
@@ -167,10 +175,10 @@ export default function Hero() {
             aria-hidden
             className="absolute inset-0 -z-10 translate-y-4 rounded-[3rem] bg-white/10 blur-2xl"
           />
-          <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] border-4 border-white/25 bg-rosa-100 shadow-fuerte">
+          <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] border-4 border-white/30 bg-gradient-to-br from-rosa-50 to-rosa-100 shadow-fuerte">
             <div className="grid size-full place-content-center place-items-center gap-3 p-8 text-center">
               <span aria-hidden className="text-5xl">👩‍⚕️</span>
-              <p className="font-titulo text-[0.9rem] font-semibold text-magenta-600">
+              <p className="font-titulo text-[0.9rem] font-semibold text-rojo-600">
                 Ilustración de Francisca
               </p>
               <p className="text-[0.78rem] leading-snug text-gris">
@@ -183,7 +191,7 @@ export default function Hero() {
           <div className="absolute -left-3 bottom-8 flex items-center gap-3 rounded-2xl bg-white p-3.5 shadow-fuerte">
             <span aria-hidden className="text-xl">🎓</span>
             <span className="text-[0.8rem] leading-tight">
-              <strong className="block font-titulo text-magenta-600">
+              <strong className="block font-titulo text-rojo-600">
                 Matrona titulada
               </strong>
               <span className="text-gris">{CONTACTO.registro}</span>

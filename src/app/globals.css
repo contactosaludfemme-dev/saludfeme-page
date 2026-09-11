@@ -5,22 +5,37 @@
    Paleta extraída de sus publicaciones en redes sociales
    ============================================================ */
 @theme {
-  /* --- Rosas --- */
-  --color-rosa-50:  #FDF2F4;
-  --color-rosa-100: #FBE4E8;
-  --color-rosa-200: #F5C6CE;
-  --color-rosa-300: #EFA8B5;
+  /* --- Rosa de marca — tomado del logo: #FD4DB9 --- */
+  --color-rosa-50:  #FBF4F8;
+  --color-rosa-100: #F8E3F0;
+  --color-rosa-200: #F5C1E1;
+  --color-rosa-300: #F88CCE;
+  --color-rosa-400: #FD4DB9;
+  --color-rosa-500: #FD2BAC;
+  --color-rosa-600: #E8038F;
+  --color-rosa-700: #AB026A;
 
-  /* --- Magenta (acento principal) --- */
-  --color-magenta-400: #EC4899;
-  --color-magenta-500: #E5308F;
-  --color-magenta-600: #C41E75;
-  --color-magenta-700: #9E1A5F;
+  /* --- Rojo de marca — tomado del logo: #FD0D0E --- */
+  --color-rojo-50:  #FBF4F4;
+  --color-rojo-100: #F8E3E3;
+  --color-rojo-200: #F6C1C1;
+  --color-rojo-300: #F78282;
+  --color-rojo-400: #FD3536;
+  --color-rojo-500: #FD0D0E;
+  --color-rojo-600: #D40203;
+  --color-rojo-700: #A20102;
 
-  /* --- Coral (acento secundario) --- */
-  --color-coral-400: #E36A5C;
-  --color-coral-500: #D94A3D;
-  --color-coral-600: #B83A2E;
+  /* --- Magenta y coral: alias hacia la paleta de marca.
+         Se conservan porque los usan muchos componentes; apuntan a los
+         tonos del logo, no a los estimados originales. --- */
+  --color-magenta-400: #FD4DB9;
+  --color-magenta-500: #FD2BAC;
+  --color-magenta-600: #E8038F;
+  --color-magenta-700: #AB026A;
+
+  --color-coral-400: #FD3536;
+  --color-coral-500: #FD0D0E;
+  --color-coral-600: #D40203;
 
   /* --- Neutros --- */
   --color-carbon:     #2E2A2B;
