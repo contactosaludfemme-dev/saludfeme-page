@@ -15,6 +15,11 @@
   --color-rosa-600: #E8038F;
   --color-rosa-700: #AB026A;
 
+  /* --- Rosas suaves del fondo de sus publicaciones --- */
+  --color-fondo-rosa:  #F8B2D0;
+  --color-fondo-medio: #FACDDE;
+  --color-fondo-claro: #FDF2F5;
+
   /* --- Rojo de marca — tomado del logo: #FD0D0E --- */
   --color-rojo-50:  #FBF4F4;
   --color-rojo-100: #F8E3E3;
