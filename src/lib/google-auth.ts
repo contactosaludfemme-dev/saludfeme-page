@@ -22,9 +22,45 @@ export function estaConfigurado(): boolean {
   );
 }
 
-/** ¿Ya se autorizó la cuenta? */
+/**
+ * ¿Hay un refresh token guardado?
+ *
+ * Ojo: esto solo confirma que la variable existe, no que Google la siga
+ * aceptando. Un token puede estar presente y haber sido revocado —usa
+ * `verificarAcceso` para comprobarlo de verdad.
+ */
 export function estaAutorizado(): boolean {
   return estaConfigurado() && Boolean(process.env.GOOGLE_REFRESH_TOKEN);
+}
+
+/**
+ * Comprueba contra Google que el token sirve.
+ * Devuelve el motivo del fallo cuando no.
+ */
+export async function verificarAcceso(): Promise<
+  { ok: true } | { ok: false; motivo: string; detalle: string }
+> {
+  if (!estaAutorizado()) {
+    return { ok: false, motivo: "sin_credenciales", detalle: "Faltan variables de entorno" };
+  }
+  try {
+    const auth = clienteOAuth();
+    auth.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+    await auth.getAccessToken(); // canjea el refresh token
+    return { ok: true };
+  } catch (e) {
+    const err = e as { message?: string; response?: { data?: { error?: string; error_description?: string } } };
+    const cod = err?.response?.data?.error ?? "desconocido";
+    const msg = err?.response?.data?.error_description ?? err?.message ?? String(e);
+    return {
+      ok: false,
+      motivo: cod,
+      detalle:
+        cod === "invalid_grant"
+          ? "El refresh token fue revocado o expiró. Hay que volver a autorizar en /api/google/auth."
+          : msg,
+    };
+  }
 }
 
 /** Cliente OAuth sin credenciales de usuario (para iniciar el flujo). */

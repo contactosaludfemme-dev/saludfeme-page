@@ -35,8 +35,8 @@ export const SEDES: Sede[] = [
     centro: "Centro Kuyentun",
     direccion: "Edificio Espacio Talca, 2 Sur con 2 Oriente, piso 13, of. 1315",
     mapaUrl:
-      "https://maps.google.com/?q=Edificio+Espacio+Talca+2+Sur+2+Oriente+Talca",
-    coordenadas: { lat: -35.4269, lng: -71.6554 },
+      "https://maps.google.com/?q=Edificio+Espacio+Talca,+2+Sur+con+2+Oriente,+Talca",
+    coordenadas: { lat: -35.429031, lng: -71.667221 },
   },
   {
     id: "linares",
@@ -480,8 +480,8 @@ export const FAQS = [
     r: "Sí, a todo Chile. La telemedicina dura 45 minutos y tiene un valor de $25.000.",
   },
   {
-    p: "¿Atiendes por Fonasa?",
-    r: "No cuento con convenio Fonasa. La atención es solo particular.",
+    p: "¿Atiendes por Fonasa o Isapre?",
+    r: "No cuento con convenio Fonasa, así que la atención es particular. Emito boleta por cada atención y, dependiendo de tu plan de Isapre, puedes presentarla para pedir el reembolso directamente con ellos. Conviene que consultes con tu Isapre qué cobertura tiene tu plan para consultas de matronería.",
   },
   {
     p: "¿Realizas ecografías en tu consulta?",
@@ -528,7 +528,9 @@ export const FAQS = [
  */
 export function duracionDe(servicio: Servicio, modalidad: string): number {
   if (servicio.duracion) return servicio.duracion;
-  return modalidad === "online" ? 45 : 60;
+  // Las consultas duran una hora, presenciales u online. El control díada
+  // declara sus 90 minutos en el propio servicio.
+  return 60;
 }
 
 /** Valor de una atención según la modalidad elegida. */

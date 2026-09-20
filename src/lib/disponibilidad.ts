@@ -29,15 +29,60 @@ function horaEnChile(d: Date): { h: number; m: number } {
 
 export type Intervalo = { inicio: Date; fin: Date };
 
+/** Normaliza un texto: sin tildes, sin espacios sobrantes, en mayúsculas. */
+function normalizar(t: string): string {
+  return t
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toUpperCase();
+}
+
 /** ¿El título del evento abre disponibilidad? */
 export function esBloqueDisponible(titulo: string | null | undefined): boolean {
   if (!titulo) return false;
-  const limpio = titulo
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "") // quita tildes
-    .trim()
-    .toUpperCase();
-  return limpio.startsWith(PREFIJO_DISPONIBLE);
+  return normalizar(titulo).startsWith(PREFIJO_DISPONIBLE);
+}
+
+/**
+ * Sede a la que corresponde un bloque, según su título.
+ *
+ *   "DISPONIBLE TALCA"    → talca
+ *   "DISPONIBLE LINARES"  → linares
+ *   "DISPONIBLE ONLINE"   → online
+ *   "DISPONIBLE"          → null (sirve para cualquier sede)
+ *
+ * Un bloque sin sede se ofrece en todas, que es lo razonable cuando ella
+ * no quiere distinguir.
+ */
+export function sedeDelBloque(titulo: string | null | undefined): string | null {
+  if (!titulo) return null;
+  const t = normalizar(titulo);
+  if (t.includes("TALCA")) return "talca";
+  if (t.includes("LINARES")) return "linares";
+  if (t.includes("ONLINE") || t.includes("TELEMEDICINA")) return "online";
+  return null;
+}
+
+/**
+ * ¿Este bloque sirve para la sede y modalidad que eligió la paciente?
+ *
+ * Reglas:
+ *  - Un bloque sin sede declarada sirve para todo.
+ *  - Para telemedicina sirve cualquier bloque: si está en consulta, puede
+ *    igualmente atender por videollamada desde ahí.
+ *  - Para presencial, el bloque debe ser de esa ciudad. Un bloque marcado
+ *    ONLINE no sirve para presencial, porque no implica estar en consulta.
+ */
+export function bloqueSirvePara(
+  titulo: string | null | undefined,
+  modalidad: string,
+  sede: string
+): boolean {
+  const declarada = sedeDelBloque(titulo);
+  if (declarada === null) return true;
+  if (modalidad === "online") return true;
+  return declarada === sede;
 }
 
 /** ¿Se pisan dos intervalos? */

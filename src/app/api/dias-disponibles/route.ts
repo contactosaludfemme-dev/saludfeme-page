@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { SERVICIOS, duracionDe } from "@/lib/datos";
 import { usaCalendarioReal } from "@/lib/google-calendar";
 import { clienteCalendario } from "@/lib/google-auth";
-import { esBloqueDisponible, aIntervalos, calcularBloques } from "@/lib/disponibilidad";
+import { esBloqueDisponible, bloqueSirvePara, aIntervalos, calcularBloques } from "@/lib/disponibilidad";
 import { claveFecha, claveFechaChile, tieneCupo, ZONA, offsetChile, VENTANA_DIAS } from "@/lib/calendario";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +19,7 @@ export async function GET(req: Request) {
   const mes = searchParams.get("mes");
   const servicioId = searchParams.get("servicio");
   const modalidad = searchParams.get("modalidad") ?? "presencial";
+  const sede = searchParams.get("sede") ?? "talca";
 
   if (!mes || !/^\d{4}-\d{2}$/.test(mes)) {
     return NextResponse.json({ error: "Mes inválido" }, { status: 400 });
@@ -72,8 +73,15 @@ export async function GET(req: Request) {
       const clave = claveFechaChile(new Date(inicio));
       if (!porDia.has(clave)) porDia.set(clave, { abiertos: [], ocupados: [] });
       const grupo = porDia.get(clave)!;
-      if (esBloqueDisponible(ev.summary)) grupo.abiertos.push(ev);
-      else grupo.ocupados.push(ev);
+      if (
+        esBloqueDisponible(ev.summary) &&
+        bloqueSirvePara(ev.summary, modalidad, sede)
+      ) {
+        grupo.abiertos.push(ev);
+      } else if (!esBloqueDisponible(ev.summary)) {
+        // Las citas ya agendadas ocupan la hora en cualquier sede
+        grupo.ocupados.push(ev);
+      }
     }
 
     const dias: string[] = [];
@@ -84,14 +92,22 @@ export async function GET(req: Request) {
         aIntervalos(grupo.abiertos),
         aIntervalos(grupo.ocupados),
         duracion,
-        30,
+        duracion,
         desde
       );
       if (bloques.some((b) => b.libre)) dias.push(clave);
     }
 
     return NextResponse.json({ mes, dias: dias.sort(), fuente: "calendario" });
-  } catch {
+  } catch (e) {
+    // El error de Google va al log del servidor: sin esto un fallo de
+    // calendario es indistinguible de "no hay horas".
+    const err = e as { message?: string; code?: number; errors?: { reason?: string }[] };
+    console.error("[CALENDARIO] events.list falló:", {
+      mensaje: err?.message,
+      codigo: err?.code,
+      motivo: err?.errors?.[0]?.reason,
+    });
     return NextResponse.json(
       { error: "No se pudo consultar el calendario" },
       { status: 502 }

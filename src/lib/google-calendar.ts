@@ -28,6 +28,7 @@ import {
   calcularBloques,
   aIntervalos,
   esBloqueDisponible,
+  bloqueSirvePara,
 } from "./disponibilidad";
 
 /** Anticipación mínima para reservar, en horas. */
@@ -66,7 +67,9 @@ function sumarMinutos(fecha: string, hora: string, minutos: number): string {
  */
 export async function obtenerDisponibilidad(
   fecha: string,
-  duracionMin: number
+  duracionMin: number,
+  modalidad = "presencial",
+  sede = "talca"
 ): Promise<Bloque[]> {
   if (!usaCalendarioReal()) {
     // Respaldo: horario genérico menos lo reservado en esta sesión
@@ -87,15 +90,23 @@ export async function obtenerDisponibilidad(
   });
 
   const eventos = data.items ?? [];
+  // Solo los bloques de la sede elegida; los que no declaran sede sirven
+  // para todas.
   const abiertos = aIntervalos(
-    eventos.filter((e) => esBloqueDisponible(e.summary))
+    eventos.filter(
+      (e) =>
+        esBloqueDisponible(e.summary) &&
+        bloqueSirvePara(e.summary, modalidad, sede)
+    )
   );
   const ocupados = aIntervalos(
     eventos.filter((e) => !esBloqueDisponible(e.summary))
   );
 
   const desde = new Date(Date.now() + ANTICIPACION_HORAS * 3600_000);
-  return calcularBloques(abiertos, ocupados, duracionMin, 30, desde);
+  // Paso igual a la duración: las horas ofrecidas no se solapan, así una
+  // reserva no invalida las tres siguientes.
+  return calcularBloques(abiertos, ocupados, duracionMin, duracionMin, desde);
 }
 
 /**

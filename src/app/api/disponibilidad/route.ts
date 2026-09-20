@@ -10,6 +10,7 @@ export async function GET(req: Request) {
   const fecha = searchParams.get("fecha");
   const servicioId = searchParams.get("servicio");
   const modalidad = searchParams.get("modalidad") ?? "presencial";
+  const sede = searchParams.get("sede") ?? "talca";
 
   if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
     return NextResponse.json({ error: "Fecha inválida" }, { status: 400 });
@@ -21,9 +22,20 @@ export async function GET(req: Request) {
   }
 
   try {
-    const bloques = await obtenerDisponibilidad(fecha, duracionDe(servicio, modalidad));
+    const bloques = await obtenerDisponibilidad(
+      fecha,
+      duracionDe(servicio, modalidad),
+      modalidad,
+      sede
+    );
     return NextResponse.json({ fecha, bloques });
-  } catch {
+  } catch (e) {
+    const err = e as { message?: string; code?: number; errors?: { reason?: string }[] };
+    console.error("[DISPONIBILIDAD] falló:", {
+      mensaje: err?.message,
+      codigo: err?.code,
+      motivo: err?.errors?.[0]?.reason,
+    });
     return NextResponse.json(
       { error: "No se pudo consultar la disponibilidad" },
       { status: 502 }
