@@ -5,6 +5,28 @@
    Paleta extraída de sus publicaciones en redes sociales
    ============================================================ */
 @theme {
+  /* --- Verde de WhatsApp, en versión pastel para el botón --- */
+  --color-wsp-100: #CFEFD8;
+  --color-wsp-200: #B8E6C6;
+  --color-wsp-700: #0A5C2A;
+
+  /* --- Degradado del hero --- */
+  --hero-blanco: #FFFFFF;
+  --hero-rosa:   #F748A5;
+  --hero-rojo:   #EE1C25;
+
+  /* --- Ciruela: el texto del hero. Sobre el degradado rosa, los tonos
+         medios se pierden; este mantiene el calor de la marca y a la vez
+         destaca (5.2:1 en el peor punto). --- */
+  --color-ciruela-600: #5A0B33;
+  --color-ciruela-700: #3D0620;
+  --color-ciruela-800: #2A0416;
+
+  /* Rosa legible sobre fondo claro, y un rosa saturado para los destellos */
+  --color-rosa-400: #FD4DB9;
+  --color-rosa-500: #FD2BAC;
+  --color-rosa-650: #8F0256;
+
   /* --- Rosas --- */
   --color-rosa-50:  #FDF2F4;
   --color-rosa-100: #FBE4E8;

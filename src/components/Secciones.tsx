@@ -185,7 +185,9 @@ export function Modalidades() {
             Tu hora queda confirmada una vez recibido el comprobante.
           </p>
           <p className="mx-auto mt-3 max-w-xl text-[0.85rem] leading-relaxed text-gris">
-            No cuento con convenio Fonasa ni Isapre.
+            No cuento con convenio Fonasa. Emito boleta por cada atención, y
+            según tu plan de Isapre puedes presentarla para solicitar el
+            reembolso directamente con ellos.
           </p>
         </div>
       </div>

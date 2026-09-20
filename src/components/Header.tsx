@@ -37,20 +37,37 @@ export default function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-50 border-b transition-all ${
+      /* Sobre el hero va totalmente transparente: el degradado sigue de
+         corrido sin ningún corte. El texto blanco lleva sombra para
+         mantener contraste sobre los tramos más claros. Al hacer scroll
+         aparece el fondo opaco, ya sobre contenido claro. */
+      className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
         scrolled
-          ? "border-gris-claro bg-rosa-50/90 backdrop-blur-md"
-          : "border-transparent bg-rosa-50"
+          ? "border-gris-claro/60 bg-rosa-50/92 backdrop-blur-md"
+          : "border-transparent bg-transparent"
       }`}
     >
       <div className="mx-auto flex min-h-[4.75rem] max-w-6xl items-center justify-between gap-6 px-5">
         <a href="#inicio" className="flex shrink-0 items-center gap-3">
-          <LogoSaludFemme className="h-11 shrink-0 sm:h-12" />
-          <span className="hidden flex-col border-l border-gris-claro pl-3 leading-tight xl:flex">
-            <span className="whitespace-nowrap font-titulo text-[0.85rem] font-bold text-carbon">
+          <LogoSaludFemme claro={!scrolled} className="h-11 shrink-0 sm:h-12" />
+          <span
+            className={`hidden flex-col border-l pl-3 leading-tight transition-colors xl:flex ${
+              scrolled ? "border-gris-claro" : "border-white/35"
+            }`}
+            style={scrolled ? undefined : { textShadow: "0 1px 6px rgba(95,0,55,.55)" }}
+          >
+            <span
+              className={`whitespace-nowrap font-titulo text-[0.85rem] font-bold ${
+                scrolled ? "text-carbon" : "text-white"
+              }`}
+            >
               {CONTACTO.nombre}
             </span>
-            <span className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-coral-500">
+            <span
+              className={`text-[0.75rem] font-semibold uppercase tracking-[0.14em] ${
+                scrolled ? "text-coral-500" : "text-white/85"
+              }`}
+            >
               {CONTACTO.profesion}
             </span>
           </span>
@@ -62,10 +79,13 @@ export default function Header() {
             <a
               key={e.href}
               href={e.href}
-              className="group relative whitespace-nowrap py-1 text-[0.9rem] font-medium text-carbon transition-colors hover:text-magenta-600"
+              className={`group relative whitespace-nowrap py-1 text-[0.9rem] font-medium transition-colors ${
+                scrolled ? "text-carbon hover:text-magenta-600" : "text-white hover:text-rosa-200"
+              }`}
+              style={scrolled ? undefined : { textShadow: "0 1px 6px rgba(95,0,55,.55)" }}
             >
               {e.texto}
-              <span className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-magenta-500 transition-transform duration-200 group-hover:scale-x-100" />
+              <span className={`absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 transition-transform duration-200 group-hover:scale-x-100 ${scrolled ? "bg-magenta-500" : "bg-white"}`} />
             </a>
           ))}
           <button
@@ -84,7 +104,9 @@ export default function Header() {
           aria-expanded={abierto}
           aria-controls="menu-movil"
           aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
-          className="rounded-lg p-2 text-carbon transition-colors hover:bg-rosa-100 lg:hidden"
+          className={`rounded-lg p-2 transition-colors lg:hidden ${
+            scrolled ? "text-carbon hover:bg-rosa-100" : "text-white hover:bg-white/15"
+          }`}
         >
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
             {abierto ? (

@@ -84,7 +84,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
 
     const clave = `${mes.getFullYear()}-${String(mes.getMonth() + 1).padStart(2, "0")}`;
     fetch(
-      `/api/dias-disponibles?mes=${clave}&servicio=${servicio.id}&modalidad=${modalidad}`
+      `/api/dias-disponibles?mes=${clave}&servicio=${servicio.id}&modalidad=${modalidad}&sede=${sede}`
     )
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => {
@@ -114,7 +114,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
     return () => {
       vigente = false;
     };
-  }, [mes, servicio, modalidad]);
+  }, [mes, servicio, modalidad, sede]);
 
   /* Carga los bloques del día elegido desde la API */
   useEffect(() => {
@@ -124,7 +124,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
     setHora(null);
 
     fetch(
-      `/api/disponibilidad?fecha=${dia}&servicio=${servicio.id}&modalidad=${modalidad}`
+      `/api/disponibilidad?fecha=${dia}&servicio=${servicio.id}&modalidad=${modalidad}&sede=${sede}`
     )
       .then((r) => {
         if (!r.ok) throw new Error("respuesta no válida");
@@ -151,7 +151,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
       });
 
     return () => { vigente = false; };
-  }, [dia, servicio, modalidad]);
+  }, [dia, servicio, modalidad, sede]);
 
   function elegirServicio(s: Servicio) {
     setServicio(s);
