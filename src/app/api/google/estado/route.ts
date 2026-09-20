@@ -9,25 +9,34 @@ export const dynamic = "force-dynamic";
  * Diagnóstico rápido de qué integraciones están activas.
  * No expone ningún valor secreto.
  */
-export async function GET() {
+export async function GET(req: Request) {
   // Prueba real contra Google: es la única forma de ver por qué falla
   let prueba: Record<string, string> = { estado: "no se intentó" };
   if (estaAutorizado()) {
     try {
       const { clienteCalendario } = await import("@/lib/google-auth");
       const cal = clienteCalendario();
-      const hoy = new Date().toISOString().slice(0, 10);
+      // Permite inspeccionar un día concreto con ?fecha=YYYY-MM-DD
+      const url = new URL(req.url);
+      const hoy = url.searchParams.get("fecha") ?? new Date().toISOString().slice(0, 10);
       const { data } = await cal.events.list({
         calendarId: process.env.GOOGLE_CALENDAR_ID || "primary",
         timeMin: `${hoy}T00:00:00-03:00`,
         timeMax: `${hoy}T23:59:59-03:00`,
         singleEvents: true,
-        maxResults: 5,
+        maxResults: 20,
       });
       prueba = {
         estado: "✓ Google respondió",
-        eventosHoy: String(data.items?.length ?? 0),
-        titulos: (data.items ?? []).map((e) => e.summary ?? "(sin título)").join(" · ") || "ninguno",
+        fecha: hoy,
+        eventos: String(data.items?.length ?? 0),
+        detalle:
+          (data.items ?? [])
+            .map(
+              (e) =>
+                `"${e.summary ?? "(sin título)"}" ${e.start?.dateTime ?? e.start?.date ?? "?"}`
+            )
+            .join(" | ") || "ninguno",
       };
     } catch (e) {
       const err = e as { message?: string; code?: number; errors?: { reason?: string }[] };
