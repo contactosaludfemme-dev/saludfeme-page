@@ -155,39 +155,65 @@ export function Modalidades() {
           texto="Elige la que mejor se acomode a tu momento. Todas con la misma dedicación."
         />
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="mx-auto grid max-w-3xl gap-5 sm:grid-cols-2">
           {MODALIDADES_ATENCION.map((m) => (
             <article
               key={m.id}
-              className="rounded-2xl border border-gris-claro bg-white p-5 text-center shadow-suave transition-all hover:-translate-y-1 hover:shadow-media md:rounded-3xl md:p-6"
+              className="flex flex-col rounded-2xl border border-gris-claro bg-white p-6 text-center shadow-suave transition-all hover:-translate-y-1 hover:shadow-media md:rounded-3xl md:p-7"
             >
-              <span aria-hidden className="mb-2 block text-3xl md:text-4xl">
-                {m.icono}
-              </span>
-              <h3 className="mb-1 text-[1.05rem]">{m.nombre}</h3>
-              <p className="font-titulo text-xl font-bold text-magenta-600">
-                {precioCLP(m.precio)}
-              </p>
-              <p className="mb-2 text-[0.8rem] text-coral-500">{m.duracion} minutos</p>
-              <p className="text-[0.87rem] leading-relaxed text-gris">
+              <span aria-hidden className="mb-2 block text-4xl">{m.icono}</span>
+              <h3 className="mb-1 text-[1.15rem]">{m.nombre}</h3>
+              <p className="mb-5 text-[0.88rem] leading-relaxed text-gris">
                 {m.descripcion}
               </p>
+
+              <dl className="mt-auto space-y-3 border-t border-gris-claro pt-4 text-left">
+                <div className="flex items-baseline justify-between gap-3">
+                  <dt>
+                    <span className="block font-titulo text-[0.92rem] font-semibold">
+                      Consulta
+                    </span>
+                    <span className="text-[0.78rem] text-gris">
+                      {m.duracion} minutos
+                    </span>
+                  </dt>
+                  <dd className="font-titulo text-[1.15rem] font-bold text-magenta-600">
+                    {precioCLP(m.precio)}
+                  </dd>
+                </div>
+
+                <div className="flex items-baseline justify-between gap-3">
+                  <dt>
+                    <span className="block font-titulo text-[0.92rem] font-semibold">
+                      Control
+                    </span>
+                    <span className="text-[0.78rem] text-gris">
+                      {m.control.duracion} minutos
+                    </span>
+                  </dt>
+                  <dd className="font-titulo text-[1.15rem] font-bold text-magenta-600">
+                    {precioCLP(m.control.precio)}
+                  </dd>
+                </div>
+              </dl>
             </article>
           ))}
         </div>
+
+        <p className="mx-auto mt-5 max-w-2xl text-center text-[0.86rem] leading-relaxed text-gris">
+          El control es la atención de seguimiento, disponible hasta 60 días
+          después de tu consulta. Pasado ese plazo corresponde agendar como
+          primera consulta.
+        </p>
 
         <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-gris-claro bg-white p-5 text-center shadow-suave md:rounded-3xl md:p-7">
           <p className="mb-2 font-titulo text-[1.05rem] font-bold text-carbon">
             Atención particular
           </p>
           <p className="mx-auto max-w-xl text-[0.92rem] leading-relaxed text-gris">
-            El pago se realiza por <strong>transferencia electrónica</strong>.
-            Tu hora queda confirmada una vez recibido el comprobante.
-          </p>
-          <p className="mx-auto mt-3 max-w-xl text-[0.85rem] leading-relaxed text-gris">
-            No cuento con convenio Fonasa. Emito boleta por cada atención, y
-            según tu plan de Isapre puedes presentarla para solicitar el
-            reembolso directamente con ellos.
+            Pago por <strong>transferencia</strong>: tu hora se confirma con el
+            comprobante. Sin convenio Fonasa, pero emito boleta para que pidas
+            reembolso a tu Isapre.
           </p>
         </div>
       </div>
@@ -242,6 +268,10 @@ const TRAYECTORIA = [
   {
     t: "Especialización internacional en Sexología",
     s: "Centro Integrato di Sessuologia Il Ponte",
+  },
+  {
+    t: "Consejera certificada de VIH e Infecciones de transmisión sexual",
+    s: "Seremi de Salud del Maule",
   },
   { t: "Diplomado en Sexualidad", s: "" },
   { t: "Diplomado en Recién Nacido de Alto Riesgo", s: "" },
@@ -450,20 +480,6 @@ export function Testimonios() {
                     {t.texto}
                   </blockquote>
 
-                  {(t.contexto || t.ciudad) && (
-                    <figcaption className="mt-4 flex flex-wrap gap-1.5 border-t border-gris-claro pt-3">
-                      {t.contexto && (
-                        <span className="rounded-full bg-rosa-50 px-2.5 py-1 text-[0.72rem] font-semibold text-magenta-600">
-                          {t.contexto}
-                        </span>
-                      )}
-                      {t.ciudad && (
-                        <span className="rounded-full bg-rosa-50 px-2.5 py-1 text-[0.72rem] font-semibold text-coral-500">
-                          {t.ciudad}
-                        </span>
-                      )}
-                    </figcaption>
-                  )}
                 </figure>
               ))}
             </div>

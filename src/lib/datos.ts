@@ -50,7 +50,10 @@ export const SEDES: Sede[] = [
   },
 ];
 
-/** Modalidades con su duración y valor base. */
+/**
+ * Modalidades de atención. Cada una incluye el valor de la consulta y el
+ * del control, que es la atención de seguimiento dentro de los 60 días.
+ */
 export const MODALIDADES_ATENCION = [
   {
     id: "presencial",
@@ -58,24 +61,17 @@ export const MODALIDADES_ATENCION = [
     nombre: "Presencial",
     duracion: 60,
     precio: 30000,
+    control: { precio: 25000, duracion: 20 },
     descripcion: "En Talca o Linares, en un espacio confidencial y cómodo.",
   },
   {
     id: "online",
     icono: "💻",
     nombre: "Telemedicina",
-    duracion: 45,
+    duracion: 60,
     precio: 25000,
+    control: { precio: 20000, duracion: 20 },
     descripcion: "Por videollamada, a todo Chile.",
-  },
-  {
-    id: "control",
-    icono: "🔁",
-    nombre: "Control",
-    duracion: 20,
-    precio: 20000,
-    descripcion:
-      "Presencial u online, hasta 60 días después de tu primera atención.",
   },
 ] as const;
 
@@ -226,7 +222,7 @@ export const SERVICIOS: Servicio[] = [
     id: "insercion-implante",
     nombre: "Inserción de implante anticonceptivo",
     icono: "💉",
-    categoria: "Anticoncepción",
+    categoria: "Procedimientos",
     descripcion: "Implanon o Jadelle, en consulta y con anestesia local.",
     precio: 55000,
     modalidades: ["presencial"],
@@ -236,7 +232,7 @@ export const SERVICIOS: Servicio[] = [
     id: "extraccion-implante",
     nombre: "Extracción de implante anticonceptivo",
     icono: "💉",
-    categoria: "Anticoncepción",
+    categoria: "Procedimientos",
     descripcion: "Retiro de Implanon o Jadelle.",
     precio: 55000,
     modalidades: ["presencial"],
@@ -245,7 +241,7 @@ export const SERVICIOS: Servicio[] = [
     id: "insercion-diu",
     nombre: "Inserción de dispositivo intrauterino",
     icono: "📌",
-    categoria: "Anticoncepción",
+    categoria: "Procedimientos",
     descripcion: "T de cobre, Asertia o Mirena.",
     precio: 60000,
     modalidades: ["presencial"],
@@ -255,7 +251,7 @@ export const SERVICIOS: Servicio[] = [
     id: "extraccion-diu",
     nombre: "Extracción de dispositivo intrauterino",
     icono: "📌",
-    categoria: "Anticoncepción",
+    categoria: "Procedimientos",
     descripcion: "T de cobre, Asertia, Mirena o Kyleena.",
     precio: 35000,
     modalidades: ["presencial"],
@@ -274,7 +270,7 @@ export const SERVICIOS: Servicio[] = [
     id: "inyeccion-anticonceptiva",
     nombre: "Administración de inyección anticonceptiva",
     icono: "💉",
-    categoria: "Anticoncepción",
+    categoria: "Procedimientos",
     descripcion: "Intramuscular o subcutánea.",
     precio: 20000,
     modalidades: ["presencial"],
@@ -297,7 +293,7 @@ export const SERVICIOS: Servicio[] = [
     icono: "🔬",
     categoria: "Salud sexual",
     descripcion:
-      "Evaluación de síntomas, indicación de tratamiento y orientación sobre prevención.",
+      "Evaluación de síntomas, indicación de tratamiento y orientación sobre prevención, con certificación como consejera de VIH e ITS de la Seremi de Salud del Maule.",
     precio: 30000,
     modalidades: ["presencial", "online"],
   },
@@ -367,7 +363,9 @@ export const MEDIOS_PAGO = [
  */
 export type Testimonio = {
   texto: string;
+  /** Sin uso en la tarjeta: se muestra solo el testimonio. */
   contexto?: string;
+  /** Sin uso en la tarjeta. */
   ciudad?: string;
 };
 
