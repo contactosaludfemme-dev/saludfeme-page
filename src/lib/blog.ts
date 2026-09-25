@@ -135,7 +135,7 @@ export const ARTICULOS: Articulo[] = [
       {
         tipo: "destacado",
         texto:
-          "Una molestia leve los primeros días es esperable. Un dolor que te hace apretar los dientes, que dura toda la mamada o que te deja grietas, no lo es. Es una señal de que algo se puede corregir.",
+          "Una molestia leve los primeros días es esperable. Un dolor que te hace apretar los dientes, que dura toda la toma o que te deja grietas, no lo es. Es una señal de que algo se puede corregir.",
       },
       { tipo: "subtitulo", texto: "Casi siempre es el acople" },
       {
@@ -152,14 +152,14 @@ export const ARTICULOS: Articulo[] = [
           "Los labios quedan hacia afuera, como de pescadito.",
           "Se ve más areola por sobre el labio superior que por debajo.",
           "Escuchas que traga, con pausas, no solo movimientos rápidos.",
-          "No sientes dolor una vez que empezó a mamar.",
+          "No sientes dolor una vez que empezó a succionar.",
         ],
       },
       { tipo: "subtitulo", texto: "Si ya tienes grietas" },
       {
         tipo: "parrafo",
         texto:
-          "Lo primero es corregir el acople, porque si no, la grieta no cierra por mucha crema que te pongas. Después de cada mamada puedes dejar una gota de tu propia leche sobre el pezón y secar al aire.",
+          "Lo primero es corregir el acople, porque si no, la grieta no cierra por mucha crema que te pongas. Después de cada toma puedes dejar una gota de tu propia leche sobre el pezón y secar al aire.",
       },
       {
         tipo: "lista",
@@ -178,7 +178,7 @@ export const ARTICULOS: Articulo[] = [
       {
         tipo: "parrafo",
         texto:
-          "Una sesión de asesoría suele bastar para corregir la técnica. He visto muchas veces cómo cambia todo en una sola consulta — y siempre me quedo pensando en cuánto dolor se podría haber evitado si hubieran consultado antes.",
+          "A veces una sola sesión de asesoría basta para corregir la técnica. He visto muchas veces cómo cambia todo — y siempre me quedo pensando en cuánto dolor se podría haber evitado si hubieran consultado antes.",
       },
     ],
   },
@@ -199,20 +199,19 @@ export const ARTICULOS: Articulo[] = [
         texto:
           "Cuando alguien me pregunta cuál es el mejor método anticonceptivo, mi respuesta siempre es la misma: depende de ti. De tu salud, tu etapa, tu rutina y de qué tan cómoda te sientas con cada opción.",
       },
-      { tipo: "subtitulo", texto: "Cuatro preguntas para orientarte" },
+      { tipo: "subtitulo", texto: "Tres preguntas para orientarte" },
       {
         tipo: "lista",
         items: [
           "¿Buscas algo por unos meses o por varios años?",
           "¿Te acomoda algo diario, o prefieres olvidarte por un tiempo largo?",
           "¿Tienes alguna condición de salud, o fumas y tienes más de 35 años?",
-          "¿Necesitas también protección contra infecciones de transmisión sexual?",
         ],
       },
       {
         tipo: "destacado",
         texto:
-          "El preservativo es el único método que además previene infecciones de transmisión sexual. Se puede combinar con cualquier otro.",
+          "El preservativo es el único método que además previene infecciones de transmisión sexual, así que va siempre: se combina con cualquier otro método. A eso le llamamos doble protección.",
       },
       { tipo: "subtitulo", texto: "Métodos de larga duración" },
       {
