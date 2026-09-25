@@ -49,12 +49,11 @@ export default function Header() {
     >
       <div className="mx-auto flex min-h-[4.75rem] max-w-6xl items-center justify-between gap-6 px-5">
         <a href="#inicio" className="flex shrink-0 items-center gap-3">
-          <LogoSaludFemme claro={!scrolled} className="h-11 shrink-0 sm:h-12" />
+          <LogoSaludFemme className="h-11 shrink-0 sm:h-12" />
           <span
             className={`hidden flex-col border-l pl-3 leading-tight transition-colors xl:flex ${
               scrolled ? "border-gris-claro" : "border-white/35"
             }`}
-            style={scrolled ? undefined : { textShadow: "0 1px 6px rgba(95,0,55,.55)" }}
           >
             <span
               className={`whitespace-nowrap font-titulo text-[0.85rem] font-bold ${
@@ -82,7 +81,6 @@ export default function Header() {
               className={`group relative whitespace-nowrap py-1 text-[0.9rem] font-medium transition-colors ${
                 scrolled ? "text-carbon hover:text-magenta-600" : "text-white hover:text-rosa-200"
               }`}
-              style={scrolled ? undefined : { textShadow: "0 1px 6px rgba(95,0,55,.55)" }}
             >
               {e.texto}
               <span className={`absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 transition-transform duration-200 group-hover:scale-x-100 ${scrolled ? "bg-magenta-500" : "bg-white"}`} />
