@@ -178,28 +178,30 @@ export default function Contacto() {
             </div>
           </div>
 
-          {/* Mapa: en móvil se carga solo al tocarlo (ahorra 384px y datos) */}
-          <div className="overflow-hidden rounded-2xl border border-gris-claro bg-white shadow-suave md:min-h-[24rem] md:rounded-3xl">
-            {verMapa || esEscritorio ? (
-              <iframe
-                title={`Ubicación en ${sede.ciudad}`}
-                src={mapaSrc}
-                className="h-64 w-full border-0 md:size-full md:min-h-[24rem]"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setVerMapa(true)}
-                  className="flex min-h-11 w-full items-center justify-center gap-2 p-4 font-titulo text-[0.9rem] font-semibold text-magenta-600 md:hidden"
-                >
-                  <IconoUbicacion />
-                  Ver mapa de {sede.ciudad}
-                </button>
-              </>
-            )}
+          <div className="space-y-4">
+            {/* Mapa: en móvil se carga solo al tocarlo (ahorra 384px y datos) */}
+            <div className="overflow-hidden rounded-2xl border border-gris-claro bg-white shadow-suave md:rounded-3xl">
+              {verMapa || esEscritorio ? (
+                <iframe
+                  title={`Ubicación en ${sede.ciudad}`}
+                  src={mapaSrc}
+                  className="h-64 w-full border-0 md:h-80"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setVerMapa(true)}
+                    className="flex min-h-11 w-full items-center justify-center gap-2 p-4 font-titulo text-[0.9rem] font-semibold text-magenta-600 md:hidden"
+                  >
+                    <IconoUbicacion />
+                    Ver mapa de {sede.ciudad}
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
