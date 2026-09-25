@@ -116,6 +116,8 @@ export type Servicio = {
   modalidades: ("presencial" | "online")[];
   /** Advertencia o requisito que la paciente debe conocer antes de agendar. */
   aviso?: string;
+  /** Beneficio incluido, se muestra destacado en verde. */
+  incluye?: string;
 };
 
 export const SERVICIOS: Servicio[] = [
@@ -141,6 +143,8 @@ export const SERVICIOS: Servicio[] = [
     precio: 30000,
     modalidades: ["presencial", "online"],
     aviso: "No realizo ecografías, pero entrego la orden en la consulta.",
+    incluye:
+      "Si te realizas todos los controles de tu embarazo conmigo, incluye un taller prenatal de lactancia materna online, gratuito. Valor referencial: $40.000.",
   },
   {
     id: "control-preconcepcional",
