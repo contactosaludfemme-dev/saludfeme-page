@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useAgenda } from "./AgendaProvider";
 import {
   SERVICIOS, CATEGORIAS, NOTAS_SERVICIOS, MODALIDADES_ATENCION,
@@ -122,6 +123,13 @@ function TarjetaServicio({ servicio: s }: { servicio: Servicio }) {
       {s.aviso && (
         <p className="mt-3 rounded-lg bg-rosa-50 px-3 py-2 text-[0.8rem] leading-snug text-gris">
           {s.aviso}
+        </p>
+      )}
+
+      {s.incluye && (
+        <p className="mt-3 rounded-lg bg-wsp-100 px-3 py-2 text-[0.8rem] leading-snug text-wsp-700">
+          <strong className="font-titulo">Incluido: </strong>
+          {s.incluye}
         </p>
       )}
 
@@ -283,19 +291,47 @@ const TRAYECTORIA = [
   },
 ];
 
+/** Fotografías de ambas consultas, recortadas en cuadrado. */
+const CONSULTAS = [
+  {
+    src: "/consulta-talca.jpg",
+    ciudad: "Talca",
+    centro: "Centro Kuyentun",
+    alt: "Box de atención en el Centro Kuyentun, Talca",
+  },
+  {
+    src: "/consulta-linares.jpg",
+    ciudad: "Linares",
+    centro: "Fix Salud",
+    alt: "Sala de espera de Fix Salud, Linares",
+  },
+];
+
 export function SobreMi() {
   return (
     <section id="sobre-mi" className="bg-rosa-50 py-20 lg:py-24">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="mx-auto w-full max-w-sm">
-          <div className="grid aspect-square place-items-center rounded-3xl bg-gradient-to-br from-rosa-200 to-coral-500 shadow-media">
-            <p className="px-6 text-center font-titulo text-sm text-white/90">
-              Fotografía en consulta
-              <span className="mt-1 block text-xs font-normal text-white/70">
-                (reemplazar en el sitio final)
-              </span>
-            </p>
-          </div>
+        <div className="mx-auto grid w-full max-w-sm gap-4">
+          {CONSULTAS.map((c) => (
+            <figure
+              key={c.src}
+              className="overflow-hidden rounded-3xl bg-white shadow-media"
+            >
+              <div className="relative aspect-square">
+                <Image
+                  src={c.src}
+                  alt={c.alt}
+                  fill
+                  sizes="(min-width: 1024px) 24rem, (min-width: 640px) 24rem, 100vw"
+                  className="object-cover"
+                />
+              </div>
+              <figcaption className="px-4 py-3 text-[0.82rem]">
+                <strong className="font-titulo">Consulta en {c.ciudad}</strong>
+                <span className="text-gris"> · {c.centro}</span>
+              </figcaption>
+            </figure>
+          ))}
         </div>
 
         <div>
