@@ -35,8 +35,8 @@ export const SEDES: Sede[] = [
     centro: "Centro Kuyentun",
     direccion: "Edificio Espacio Talca, 2 Sur con 2 Oriente, piso 13, of. 1315",
     mapaUrl:
-      "https://maps.google.com/?q=Edificio+Espacio+Talca,+2+Sur+con+2+Oriente,+Talca",
-    coordenadas: { lat: -35.429031, lng: -71.667221 },
+      "https://maps.google.com/?q=Edificio+Espacio+Talca&cid=5844557774143970886",
+    coordenadas: { lat: -35.428327, lng: -71.666021 },
   },
   {
     id: "linares",
@@ -45,8 +45,8 @@ export const SEDES: Sede[] = [
     direccion: "Av. León Bustos esquina Mariano Latorre #24",
     referencia: "A pasos de Espacio Urbano",
     mapaUrl:
-      "https://maps.google.com/?q=Mariano+Latorre+24+Linares+Chile",
-    coordenadas: { lat: -35.8464, lng: -71.5931 },
+      "https://maps.google.com/?q=Av.+Le%C3%B3n+Bustos+esquina+Mariano+Latorre+24,+Linares,+Chile",
+    coordenadas: { lat: -35.843942, lng: -71.605378 },
   },
 ];
 
@@ -68,7 +68,7 @@ export const MODALIDADES_ATENCION = [
     id: "online",
     icono: "💻",
     nombre: "Telemedicina",
-    duracion: 60,
+    duracion: 45,
     precio: 25000,
     control: { precio: 20000, duracion: 20 },
     descripcion: "Por videollamada, a todo Chile.",
@@ -194,7 +194,8 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Consultas y controles",
     descripcion:
       "Revisión de tus resultados con indicaciones, educación y derivación cuando corresponda.",
-    precio: 20000,
+    precio: 25000,
+    precioOnline: 20000,
     modalidades: ["presencial", "online"],
     aviso:
       "La revisión es gratuita dentro de los 7 días corridos desde que se entregó la orden.",
@@ -218,7 +219,7 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Anticoncepción",
     descripcion:
       "Coordinamos la fecha, los exámenes necesarios y la compra del anticonceptivo antes de la inserción.",
-    precio: 20000,
+    precio: 25000,
     modalidades: ["presencial", "online"],
     aviso: "Obligatoria antes de agendar una inserción.",
   },
@@ -529,16 +530,34 @@ export const FAQS = [
  * servicio declare la suya — como el control díada, de 90 minutos.
  */
 export function duracionDe(servicio: Servicio, modalidad: string): number {
+  // El servicio manda cuando declara su propia duración (p. ej. el control
+  // díada, de 90 minutos).
   if (servicio.duracion) return servicio.duracion;
-  // Las consultas duran una hora, presenciales u online. El control díada
-  // declara sus 90 minutos en el propio servicio.
-  return 60;
+  // Si no, vale la de la modalidad: la telemedicina dura menos que la
+  // atención presencial.
+  const m = MODALIDADES_ATENCION.find((x) => x.id === modalidad);
+  return m?.duracion ?? 60;
 }
 
-/** Valor de una atención según la modalidad elegida. */
-export function precioDe(servicio: Servicio, modalidad: string): number {
-  if (modalidad === "online" && servicio.precioOnline) {
-    return servicio.precioOnline;
+/** Valor mínimo de una atención presencial en Linares. */
+export const MINIMO_LINARES = 30000;
+
+/**
+ * Valor de una atención según modalidad y sede.
+ *
+ * En Linares ninguna atención presencial baja de $30.000: las que valen
+ * menos se cobran a ese mínimo. La telemedicina no depende de la sede.
+ */
+export function precioDe(
+  servicio: Servicio,
+  modalidad: string,
+  sede?: string | null
+): number {
+  if (modalidad === "online") {
+    return servicio.precioOnline ?? servicio.precio;
+  }
+  if (sede === "linares") {
+    return Math.max(servicio.precio, MINIMO_LINARES);
   }
   return servicio.precio;
 }
