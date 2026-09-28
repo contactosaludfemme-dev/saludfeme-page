@@ -15,7 +15,12 @@ type Cuerpo = {
   servicioId: string;
   fecha: string;
   hora: string;
+  /** Etiqueta para mostrar, p. ej. "Presencial · Talca". */
   modalidad: string;
+  /** Identificador de la modalidad, para calcular precio y duración. */
+  modalidadId?: string;
+  /** Sede elegida, cuando la atención es presencial. */
+  sede?: string;
   nombre: string;
   email: string;
   telefono: string;
@@ -62,7 +67,7 @@ export async function POST(req: Request) {
   }
 
   // Revalidación de disponibilidad en el servidor (evita reservas dobles)
-  const enHorario = bloquesDelDia(body.fecha, duracionDe(servicio!, body.modalidad)).some(
+  const enHorario = bloquesDelDia(body.fecha, duracionDe(servicio!, body.modalidadId ?? body.modalidad)).some(
     (b) => b.hora === body.hora && b.libre
   );
   if (!enHorario || estaTomada(body.fecha, body.hora)) {
@@ -103,7 +108,7 @@ export async function POST(req: Request) {
     const correos = await enviarCorreos({
       paciente,
       servicio: servicio!.nombre,
-      precio: precioDe(servicio!, body.modalidad),
+      precio: precioDe(servicio!, body.modalidadId ?? body.modalidad, body.sede),
       modalidad: body.modalidad,
       fecha: body.fecha,
       hora: body.hora,

@@ -51,7 +51,9 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
     const h = new Date();
     return new Date(h.getFullYear(), h.getMonth(), 1);
   });
-  const [sede, setSede] = useState(SEDES[0].id);
+  // Sin elegir: el valor y la disponibilidad dependen de la sede, así que
+  // no se muestran hasta que la paciente diga dónde quiere atenderse.
+  const [sede, setSede] = useState<string | null>(null);
   const [dia, setDia] = useState<string | null>(null);
   const [hora, setHora] = useState<string | null>(null);
   const [bloques, setBloques] = useState<Bloque[]>([]);
@@ -75,7 +77,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
   const [cargandoMes, setCargandoMes] = useState(false);
 
   useEffect(() => {
-    if (!servicio) {
+    if (!servicio || (modalidad === "presencial" && !sede)) {
       setDiasConCupo(new Set());
       return;
     }
@@ -118,7 +120,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
 
   /* Carga los bloques del día elegido desde la API */
   useEffect(() => {
-    if (!dia || !servicio) return;
+    if (!dia || !servicio || (modalidad === "presencial" && !sede)) return;
     let vigente = true;
     setCargandoHoras(true);
     setHora(null);
@@ -186,6 +188,10 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
           servicioId: servicio.id,
           fecha: dia,
           hora,
+          // La etiqueta de modalidad ya lleva la ciudad, pero el servidor
+          // necesita estos dos para calcular el valor de la sede.
+          modalidadId: modalidad,
+          sede: modalidad === "presencial" ? sede : undefined,
           modalidad:
             modalidad === "presencial"
               ? `Presencial · ${SEDES.find((x) => x.id === sede)?.ciudad}`
@@ -264,7 +270,8 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
               <div className="animate-aparecer">
                 <h3 className="text-xl">¿Qué necesitas?</h3>
                 <p className="mb-6 text-[0.93rem] text-gris">
-                  Selecciona el servicio para ver mi disponibilidad.
+                  Elige el servicio y, en el paso siguiente, dónde quieres
+                  atenderte: el valor depende de la sede.
                 </p>
                 <div className="flex flex-col gap-3">
                   {SERVICIOS.map((s) => (
@@ -287,8 +294,10 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                               : "Solo presencial"}
                         </span>
                       </span>
-                      <span className="whitespace-nowrap font-titulo font-bold text-magenta-600">
-                        {s.precioNota ? `Desde ${precioCLP(s.precio)}` : precioCLP(s.precio)}
+                      <span aria-hidden className="shrink-0 text-gris">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <path d="m9 18 6-6-6-6" />
+                        </svg>
                       </span>
                     </button>
                   ))}
@@ -359,15 +368,55 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                         </button>
                       ))}
                     </div>
+
+                    {sede && (
+                      <p
+                        aria-live="polite"
+                        className="mt-3 flex items-baseline justify-between gap-3 rounded-xl bg-rosa-50 px-4 py-3"
+                      >
+                        <span className="text-[0.88rem] text-gris">
+                          Valor en {SEDES.find((x) => x.id === sede)?.ciudad}
+                        </span>
+                        <span
+                          key={sede}
+                          className="animate-valor font-titulo text-lg font-bold text-magenta-600"
+                        >
+                          {servicio.precioNota
+                            ? `Desde ${precioCLP(precioDe(servicio, modalidad, sede))}`
+                            : precioCLP(precioDe(servicio, modalidad, sede))}
+                        </span>
+                      </p>
+                    )}
                   </fieldset>
                 )}
 
-                {!cargandoMes && diasConCupo.size === 0 && (
-                  <p className="mb-4 rounded-xl bg-rosa-50 p-4 text-center text-[0.88rem] leading-relaxed text-gris">
-                    No hay horas abiertas para este mes. Prueba el mes
-                    siguiente o escríbeme por WhatsApp y lo coordinamos.
+                {modalidad === "online" && (
+                  <p className="mb-5 flex items-baseline justify-between gap-3 rounded-xl bg-rosa-50 px-4 py-3">
+                    <span className="text-[0.88rem] text-gris">
+                      Valor por telemedicina
+                    </span>
+                    <span className="font-titulo text-lg font-bold text-magenta-600">
+                      {servicio.precioNota
+                        ? `Desde ${precioCLP(precioDe(servicio, modalidad))}`
+                        : precioCLP(precioDe(servicio, modalidad))}
+                    </span>
                   </p>
                 )}
+
+                {modalidad === "presencial" && !sede && (
+                  <p className="mb-4 rounded-xl bg-rosa-50 p-4 text-center text-[0.88rem] leading-relaxed text-gris">
+                    Elige una sede para ver el valor y las horas disponibles.
+                  </p>
+                )}
+
+                {!(modalidad === "presencial" && !sede) &&
+                  !cargandoMes &&
+                  diasConCupo.size === 0 && (
+                    <p className="mb-4 rounded-xl bg-rosa-50 p-4 text-center text-[0.88rem] leading-relaxed text-gris">
+                      No hay horas abiertas para este mes. Prueba el mes
+                      siguiente o escríbeme por WhatsApp y lo coordinamos.
+                    </p>
+                  )}
 
                 <Calendario
                   mes={mes}
@@ -476,7 +525,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                     <div className="flex justify-between gap-4 border-t border-gris-claro pt-2">
                       <dt className="text-gris">Valor</dt>
                       <dd className="font-titulo text-lg font-bold text-magenta-600">
-                        {precioCLP(precioDe(servicio, modalidad))}
+                        {precioCLP(precioDe(servicio, modalidad, sede))}
                       </dd>
                     </div>
                   </dl>
