@@ -214,14 +214,14 @@ export function Modalidades() {
           primera consulta.
         </p>
 
-        <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-gris-claro bg-white p-5 text-center shadow-suave md:rounded-3xl md:p-7">
-          <p className="mb-2 font-titulo text-[1.05rem] font-bold text-carbon">
+        <div className="mx-auto mt-8 max-w-3xl rounded-2xl bg-rojo-600 p-5 text-center shadow-media md:rounded-3xl md:p-7">
+          <p className="mb-2 font-titulo text-[1.05rem] font-bold text-white">
             Atención particular
           </p>
-          <p className="mx-auto max-w-xl text-[0.92rem] leading-relaxed text-gris">
-            Pago por <strong>transferencia</strong>: tu hora se confirma con el
-            comprobante. Sin convenio Fonasa, pero emito boleta para que pidas
-            reembolso a tu Isapre.
+          <p className="mx-auto max-w-xl text-[0.92rem] leading-relaxed text-white/95">
+            Pago por <strong className="font-semibold text-white">transferencia</strong>:
+            tu hora se confirma con el comprobante. Sin convenio Fonasa, pero
+            emito boleta para que pidas reembolso a tu Isapre.
           </p>
         </div>
       </div>
@@ -428,6 +428,23 @@ export function Cierre() {
 }
 
 /* ---------- Testimonios ---------- */
+/** Cinco estrellas llenas, como las reseñas de Google. */
+function Estrellas() {
+  return (
+    <div
+      className="mb-2 flex gap-0.5 text-[#FBBC04]"
+      role="img"
+      aria-label="5 de 5 estrellas"
+    >
+      {Array.from({ length: 5 }, (_, i) => (
+        <svg key={i} width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.9-6.2-3.3-6.2 3.3L7 14.2l-5-4.9 6.9-1z" />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
 export function Testimonios() {
   const pista = useRef<HTMLDivElement>(null);
   const [pagina, setPagina] = useState(0);
@@ -506,6 +523,7 @@ export function Testimonios() {
                   key={j}
                   className="flex h-full flex-col rounded-2xl bg-white/95 p-5 shadow-media backdrop-blur-sm"
                 >
+                  <Estrellas />
                   <span
                     aria-hidden
                     className="mb-1 font-mano text-3xl leading-none text-magenta-500"
