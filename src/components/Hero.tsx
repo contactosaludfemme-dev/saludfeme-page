@@ -116,32 +116,34 @@ export default function Hero() {
             </span>
           </h1>
 
-          <p className="mt-6 max-w-[44ch] text-[1.06rem] leading-relaxed text-white texto-hero">
-            Soy {CONTACTO.nombre}, matrona y creadora de {CONTACTO.marca}. Un
-            espacio de atención cercano, respetuoso y sin juicios, enfocado en
-            la salud integral de la mujer.
-          </p>
+          <div className="mt-6 max-w-[46ch] rounded-2xl border border-white/60 bg-white/85 p-5 shadow-media backdrop-blur-sm">
+            <p className="text-[1.06rem] leading-relaxed text-carbon">
+              Soy {CONTACTO.nombre}, matrona y creadora de {CONTACTO.marca}. Un
+              espacio de atención cercano, respetuoso y sin juicios, enfocado en
+              la salud integral de la mujer.
+            </p>
 
-          <ul className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.9rem] font-semibold text-white texto-hero">
-            <li className="flex items-center gap-1.5">
-              <MapPin size={16} strokeWidth={2.5} aria-hidden />
-              Talca
-            </li>
-            <li className="flex items-center gap-1.5">
-              <MapPin size={16} strokeWidth={2.5} aria-hidden />
-              Linares
-            </li>
-            <li className="flex items-center gap-1.5">
-              <Monitor size={16} strokeWidth={2.5} aria-hidden />
-              Online a todo Chile
-            </li>
-          </ul>
+            <ul className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-gris-claro pt-4 text-[0.9rem] font-semibold text-magenta-600">
+              <li className="flex items-center gap-1.5">
+                <MapPin size={16} strokeWidth={2.5} aria-hidden />
+                Talca
+              </li>
+              <li className="flex items-center gap-1.5">
+                <MapPin size={16} strokeWidth={2.5} aria-hidden />
+                Linares
+              </li>
+              <li className="flex items-center gap-1.5">
+                <Monitor size={16} strokeWidth={2.5} aria-hidden />
+                Online a todo Chile
+              </li>
+            </ul>
+          </div>
 
           <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <button
               type="button"
               onClick={() => abrir()}
-              className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white px-8 py-4 font-titulo font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/15"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-rosa-650 px-8 py-4 font-titulo font-semibold text-white shadow-boton transition-all hover:-translate-y-0.5 hover:bg-rosa-750 hover:shadow-boton-alto"
             >
               Agendar mi hora
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden>
@@ -152,7 +154,7 @@ export default function Hero() {
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white px-7 py-4 font-titulo font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/15"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-wsp-100 px-7 py-4 font-titulo font-semibold text-wsp-700 shadow-boton transition-all hover:-translate-y-0.5 hover:bg-wsp-200 hover:shadow-boton-alto"
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                 <path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.6.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.6-1.5-.9-2.1-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.3-.2-.5-.3zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2z" />

@@ -28,6 +28,7 @@
   --color-rosa-400: #FD4DB9;
   --color-rosa-500: #FD2BAC;
   --color-rosa-650: #8F0256;
+  --color-rosa-750: #6B0140;  /* hover del botón principal */
 
   /* --- Rosas --- */
   --color-rosa-50:  #FDF2F4;
@@ -66,16 +67,28 @@
   --shadow-suave:  0 2px 12px rgba(46,42,43,.07);
   --shadow-media:  0 6px 24px rgba(196,30,117,.10);
   --shadow-fuerte: 0 16px 48px rgba(196,30,117,.16);
+  /* Los botones del hero van sobre rosa saturado: las sombras de arriba son
+     magenta y difusas, así que ahí se pierden. Esta es más cerrada y oscura
+     para que el botón se despegue del fondo. */
+  --shadow-boton: 0 4px 6px rgba(74,4,38,.22), 0 10px 20px rgba(74,4,38,.18);
+  --shadow-boton-alto: 0 6px 10px rgba(74,4,38,.26), 0 16px 28px rgba(74,4,38,.22);
 
   /* --- Animaciones --- */
   --animate-aparecer: aparecer .35s cubic-bezier(.4,0,.2,1);
   --animate-latido:   latido 2s ease-in-out infinite;
   --animate-brillo:       brillo 4s ease-in-out infinite;
   --animate-brillo-lento: brillo 6.5s ease-in-out infinite;
+  /* Cambio de valor al elegir otra sede: un salto seco se lee como un
+     error, así que el monto se atenúa y vuelve en su sitio. */
+  --animate-valor: valor .4s cubic-bezier(.4,0,.2,1);
 }
 
 @keyframes aparecer {
   from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes valor {
+  from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: none; }
 }
 /* Texto blanco sobre el rosa de marca: el fondo es claro, así que cada
