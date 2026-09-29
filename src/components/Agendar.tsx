@@ -56,7 +56,18 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
   const [sede, setSede] = useState<string | null>(null);
   const [dia, setDia] = useState<string | null>(null);
   const [hora, setHora] = useState<string | null>(null);
+  /** Hora tomada que la paciente acaba de pulsar, para explicar por qué no puede. */
+  const [horaOcupada, setHoraOcupada] = useState<string | null>(null);
   const [bloques, setBloques] = useState<Bloque[]>([]);
+  /**
+   * La hora elegida sigue libre en los bloques actuales.
+   *
+   * No basta con que `hora` tenga valor: entre que la paciente la elige y
+   * pulsa Continuar, otra puede haberla reservado y los bloques recargarse.
+   */
+  const horaSigueLibre = Boolean(
+    hora && bloques.some((b) => b.hora === hora && b.libre)
+  );
   const [cargandoHoras, setCargandoHoras] = useState(false);
   const [avisoHoras, setAvisoHoras] = useState<string | null>(null);
 
@@ -124,6 +135,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
     let vigente = true;
     setCargandoHoras(true);
     setHora(null);
+    setHoraOcupada(null);
 
     fetch(
       `/api/disponibilidad?fecha=${dia}&servicio=${servicio.id}&modalidad=${modalidad}&sede=${sede}`
@@ -450,24 +462,53 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                           <button
                             key={b.hora}
                             type="button"
-                            disabled={!b.libre}
-                            onClick={() => setHora(b.hora)}
+                            onClick={() =>
+                              b.libre
+                                ? (setHora(b.hora),
+                                  setHoraOcupada(null),
+                                  setErrorGlobal(null))
+                                : setHoraOcupada(b.hora)
+                            }
                             aria-pressed={hora === b.hora}
+                            aria-disabled={!b.libre}
                             className={`rounded-xl border-2 px-2 py-2.5 text-[0.9rem] font-semibold transition-colors ${
                               hora === b.hora
                                 ? "border-magenta-500 bg-magenta-500 text-white"
                                 : b.libre
                                   ? "border-gris-claro bg-white hover:border-magenta-500 hover:text-magenta-600"
-                                  : "cursor-not-allowed border-gris-claro/50 bg-white text-gris-claro line-through"
+                                  : horaOcupada === b.hora
+                                    ? "cursor-not-allowed border-rojo-700 bg-gris-claro text-rojo-700 line-through"
+                                    : "cursor-not-allowed border-gris-claro bg-gris-claro text-gris line-through"
                             }`}
                           >
                             {b.hora}
+                            <span className="sr-only">
+                              {b.libre ? "" : " (hora ocupada)"}
+                            </span>
                           </button>
                         ))}
                       </div>
                     ) : (
                       <p className="rounded-xl bg-rosa-50 p-5 text-center text-[0.9rem] text-gris">
                         No quedan horas disponibles este día. Elige otra fecha.
+                      </p>
+                    )}
+
+                    {(horaOcupada || errorGlobal) && (
+                      <p
+                        role="alert"
+                        className="mt-3 flex items-start gap-2 rounded-xl border border-coral-500/40 bg-coral-500/10 px-4 py-3 text-[0.88rem] leading-snug text-carbon"
+                      >
+                        <span aria-hidden className="text-coral-500">●</span>
+                        <span>
+                          {errorGlobal ?? (
+                            <>
+                              Las <strong>{horaOcupada}</strong> ya están
+                              tomadas. Elige otra hora de las marcadas en
+                              blanco.
+                            </>
+                          )}
+                        </span>
                       </p>
                     )}
                   </div>
@@ -483,8 +524,16 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                   </button>
                   <button
                     type="button"
-                    disabled={!dia || !hora}
-                    onClick={() => setPaso(2)}
+                    disabled={!dia || !horaSigueLibre}
+                    onClick={() => {
+                      // La hora pudo tomarse mientras la paciente elegía
+                      if (!horaSigueLibre) {
+                        setHoraOcupada(hora);
+                        setHora(null);
+                        return;
+                      }
+                      setPaso(2);
+                    }}
                     className="rounded-full bg-magenta-500 px-7 py-3 font-titulo font-semibold text-white transition-all hover:enabled:-translate-y-0.5 hover:enabled:bg-magenta-600 disabled:opacity-40"
                   >
                     Continuar
@@ -494,7 +543,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
             )}
 
             {/* ---------- Paso 3: datos ---------- */}
-            {paso === 2 && servicio && dia && hora && (
+            {paso === 2 && servicio && dia && hora && horaSigueLibre && (
               <div className="animate-aparecer">
                 <h3 className="text-xl">Tus datos</h3>
                 <p className="mb-5 text-[0.93rem] text-gris">
@@ -667,11 +716,26 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                 <span aria-hidden className="mx-auto mb-5 grid size-16 place-items-center rounded-full bg-exito-50 text-3xl">
                   ✓
                 </span>
-                <h3 className="text-2xl">¡Tu hora está reservada!</h3>
+                <h3 className="text-2xl">¡Solicitud enviada!</h3>
                 <p className="mx-auto mt-2 max-w-md text-[0.95rem] text-gris">
-                  Te envié un correo a <strong>{form.email}</strong>. Te
-                  contactaré a la brevedad para coordinar el pago por
-                  transferencia y confirmar tu hora. 🩷
+                  {resultado.vistaPrevia.enviados ? (
+                    <>
+                      Te escribí a <strong>{form.email}</strong> con el detalle.
+                      Revisaré tu solicitud y te confirmo por ese mismo correo.
+                      🩷
+                    </>
+                  ) : (
+                    <>
+                      Guarda tu código de reserva. Revisaré tu solicitud y te
+                      contactaré a la brevedad para confirmarte la hora. 🩷
+                    </>
+                  )}
+                </p>
+
+                <p className="mx-auto mt-4 max-w-md rounded-xl border border-coral-500/30 bg-coral-500/10 px-4 py-3 text-[0.88rem] leading-snug text-carbon">
+                  <strong>Tu hora aún no está confirmada.</strong> Cuando revise
+                  tu solicitud te envío los datos para transferir: la hora queda
+                  firme al recibir el comprobante.
                 </p>
 
                 <div className="mx-auto mt-6 max-w-md rounded-2xl bg-rosa-50 p-5 text-left">
