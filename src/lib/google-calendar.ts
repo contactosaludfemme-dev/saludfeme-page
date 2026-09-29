@@ -46,6 +46,9 @@ type Cita = {
   hora: string;  // HH:mm
   paciente: { nombre: string; email: string; telefono: string; notas?: string };
   modalidad: string;
+  /** Se guardan en el evento para poder pedirlos al confirmar el pago. */
+  precio?: number;
+  codigoReserva?: string;
 };
 
 /** Suma minutos a "YYYY-MM-DDTHH:mm:00" respetando la hora local. */
@@ -135,14 +138,20 @@ export async function crearEvento(
   const { data } = await calendar.events.insert({
     calendarId: process.env.GOOGLE_CALENDAR_ID || "primary",
     conferenceDataVersion: esOnline ? 1 : 0,
-    sendUpdates: "all", // Google envía la invitación a la paciente
+    // La paciente no recibe invitación todavía: la cita está por confirmar.
+    // Google la enviará al aceptarla, desde `confirmarEvento`.
+    sendUpdates: "none",
     requestBody: {
-      summary: `${cita.servicio} — ${cita.paciente.nombre}`,
+      summary: `⏳ POR CONFIRMAR — ${cita.servicio} — ${cita.paciente.nombre}`,
+      colorId: "6", // naranja: se distingue de las citas ya aceptadas
       description:
+        `Servicio: ${cita.servicio}\n` +
         `Paciente: ${cita.paciente.nombre}\n` +
         `Teléfono: ${cita.paciente.telefono}\n` +
         `Email: ${cita.paciente.email}\n` +
-        `Modalidad: ${cita.modalidad}\n\n` +
+        `Modalidad: ${cita.modalidad}\n` +
+        `Valor: ${cita.precio ?? ""}\n` +
+        `Codigo: ${cita.codigoReserva ?? ""}\n\n` +
         `Motivo de consulta: ${cita.paciente.notas || "—"}\n\n` +
         `Reservado desde el sitio web.`,
       start: { dateTime: inicio, timeZone: ZONA },
@@ -172,6 +181,127 @@ export async function crearEvento(
     eventoId: data.id!,
     meetUrl: data.hangoutLink ?? undefined,
     htmlLink: data.htmlLink ?? undefined,
+  };
+}
+
+/**
+ * Acepta una cita pendiente.
+ *
+ * Le quita la marca de "por confirmar", la pinta de verde y recién ahí
+ * Google manda la invitación a la paciente.
+ */
+export async function confirmarEvento(eventoId: string): Promise<{
+  ok: boolean;
+  yaResuelta?: boolean;
+  meetUrl?: string;
+  datos?: DatosEvento;
+}> {
+  if (!usaCalendarioReal()) return { ok: true };
+
+  const calendar = clienteCalendario();
+  const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
+
+  const { data: actual } = await calendar.events.get({ calendarId, eventId: eventoId });
+  const titulo = actual.summary ?? "";
+  // Ya se decidió antes: el enlace del correo puede abrirse dos veces
+  if (!titulo.startsWith("⏳ POR CONFIRMAR")) {
+    return { ok: true, yaResuelta: true };
+  }
+
+  // Aceptada, pero aún no definitiva: falta la transferencia. La invitación
+  // de Google se manda al confirmarse el pago, no ahora.
+  const { data } = await calendar.events.patch({
+    calendarId,
+    eventId: eventoId,
+    sendUpdates: "none",
+    requestBody: {
+      summary: titulo.replace("⏳ POR CONFIRMAR — ", "💸 POR PAGAR — "),
+      colorId: "5", // amarillo: esperando el comprobante
+    },
+  });
+
+  return {
+    ok: true,
+    meetUrl: data.hangoutLink ?? undefined,
+    datos: datosDelEvento(data.description ?? ""),
+  };
+}
+
+/** Rechaza una cita pendiente: borra el evento y libera la hora. */
+export async function rechazarEvento(eventoId: string): Promise<{
+  ok: boolean;
+  yaResuelta?: boolean;
+  datos?: DatosEvento;
+}> {
+  if (!usaCalendarioReal()) return { ok: true };
+
+  const calendar = clienteCalendario();
+  const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
+
+  const { data: actual } = await calendar.events.get({ calendarId, eventId: eventoId });
+  const t = actual.summary ?? "";
+  // Se puede rechazar tanto una solicitud nueva como una que no pagó a tiempo
+  if (!t.startsWith("⏳ POR CONFIRMAR") && !t.startsWith("💸 POR PAGAR")) {
+    return { ok: true, yaResuelta: true };
+  }
+
+  const datos = datosDelEvento(actual.description ?? "");
+  await calendar.events.delete({ calendarId, eventId: eventoId, sendUpdates: "none" });
+  return { ok: true, datos };
+}
+
+/**
+ * Marca la cita como pagada: es el paso final.
+ *
+ * Recién aquí Google envía la invitación, porque recién aquí la hora es firme.
+ */
+export async function marcarPagada(eventoId: string): Promise<{
+  ok: boolean;
+  yaResuelta?: boolean;
+  datos?: DatosEvento;
+}> {
+  if (!usaCalendarioReal()) return { ok: true };
+
+  const calendar = clienteCalendario();
+  const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
+
+  const { data: actual } = await calendar.events.get({ calendarId, eventId: eventoId });
+  const titulo = actual.summary ?? "";
+  if (!titulo.startsWith("💸 POR PAGAR")) {
+    return { ok: true, yaResuelta: true };
+  }
+
+  const { data } = await calendar.events.patch({
+    calendarId,
+    eventId: eventoId,
+    sendUpdates: "all", // ahora sí: la hora está firme
+    requestBody: {
+      summary: titulo.replace("💸 POR PAGAR — ", ""),
+      colorId: "10", // verde
+    },
+  });
+
+  return { ok: true, datos: datosDelEvento(data.description ?? "") };
+}
+
+type DatosEvento = {
+  servicio: string;
+  paciente: string;
+  email: string;
+  precio: number;
+  codigo: string;
+};
+
+/** Recupera los datos de la paciente desde la descripción del evento. */
+function datosDelEvento(desc: string): DatosEvento {
+  const sacar = (campo: string) =>
+    desc.match(new RegExp(`${campo}: (.+)`))?.[1]?.trim() ?? "";
+  return {
+    servicio: sacar("Servicio"),
+    paciente: sacar("Paciente"),
+    email: sacar("Email"),
+    precio: Number(sacar("Valor")) || 0,
+    codigo: sacar("Codigo"),
   };
 }
 

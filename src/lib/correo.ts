@@ -10,7 +10,9 @@
  *   3. Cargar RESEND_API_KEY y EMAIL_DESDE en las variables de entorno
  */
 
-import { CONTACTO, SEDES, precioCLP } from "./datos";
+import {
+  CONTACTO, SEDES, DATOS_TRANSFERENCIA, hayDatosTransferencia, precioCLP,
+} from "./datos";
 import { fechaLarga } from "./calendario";
 
 /** Envía de verdad solo si hay credenciales de Resend configuradas. */
@@ -134,6 +136,112 @@ export function correoMatrona(d: DatosCorreo) {
 }
 
 /** Envía ambos correos. En modo demo solo los registra y los devuelve. */
+
+/* ---------- Preconfirmación ---------- */
+
+/** Aviso a la paciente: la solicitud llegó, falta que la matrona la acepte. */
+export function correoSolicitudPaciente(d: DatosCorreo) {
+  return {
+    para: d.paciente.email,
+    asunto: `Recibimos tu solicitud de hora — ${CONTACTO.marca}`,
+    html: envoltorio(
+      "Solicitud recibida",
+      `<h1 style="margin:0 0 12px;font-size:22px;">Hola ${esc(d.paciente.nombre)} 🩷</h1>
+       <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
+         Recibí tu solicitud de hora. La estoy revisando y te confirmo a la
+         brevedad por este mismo correo.
+       </p>
+       <p style="margin:0 0 4px;font-size:15px;line-height:1.6;">
+         <strong>Tu hora aún no está confirmada.</strong> Espera mi respuesta
+         antes de organizar tu día.
+       </p>
+       ${tablaCita(d)}
+       <p style="margin:0;font-size:14px;color:${CARBON};line-height:1.6;">
+         Si necesitas cambiar algo, escríbeme a ${esc(CONTACTO.telefonoDisplay)}.
+       </p>`
+    ),
+  };
+}
+
+/** Aviso a la matrona, con los dos botones de decisión. */
+export function correoSolicitudMatrona(
+  d: DatosCorreo,
+  enlaces: { confirmar: string; rechazar: string }
+) {
+  const boton = (url: string, texto: string, fondo: string) =>
+    `<a href="${esc(url)}" style="display:inline-block;padding:14px 28px;border-radius:999px;
+        background:${fondo};color:#fff;font-weight:700;font-size:15px;text-decoration:none;">
+       ${texto}
+     </a>`;
+
+  return {
+    para: CONTACTO.email,
+    asunto: `Nueva solicitud: ${d.servicio} — ${fechaLarga(d.fecha)} ${d.hora}`,
+    html: envoltorio(
+      "Nueva solicitud de hora",
+      `<h1 style="margin:0 0 12px;font-size:22px;">Nueva solicitud</h1>
+       <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
+         <strong>${esc(d.paciente.nombre)}</strong> pidió una hora. Está
+         reservada de forma provisional hasta que decidas.
+       </p>
+       ${tablaCita(d)}
+       <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+              style="background:#FDF2F4;border-radius:12px;padding:16px 20px;margin:0 0 24px;">
+         <tr><td style="padding:6px 0;font-size:14px;">📞 ${esc(d.paciente.telefono)}</td></tr>
+         <tr><td style="padding:6px 0;font-size:14px;">✉️ ${esc(d.paciente.email)}</td></tr>
+         ${
+           d.paciente.notas
+             ? `<tr><td style="padding:6px 0;font-size:14px;line-height:1.5;">📝 ${esc(d.paciente.notas)}</td></tr>`
+             : ""
+         }
+       </table>
+       <p style="margin:0 0 12px;font-size:15px;font-weight:600;">¿Aceptas esta hora?</p>
+       <p style="margin:0 0 12px;">${boton(enlaces.confirmar, "✓ Confirmar hora", "#1B8146")}</p>
+       <p style="margin:0 0 20px;">${boton(enlaces.rechazar, "✕ Rechazar", "#B83A2E")}</p>
+       <p style="margin:0;font-size:13px;color:#6B6264;line-height:1.6;">
+         La paciente no recibe nada hasta que decidas. Mientras tanto, la hora
+         queda bloqueada para que nadie más la tome.
+       </p>`
+    ),
+  };
+}
+
+/** Rechazo: la hora vuelve a estar libre. */
+export function correoRechazo(
+  paciente: { nombre: string; email: string },
+  datos: { servicio: string; fecha: string; hora: string },
+  motivo?: string
+) {
+  return {
+    para: paciente.email,
+    asunto: `Sobre tu solicitud de hora — ${CONTACTO.marca}`,
+    html: envoltorio(
+      "Solicitud no confirmada",
+      `<h1 style="margin:0 0 12px;font-size:22px;">Hola ${esc(paciente.nombre)}</h1>
+       <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
+         Lamentablemente no puedo atenderte el
+         <strong>${esc(fechaLarga(datos.fecha))} a las ${esc(datos.hora)}</strong>.
+       </p>
+       ${
+         motivo
+           ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                 style="background:#FDF2F4;border-radius:12px;padding:16px 20px;margin:0 0 20px;">
+                <tr><td style="font-size:14px;line-height:1.6;">${esc(motivo)}</td></tr>
+              </table>`
+           : ""
+       }
+       <p style="margin:0 0 20px;font-size:15px;line-height:1.6;">
+         Puedes elegir otro horario en el sitio, o escribirme y lo coordinamos
+         juntas.
+       </p>
+       <p style="margin:0;font-size:15px;">
+         <a href="https://wa.me/${CONTACTO.telefono.replace(/\D/g, "")}"
+            style="color:${M};font-weight:600;">Escríbeme por WhatsApp</a>
+       </p>`
+    ),
+  };
+}
+
 export async function enviarCorreos(d: DatosCorreo) {
   const paciente = correoPaciente(d);
   const matrona = correoMatrona(d);
@@ -166,5 +274,174 @@ export async function enviarCorreos(d: DatosCorreo) {
     // Un fallo de correo no debe tumbar la reserva: ya quedó agendada
     console.error("[CORREO] No se pudo enviar:", e);
     return { enviados: false, paciente, matrona };
+  }
+}
+
+
+/**
+ * La matrona aceptó: la paciente recibe los datos para transferir.
+ *
+ * La hora todavía no es definitiva — se confirma al llegar el comprobante.
+ */
+export function correoPorPagar(
+  paciente: { nombre: string; email: string },
+  datos: {
+    servicio: string;
+    fecha: string;
+    hora: string;
+    precio: number;
+    codigoReserva: string;
+  }
+) {
+  const t = DATOS_TRANSFERENCIA;
+  const wa = `https://wa.me/${CONTACTO.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
+    `Hola Francisca, te envío el comprobante de mi hora ${datos.codigoReserva} 🌸`
+  )}`;
+  const fila = (k: string, v: string) =>
+    `<tr><td style="padding:7px 0;color:#6B6264;font-size:14px;">${k}</td>
+         <td style="padding:7px 0;text-align:right;font-weight:600;font-size:14px;">${esc(v)}</td></tr>`;
+
+  return {
+    para: paciente.email,
+    asunto: `Tu hora está reservada — falta el pago (${datos.codigoReserva})`,
+    html: envoltorio(
+      "Confirma tu hora con el pago",
+      `<h1 style="margin:0 0 12px;font-size:22px;">¡Tengo tu hora, ${esc(paciente.nombre)}! 🩷</h1>
+       <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
+         Reservé el <strong>${esc(fechaLarga(datos.fecha))} a las ${esc(datos.hora)} hrs</strong>
+         para ti. Para dejarla confirmada, transfiere el valor de la consulta y
+         envíame el comprobante.
+       </p>
+
+       ${
+         hayDatosTransferencia()
+           ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                 style="background:#FDF2F4;border-radius:12px;padding:16px 20px;margin:0 0 20px;">
+                ${fila("Titular", t.titular)}
+                ${fila("RUT", t.rut)}
+                ${fila("Banco", t.banco)}
+                ${fila("Tipo de cuenta", t.tipoCuenta)}
+                ${fila("N° de cuenta", t.numeroCuenta)}
+                ${fila("Correo", t.email)}
+                ${fila("Monto", precioCLP(datos.precio))}
+                ${fila("Código de reserva", datos.codigoReserva)}
+              </table>
+              <p style="margin:0 0 12px;font-size:15px;line-height:1.6;">
+                Al transferir, <strong>escribe tu código de reserva</strong> en
+                el mensaje para que la identifique.
+              </p>`
+           : `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                 style="background:#FDF2F4;border-radius:12px;padding:16px 20px;margin:0 0 20px;">
+                ${fila("Monto", precioCLP(datos.precio))}
+                ${fila("Código de reserva", datos.codigoReserva)}
+              </table>
+              <p style="margin:0 0 12px;font-size:15px;line-height:1.6;">
+                Escríbeme por WhatsApp y te envío los datos para la
+                transferencia.
+              </p>`
+       }
+
+       <p style="margin:0 0 20px;">
+         <a href="${esc(wa)}" style="display:inline-block;padding:14px 28px;border-radius:999px;
+            background:#25D366;color:#fff;font-weight:700;font-size:15px;text-decoration:none;">
+           Enviar comprobante por WhatsApp
+         </a>
+       </p>
+
+       <p style="margin:0;font-size:14px;color:#6B6264;line-height:1.6;">
+         Tienes <strong>${t.plazoHoras} horas</strong> para enviarlo. Pasado ese
+         plazo libero la hora para otra paciente. Si necesitas más tiempo,
+         escríbeme y lo vemos.
+       </p>`
+    ),
+  };
+}
+
+/**
+ * Recordatorio a la matrona: la paciente ya tiene los datos de pago.
+ * Incluye el enlace con que marcará la hora como pagada al recibir el
+ * comprobante.
+ */
+export function correoPagoPendiente(
+  paciente: { nombre: string },
+  datos: { fecha: string; hora: string },
+  enlacePagada: string
+) {
+  return {
+    para: CONTACTO.email,
+    asunto: `Esperando pago: ${esc(paciente.nombre)} — ${fechaLarga(datos.fecha)} ${datos.hora}`,
+    html: envoltorio(
+      "Esperando el comprobante",
+      `<h1 style="margin:0 0 12px;font-size:22px;">Aceptaste esta hora</h1>
+       <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
+         <strong>${esc(paciente.nombre)}</strong> ya recibió los datos para
+         transferir — ${esc(fechaLarga(datos.fecha))} a las ${esc(datos.hora)} hrs.
+       </p>
+       <p style="margin:0 0 20px;font-size:15px;line-height:1.6;">
+         Cuando te llegue el comprobante, marca la hora como pagada. Recién
+         entonces la paciente recibe la invitación al calendario.
+       </p>
+       <p style="margin:0 0 20px;">
+         <a href="${esc(enlacePagada)}" style="display:inline-block;padding:14px 28px;border-radius:999px;
+            background:#1B8146;color:#fff;font-weight:700;font-size:15px;text-decoration:none;">
+           ✓ Recibí el pago
+         </a>
+       </p>
+       <p style="margin:0;font-size:13px;color:#6B6264;line-height:1.6;">
+         Si no paga dentro del plazo, puedes rechazar la hora desde el correo
+         anterior y el horario vuelve a quedar libre.
+       </p>`
+    ),
+  };
+}
+
+/** Envía los dos correos de solicitud: aviso a la paciente y decisión a la matrona. */
+export async function enviarSolicitud(
+  d: DatosCorreo,
+  enlaces: { confirmar: string; rechazar: string }
+) {
+  const paciente = correoSolicitudPaciente(d);
+  const matrona = correoSolicitudMatrona(d, enlaces);
+  return despachar([paciente, matrona], { paciente, matrona });
+}
+
+/** Envía un solo correo, para el rechazo. */
+export async function enviarUno(correo: {
+  para: string;
+  asunto: string;
+  html: string;
+}) {
+  return despachar([correo], { correo });
+}
+
+/** Envío común: sin credenciales registra en consola y no interrumpe nada. */
+async function despachar<T>(
+  correos: { para: string; asunto: string; html: string }[],
+  detalle: T
+): Promise<{ enviados: boolean } & T> {
+  if (!envioActivo()) {
+    for (const c of correos) {
+      console.log("[SIN ENVÍO] →", c.para, "|", c.asunto);
+    }
+    return { enviados: false, ...detalle };
+  }
+  try {
+    const { Resend } = await import("resend");
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    await Promise.all(
+      correos.map((c) =>
+        resend.emails.send({
+          from: process.env.EMAIL_DESDE!,
+          to: c.para,
+          subject: c.asunto,
+          html: c.html,
+        })
+      )
+    );
+    return { enviados: true, ...detalle };
+  } catch (e) {
+    // Un fallo de correo no debe tumbar la reserva: ya quedó agendada
+    console.error("[CORREO] No se pudo enviar:", e);
+    return { enviados: false, ...detalle };
   }
 }

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { crearToken } from "@/lib/firma";
 import { crearEvento } from "@/lib/google-calendar";
-import { enviarCorreos } from "@/lib/correo";
-import { SERVICIOS, duracionDe, precioDe } from "@/lib/datos";
+import { enviarSolicitud } from "@/lib/correo";
+import { SERVICIOS, SITIO_URL, duracionDe, precioDe } from "@/lib/datos";
 import { bloquesDelDia } from "@/lib/calendario";
 import { estaTomada, tomar, liberar } from "@/lib/reservas";
 import {
@@ -94,28 +95,46 @@ export async function POST(req: Request) {
   }
 
   try {
+    const codigo = codigoReserva(body.fecha, body.hora, paciente.email);
+    const valor = precioDe(
+      servicio!,
+      body.modalidadId ?? body.modalidad,
+      body.sede
+    );
+
     const evento = await crearEvento({
       servicio: servicio!.nombre,
-      duracionMin: duracionDe(servicio!, body.modalidad),
+      duracionMin: duracionDe(servicio!, body.modalidadId ?? body.modalidad),
       fecha: body.fecha,
       hora: body.hora,
       paciente,
       modalidad: body.modalidad,
-    });
-
-    const codigo = codigoReserva(body.fecha, body.hora, paciente.email);
-
-    const correos = await enviarCorreos({
-      paciente,
-      servicio: servicio!.nombre,
-      precio: precioDe(servicio!, body.modalidadId ?? body.modalidad, body.sede),
-      modalidad: body.modalidad,
-      fecha: body.fecha,
-      hora: body.hora,
-      duracionMin: duracionDe(servicio!, body.modalidad),
-      meetUrl: evento.meetUrl,
+      // Se guardan en el evento para poder enviarlos al aceptar la hora
+      precio: valor,
       codigoReserva: codigo,
     });
+
+    // La cita nace por confirmar: la matrona decide desde el correo con dos
+    // enlaces firmados, sin necesidad de cuenta ni panel de administración.
+    const cita = { id: evento.eventoId, fecha: body.fecha, hora: body.hora };
+    const base = process.env.NEXT_PUBLIC_SITIO_URL ?? SITIO_URL;
+    const correos = await enviarSolicitud(
+      {
+        paciente,
+        servicio: servicio!.nombre,
+        precio: valor,
+        modalidad: body.modalidad,
+        fecha: body.fecha,
+        hora: body.hora,
+        duracionMin: duracionDe(servicio!, body.modalidadId ?? body.modalidad),
+        meetUrl: evento.meetUrl,
+        codigoReserva: codigo,
+      },
+      {
+        confirmar: `${base}/cita/confirmar/${crearToken(cita, "confirmar")}`,
+        rechazar: `${base}/cita/rechazar/${crearToken(cita, "rechazar")}`,
+      }
+    );
 
     return NextResponse.json({
       ok: true,
