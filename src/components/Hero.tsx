@@ -172,7 +172,7 @@ export default function Hero() {
           />
           <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] border-4 border-white/70 bg-gradient-to-b from-white/70 to-white/25 shadow-fuerte backdrop-blur-sm">
             <Image
-              src="/perfil-saludfeme.jpg"
+              src="/profile-page.jpeg"
               alt={`${CONTACTO.nombre}, matrona`}
               fill
               priority

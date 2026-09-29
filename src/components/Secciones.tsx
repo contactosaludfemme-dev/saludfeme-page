@@ -311,7 +311,7 @@ export function SobreMi() {
   return (
     <section id="sobre-mi" className="bg-rosa-50 py-20 lg:py-24">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="mx-auto grid w-full max-w-sm gap-4">
+        <div className="mx-auto grid w-full max-w-sm gap-4 md:max-w-none md:grid-cols-2 lg:max-w-sm lg:grid-cols-1">
           {CONSULTAS.map((c) => (
             <figure
               key={c.src}
@@ -323,7 +323,7 @@ export function SobreMi() {
                   alt={c.alt}
                   fill
                   sizes="(min-width: 1024px) 24rem, (min-width: 640px) 24rem, 100vw"
-                  className="object-cover"
+                  className="object-contain"
                 />
               </div>
               <figcaption className="px-4 py-3 text-[0.82rem]">
