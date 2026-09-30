@@ -44,9 +44,10 @@ export const SEDES: Sede[] = [
     centro: "Fix Salud",
     direccion: "Av. León Bustos esquina Mariano Latorre #24",
     referencia: "A pasos de Espacio Urbano",
+    // Enlace al lugar exacto en Google Maps, no a una búsqueda por texto.
     mapaUrl:
-      "https://maps.google.com/?q=Av.+Le%C3%B3n+Bustos+esquina+Mariano+Latorre+24,+Linares,+Chile",
-    coordenadas: { lat: -35.843942, lng: -71.605378 },
+      "https://maps.google.com/?q=Mariano+Latorre+24,+Linares,+Maule&cid=12720233520895686011",
+    coordenadas: { lat: -35.8442818, lng: -71.6053829 },
   },
 ];
 
