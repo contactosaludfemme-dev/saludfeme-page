@@ -156,6 +156,7 @@ export const SERVICIOS: Servicio[] = [
       "Preparación de tu salud antes de buscar un embarazo: exámenes, suplementación y resolución de dudas.",
     precio: 30000,
     modalidades: ["presencial", "online"],
+    incluye: "Puedes venir acompañada de tu pareja.",
   },
   {
     id: "control-diada",
@@ -252,6 +253,7 @@ export const SERVICIOS: Servicio[] = [
     precio: 60000,
     modalidades: ["presencial"],
     aviso: "No incluye el dispositivo. Requiere consejería previa.",
+    incluye: "El procedimiento se realiza con anestesia local.",
   },
   {
     id: "extraccion-diu",
@@ -269,7 +271,8 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Anticoncepción",
     descripcion:
       "Seguimiento posterior a la indicación: implantes, DIU, píldoras, anillo, inyecciones o parche.",
-    precio: 20000,
+    precio: 25000,
+    precioOnline: 20000,
     modalidades: ["presencial", "online"],
   },
   {
@@ -278,7 +281,7 @@ export const SERVICIOS: Servicio[] = [
     icono: "💉",
     categoria: "Procedimientos",
     descripcion: "Intramuscular o subcutánea.",
-    precio: 20000,
+    precio: 25000,
     modalidades: ["presencial"],
   },
 
@@ -299,9 +302,11 @@ export const SERVICIOS: Servicio[] = [
     icono: "🔬",
     categoria: "Salud sexual",
     descripcion:
-      "Evaluación de síntomas, indicación de tratamiento y orientación sobre prevención, con certificación como consejera de VIH e ITS de la Seremi de Salud del Maule.",
+      "Evaluación de síntomas, indicación de tratamiento y orientación sobre prevención.",
     precio: 30000,
     modalidades: ["presencial", "online"],
+    incluye:
+      "Consejera certificada en VIH e ITS por la Seremi de Salud del Maule.",
   },
   {
     id: "lactancia",
@@ -549,7 +554,7 @@ export const FAQS = [
   },
   {
     p: "¿Atiendes por Fonasa o Isapre?",
-    r: "No cuento con convenio Fonasa, así que la atención es particular. Emito boleta por cada atención y, dependiendo de tu plan de Isapre, puedes presentarla para pedir el reembolso directamente con ellos. Conviene que consultes con tu Isapre qué cobertura tiene tu plan para consultas de matronería.",
+    r: "La atención es particular: no cuento con convenio Fonasa. Emito boleta por cada atención para que puedas presentarla a tu Isapre, pero el reembolso no es automático ni parejo: depende del convenio y de la cobertura que tenga tu plan para consultas de matronería. Algunos planes reembolsan una parte, otros no cubren esta prestación. Consúltalo con tu Isapre antes de tu hora, así sabes con qué contar.",
   },
   {
     p: "¿Realizas ecografías en tu consulta?",

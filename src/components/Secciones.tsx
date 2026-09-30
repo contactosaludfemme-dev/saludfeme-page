@@ -284,8 +284,10 @@ export function Modalidades() {
           </p>
           <p className="mx-auto max-w-xl text-[0.92rem] leading-relaxed text-white/95">
             Pago por <strong className="font-semibold text-white">transferencia</strong>:
-            tu hora se confirma con el comprobante. Sin convenio Fonasa, pero
-            emito boleta para que pidas reembolso a tu Isapre.
+            tu hora se confirma con el comprobante. No tengo convenio Fonasa.
+            Emito boleta por cada atención, y el reembolso dependerá de la
+            cobertura que tenga tu plan de Isapre: conviene que lo consultes
+            con ellos antes.
           </p>
         </div>
       </div>

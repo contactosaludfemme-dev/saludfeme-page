@@ -65,7 +65,7 @@ export default function Terminos() {
         "Los valores publicados están en pesos chilenos e incluyen impuestos.",
         "El pago se realiza por transferencia electrónica, de forma anticipada.",
         "La atención es particular: no cuento con convenio Fonasa.",
-        "Se emite boleta por cada atención. Según el plan de Isapre de cada paciente, esa boleta puede presentarse para solicitar reembolso; la cobertura depende de cada plan y es responsabilidad de la paciente verificarla con su Isapre.",
+        "Se emite boleta por cada atención, que la paciente puede presentar a su Isapre para solicitar reembolso. El reembolso depende del convenio y de la cobertura del plan de cada paciente: puede ser parcial o no proceder. Verificarlo con la Isapre es responsabilidad de la paciente y no condiciona el pago de la atención.",
         "Se considera control hasta 60 días después de la atención; pasado ese plazo corresponde agendar como primera consulta.",
         "La revisión de exámenes es gratuita hasta 7 días corridos desde la entrega de las órdenes.",
 
