@@ -6,7 +6,7 @@
 import { notFound } from "next/navigation";
 import { crearToken, leerToken } from "@/lib/firma";
 import { confirmarEvento, marcarPagada } from "@/lib/google-calendar";
-import { CONTACTO, SITIO_URL } from "@/lib/datos";
+import { CONTACTO, baseDelSitio } from "@/lib/datos";
 import { fechaLarga } from "@/lib/calendario";
 import { correoPorPagar, correoPagoPendiente, enviarUno } from "@/lib/correo";
 import FormularioRechazo from "./FormularioRechazo";
@@ -105,7 +105,7 @@ export default async function DecidirCita({ params }: Params) {
   // Aceptada: ahora la paciente recibe los datos para transferir, más el
   // enlace con que la matrona marcará el pago cuando llegue el comprobante.
   if (!r.yaResuelta && r.datos?.email) {
-    const base = process.env.NEXT_PUBLIC_SITIO_URL ?? SITIO_URL;
+    const base = baseDelSitio();
     await enviarUno(
       correoPorPagar(
         { nombre: r.datos.paciente, email: r.datos.email },

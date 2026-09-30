@@ -3,8 +3,31 @@
  * Editar aquí precios, servicios, horarios y textos.
  */
 
-/** URL pública del sitio. DEMO: cambiar por el dominio real al publicar. */
+/** URL pública del sitio. */
 export const SITIO_URL = "https://saludfemme.cl";
+
+/**
+ * Base para los enlaces que viajan por correo.
+ *
+ * No basta con `process.env.X ?? SITIO_URL`: `??` solo cae al respaldo
+ * cuando el valor es null o undefined, así que una variable vacía o a
+ * medio escribir —"http://" -- se colaba y generaba "http:///cita/…".
+ * Un enlace roto en el correo no se puede corregir después de enviarlo,
+ * así que aquí se valida antes de usarlo.
+ */
+export function baseDelSitio(): string {
+  const v = process.env.NEXT_PUBLIC_SITIO_URL?.trim().replace(/\/+$/, "");
+  if (!v) return SITIO_URL;
+  try {
+    const u = new URL(v);
+    // "http://" es una URL válida para el parser, pero sin dominio.
+    if (!u.hostname) return SITIO_URL;
+    return u.origin;
+  } catch {
+    // No parsea: puede venir sin protocolo ("saludfemme.cl").
+    return /^[\w.-]+\.[a-z]{2,}$/i.test(v) ? `https://${v}` : SITIO_URL;
+  }
+}
 
 export const CONTACTO = {
   marca: "Salud Femme",

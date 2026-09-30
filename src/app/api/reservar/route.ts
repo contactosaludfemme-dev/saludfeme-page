@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { crearToken } from "@/lib/firma";
 import { crearEvento } from "@/lib/google-calendar";
 import { enviarSolicitud } from "@/lib/correo";
-import { SERVICIOS, SITIO_URL, duracionDe, precioDe } from "@/lib/datos";
+import { SERVICIOS, baseDelSitio, duracionDe, precioDe } from "@/lib/datos";
 import { bloquesDelDia } from "@/lib/calendario";
 import { estaTomada, tomar, liberar } from "@/lib/reservas";
 import {
@@ -117,7 +117,7 @@ export async function POST(req: Request) {
     // La cita nace por confirmar: la matrona decide desde el correo con dos
     // enlaces firmados, sin necesidad de cuenta ni panel de administración.
     const cita = { id: evento.eventoId, fecha: body.fecha, hora: body.hora };
-    const base = process.env.NEXT_PUBLIC_SITIO_URL ?? SITIO_URL;
+    const base = baseDelSitio();
     const correos = await enviarSolicitud(
       {
         paciente,
