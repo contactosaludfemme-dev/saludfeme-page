@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useAgenda } from "./AgendaProvider";
 import {
-  SERVICIOS, CATEGORIAS, NOTAS_SERVICIOS, MODALIDADES_ATENCION,
+  SERVICIOS, CATEGORIAS, NOTAS_SERVICIOS, MODALIDADES_ATENCION, EXAMENES,
   AREAS, TESTIMONIOS, CONTACTO, precioCLP, type Servicio,
 } from "@/lib/datos";
 
@@ -70,6 +70,8 @@ export function Servicios() {
           ))}
         </div>
 
+        <ExamenesEnConsulta />
+
         {/* Reglas que aplican a todas las atenciones */}
         <div className="mt-8 rounded-2xl border border-gris-claro bg-white p-5 md:p-6">
           <p className="mb-3 font-titulo text-[0.95rem] font-bold">
@@ -88,6 +90,68 @@ export function Servicios() {
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Exámenes que se toman en la consulta.
+ *
+ * Van aparte de las tarjetas porque no se agendan por separado ni tienen
+ * precio propio: la toma va incluida en la atención y el análisis lo cobra
+ * el laboratorio. Esa distinción es la que hay que dejar clara.
+ */
+function ExamenesEnConsulta() {
+  const wa = `https://wa.me/${CONTACTO.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
+    "Hola Francisca, quiero consultar por el valor y la disponibilidad de un examen."
+  )}`;
+
+  return (
+    <div className="mt-8 rounded-2xl border border-rosa-200 bg-white p-5 md:p-6">
+      <div className="flex items-start gap-3">
+        <span
+          aria-hidden
+          className="grid size-10 shrink-0 place-items-center rounded-xl bg-rosa-100 text-lg"
+        >
+          🔬
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="font-titulo text-[1.02rem] font-bold">
+            Toma de exámenes en consulta
+          </h3>
+          <p className="mt-0.5 text-[0.88rem] text-gris">
+            Disponible en Talca y en Linares.
+          </p>
+        </div>
+      </div>
+
+      <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+        {EXAMENES.map((e) => (
+          <li
+            key={e}
+            className="relative rounded-lg bg-rosa-50 py-2 pl-8 pr-3 text-[0.88rem] leading-snug"
+          >
+            <span aria-hidden className="absolute left-3 top-[0.55rem] text-magenta-500">
+              ✓
+            </span>
+            {e}
+          </li>
+        ))}
+      </ul>
+
+      <p className="mt-4 rounded-lg bg-wsp-100 px-3 py-2.5 text-[0.84rem] leading-relaxed text-wsp-700">
+        <strong className="font-titulo">La toma no tiene costo adicional</strong> dentro
+        de tu consulta. El análisis del examen se paga directamente al laboratorio.
+      </p>
+
+      <a
+        href={wa}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 flex min-h-11 items-center justify-center gap-2 rounded-full border-2 border-magenta-500 px-5 font-titulo text-[0.88rem] font-semibold text-magenta-600 transition-colors hover:bg-magenta-500 hover:text-white"
+      >
+        Consultar valor y disponibilidad por WhatsApp
+      </a>
+    </div>
   );
 }
 
@@ -601,3 +665,4 @@ export function Testimonios() {
     </section>
   );
 }
+

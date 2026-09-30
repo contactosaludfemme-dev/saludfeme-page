@@ -329,6 +329,21 @@ export const SERVICIOS: Servicio[] = [
   },
 ];
 
+/**
+ * Exámenes que Francisca toma en consulta, en ambas sedes.
+ *
+ * No son servicios agendables por separado: la toma va dentro de la
+ * atención y no suma valor. Lo que sí se paga —y por eso no llevan
+ * precio aquí— es el análisis, que cobra el laboratorio.
+ */
+export const EXAMENES = [
+  "Papanicolau",
+  "Tipificación de VPH",
+  "Panel de ITS",
+  "Cultivo de flujo vaginal",
+  "SGB en embarazada",
+];
+
 /** Notas generales que aplican a todos los servicios. */
 export const NOTAS_SERVICIOS = [
   "No realizo ecografías, pero entrego la orden para hacerlas en la consulta.",
@@ -536,6 +551,10 @@ export const FAQS = [
   {
     p: "¿Cuánto plazo tengo para agendar como control y no como primera consulta?",
     r: "Tienes 60 días desde tu atención. Pasado ese plazo, corresponde agendar como primera consulta.",
+  },
+  {
+    p: "¿Qué exámenes puedes tomarme en la consulta?",
+    r: "En Talca y Linares tomo Papanicolau, tipificación de VPH, panel de ITS, cultivo de flujo vaginal y SGB en embarazada. La toma no tiene costo adicional dentro de la consulta, pero el análisis lo cobra el laboratorio. Escríbeme por WhatsApp para conocer el valor y la disponibilidad.",
   },
   {
     p: "¿Revisas los exámenes solicitados de manera gratuita?",
