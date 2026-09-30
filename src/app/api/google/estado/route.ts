@@ -62,6 +62,7 @@ export async function GET(req: Request) {
       "GOOGLE_REFRESH_TOKEN",
       "RESEND_API_KEY",
       "EMAIL_DESDE",
+      "TOKEN_SECRET",
     ].map((n) => {
       const v = process.env[n];
       return [

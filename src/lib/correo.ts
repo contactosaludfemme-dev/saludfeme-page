@@ -253,23 +253,7 @@ export async function enviarCorreos(d: DatosCorreo) {
   }
 
   try {
-    const { Resend } = await import("resend");
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    await Promise.all([
-      resend.emails.send({
-        from: process.env.EMAIL_DESDE!,
-        to: paciente.para,
-        subject: paciente.asunto,
-        html: paciente.html,
-      }),
-      resend.emails.send({
-        from: process.env.EMAIL_DESDE!,
-        to: matrona.para,
-        subject: matrona.asunto,
-        html: matrona.html,
-      }),
-    ]);
-    return { enviados: true, paciente, matrona };
+    return await despachar([paciente, matrona], { paciente, matrona });
   } catch (e) {
     // Un fallo de correo no debe tumbar la reserva: ya quedó agendada
     console.error("[CORREO] No se pudo enviar:", e);
@@ -428,7 +412,7 @@ async function despachar<T>(
   try {
     const { Resend } = await import("resend");
     const resend = new Resend(process.env.RESEND_API_KEY);
-    await Promise.all(
+    const envios = await Promise.all(
       correos.map((c) =>
         resend.emails.send({
           from: process.env.EMAIL_DESDE!,
@@ -438,6 +422,18 @@ async function despachar<T>(
         })
       )
     );
+    // Resend no lanza excepción cuando rechaza un envío: devuelve el motivo
+    // en `error`. Sin revisarlo, un correo que nunca salió se daba por
+    // enviado y nadie se enteraba.
+    const fallidos = envios
+      .map((r, i) => ({ para: correos[i].para, error: r.error }))
+      .filter((r) => r.error);
+    if (fallidos.length) {
+      for (const f of fallidos) {
+        console.error("[CORREO] Resend rechazó el envío a", f.para, "→", f.error);
+      }
+      return { enviados: false, ...detalle };
+    }
     return { enviados: true, ...detalle };
   } catch (e) {
     // Un fallo de correo no debe tumbar la reserva: ya quedó agendada
