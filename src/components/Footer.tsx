@@ -30,14 +30,16 @@ export default function Footer() {
           <nav aria-label="Enlaces del sitio">
             <h2 className="mb-2 font-titulo text-[0.95rem] text-white md:mb-3">Navegación</h2>
             <ul className="grid grid-cols-2 gap-x-4 text-[0.88rem] md:grid-cols-1 md:space-y-2">
+              {/* Rutas absolutas: el pie se repite en /blog y en cada
+                  artículo, donde un "#servicios" no lleva a ninguna parte. */}
               {[
-                ["#servicios", "Servicios"],
-                ["#modalidades", "Modalidades"],
-                ["#sobre-mi", "Sobre mí"],
-                ["#testimonios", "Testimonios"],
-                ["#preguntas", "Preguntas frecuentes"],
+                ["/#servicios", "Servicios"],
+                ["/#modalidades", "Modalidades"],
+                ["/#sobre-mi", "Sobre mí"],
+                ["/#testimonios", "Testimonios"],
+                ["/#preguntas", "Preguntas frecuentes"],
                 ["/blog", "Blog"],
-                ["#agendar", "Agendar hora"],
+                ["/#agendar", "Agendar hora"],
               ].map(([h, t]) => (
                 <li key={h}>
                   <a

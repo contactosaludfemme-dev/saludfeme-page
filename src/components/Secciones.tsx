@@ -373,7 +373,7 @@ const CONSULTAS = [
 
 export function SobreMi() {
   return (
-    <section id="sobre-mi" className="bg-rosa-50 py-20 lg:py-24">
+    <section className="bg-rosa-50 py-20 lg:py-24">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr]">
         <div className="mx-auto grid w-full max-w-sm gap-4 md:max-w-none md:grid-cols-2 lg:max-w-sm lg:grid-cols-1">
           {CONSULTAS.map((c) => (
@@ -398,7 +398,7 @@ export function SobreMi() {
           ))}
         </div>
 
-        <div>
+        <div id="sobre-mi" className="scroll-mt-28">
           <span className="mb-3 inline-block font-titulo text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-coral-500">
             Quién te acompaña
           </span>
