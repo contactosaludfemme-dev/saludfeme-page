@@ -141,12 +141,10 @@ export async function POST(req: Request) {
       codigoReserva: codigo,
       eventoId: evento.eventoId,
       meetUrl: evento.meetUrl,
-      // En demo devolvemos la vista previa de los correos
-      vistaPrevia: {
-        paciente: { para: correos.paciente.para, asunto: correos.paciente.asunto },
-        matrona: { para: correos.matrona.para, asunto: correos.matrona.asunto },
-        enviados: correos.enviados,
-      },
+      // Solo si salieron los correos: el mensaje de éxito cambia según eso.
+      // Los destinatarios no se devuelven, para no exponer el correo de la
+      // matrona en una respuesta que la paciente puede leer.
+      correosEnviados: correos.enviados,
     });
   } catch {
     // La reserva no se concretó: devolvemos el bloque a la disponibilidad

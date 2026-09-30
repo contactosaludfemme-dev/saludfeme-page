@@ -22,11 +22,7 @@ const ETIQUETA_MODALIDAD: Record<string, string> = {
 type Resultado = {
   codigoReserva: string;
   meetUrl?: string;
-  vistaPrevia: {
-    paciente: { para: string; asunto: string };
-    matrona: { para: string; asunto: string };
-    enviados: boolean;
-  };
+  correosEnviados: boolean;
 };
 
 type Props = {
@@ -736,7 +732,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                 </span>
                 <h3 className="text-2xl">¡Solicitud enviada!</h3>
                 <p className="mx-auto mt-2 max-w-md text-[0.95rem] text-gris">
-                  {resultado.vistaPrevia.enviados ? (
+                  {resultado.correosEnviados ? (
                     <>
                       Te escribí a <strong>{form.email}</strong> con el detalle.
                       Revisaré tu solicitud y te confirmo por ese mismo correo.
@@ -785,31 +781,6 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                       </a>
                     </p>
                   )}
-                </div>
-
-                {/* Aviso de demo — mostrar en vivo qué correos saldrían */}
-                <div className="mx-auto mt-5 max-w-md rounded-2xl border-2 border-dashed border-magenta-500/35 bg-white p-4 text-left">
-                  <p className="mb-2 font-titulo text-[0.8rem] font-semibold uppercase tracking-wider text-magenta-600">
-                    Vista previa · modo demo
-                  </p>
-                  <p className="mb-3 text-[0.82rem] text-gris">
-                    En producción se enviarían automáticamente estos dos correos y
-                    se crearía el evento en Google Calendar:
-                  </p>
-                  <ul className="space-y-2 text-[0.8rem]">
-                    <li className="rounded-lg bg-rosa-50 p-3">
-                      <strong className="block text-carbon">→ A la paciente</strong>
-                      <span className="text-gris">{resultado.vistaPrevia.paciente.para}</span>
-                      <br />
-                      <span className="text-gris">{resultado.vistaPrevia.paciente.asunto}</span>
-                    </li>
-                    <li className="rounded-lg bg-rosa-50 p-3">
-                      <strong className="block text-carbon">→ A la matrona</strong>
-                      <span className="text-gris">{resultado.vistaPrevia.matrona.para}</span>
-                      <br />
-                      <span className="text-gris">{resultado.vistaPrevia.matrona.asunto}</span>
-                    </li>
-                  </ul>
                 </div>
 
                 <div className="mt-7 flex flex-wrap justify-center gap-3">
