@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useAgenda } from "./AgendaProvider";
 import {
-  SERVICIOS, CATEGORIAS, NOTAS_SERVICIOS, MODALIDADES_ATENCION, EXAMENES,
+  SERVICIOS, CATEGORIAS, NOTAS_SERVICIOS, MODALIDADES_ATENCION, EXAMENES, TALLERES,
   AREAS, TESTIMONIOS, CONTACTO, precioCLP, type Servicio,
 } from "@/lib/datos";
 
@@ -666,3 +666,78 @@ export function Testimonios() {
   );
 }
 
+/* ---------- Talleres y charlas para instituciones ---------- */
+
+/**
+ * Dirigido a un público distinto al del resto de la página: aquí no llega
+ * una paciente buscando hora, sino alguien que coordina por su colegio o
+ * empresa. Por eso no lleva botón de agendar, sino el correo.
+ */
+export function Talleres() {
+  const asunto = encodeURIComponent("Solicitud de información: talleres y charlas");
+  const cuerpo = encodeURIComponent(
+    "Hola Francisca:\n\n" +
+      "Me interesa coordinar un taller o charla.\n\n" +
+      "Institución: \n" +
+      "Tema de interés: \n" +
+      "Número aproximado de participantes: \n" +
+      "Fecha tentativa: \n" +
+      "Modalidad (presencial u online): \n\n" +
+      "Quedo atenta a tu respuesta."
+  );
+
+  return (
+    <section id="talleres" className="bg-white py-16 lg:py-20">
+      <div className="mx-auto max-w-4xl px-5">
+        <div className="overflow-hidden rounded-3xl border border-rosa-200 bg-rosa-50 p-6 md:p-10">
+          <div className="flex flex-col items-center text-center">
+            <span
+              aria-hidden
+              className="grid size-14 place-items-center rounded-2xl bg-white text-2xl shadow-suave"
+            >
+              🎓
+            </span>
+
+            <h2 className="mt-4 text-[clamp(1.45rem,2.8vw,2rem)]">
+              ¿Buscas talleres y charlas educativas?
+            </h2>
+
+            <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-gris md:text-base">
+              Realizo talleres y charlas para{" "}
+              <strong className="font-semibold text-carbon">
+                {TALLERES.destinatarios}
+              </strong>
+              , adaptados a las necesidades de cada grupo.
+            </p>
+
+            <ul className="mt-5 flex flex-wrap justify-center gap-2">
+              {TALLERES.temas.map((t) => (
+                <li
+                  key={t}
+                  className="rounded-full border border-rosa-200 bg-white px-3.5 py-1.5 text-[0.82rem] font-semibold text-magenta-600"
+                >
+                  {t}
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-4 text-[0.86rem] text-gris">
+              Entre otros temas · Presencial u online
+            </p>
+
+            <a
+              href={`mailto:${CONTACTO.email}?subject=${asunto}&body=${cuerpo}`}
+              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-magenta-600 px-7 font-titulo text-[0.92rem] font-semibold text-white shadow-media transition-transform hover:-translate-y-0.5"
+            >
+              Solicitar información
+            </a>
+
+            <p className="mt-3 break-all text-[0.84rem] text-gris">
+              {CONTACTO.email}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

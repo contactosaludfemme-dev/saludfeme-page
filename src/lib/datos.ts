@@ -344,6 +344,25 @@ export const EXAMENES = [
   "SGB en embarazada",
 ];
 
+/**
+ * Talleres y charlas para instituciones.
+ *
+ * No entran en SERVICIOS porque no se agendan ni tienen valor fijo: se
+ * cotizan según el grupo y el contenido. El canal es el correo, no la
+ * reserva en línea.
+ */
+export const TALLERES = {
+  destinatarios: "colegios, instituciones, empresas y organizaciones",
+  temas: [
+    "Salud sexual",
+    "Salud femenina",
+    "Prevención",
+    "Anticoncepción",
+    "Embarazo",
+    "Lactancia",
+  ],
+};
+
 /** Notas generales que aplican a todos los servicios. */
 export const NOTAS_SERVICIOS = [
   "No realizo ecografías, pero entrego la orden para hacerlas en la consulta.",

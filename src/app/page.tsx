@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import {
-  Servicios, Areas, Modalidades, SobreMi, Testimonios, Cierre,
+  Servicios, Areas, Modalidades, SobreMi, Testimonios, Talleres, Cierre,
 } from "@/components/Secciones";
 import Preguntas from "@/components/Preguntas";
 import BlogHome from "@/components/BlogHome";
@@ -22,6 +22,7 @@ export default function Inicio() {
         <SobreMi />
         <Testimonios />
         <BlogHome />
+        <Talleres />
         <Preguntas />
         <Contacto />
         <Cierre />
