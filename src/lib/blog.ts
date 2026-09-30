@@ -278,7 +278,7 @@ export const ARTICULOS: Articulo[] = [
       {
         tipo: "parrafo",
         texto:
-          "Desde las 28 semanas conviene que conozcas su patrón. No se trata de contar todo el día, sino de notar si un día se mueve claramente menos que de costumbre. Si te pasa: recuéstate de lado, toma algo dulce y presta atención durante dos horas. Si sigues sin sentirlo como siempre, ve a urgencias.",
+          "Desde las 28 semanas conviene que conozcas su patrón. No se trata de contar todo el día, sino de notar si un día se mueve claramente menos que de costumbre. Si te pasa: recuéstate de lado izquierdo, come algo dulce y presta atención durante 2 horas. Si cuentas menos de 10 movimientos fetales en esas 2 horas, acude a la urgencia de maternidad del hospital más cercano.",
       },
       { tipo: "subtitulo", texto: "Molestias que sí son esperables" },
       {
