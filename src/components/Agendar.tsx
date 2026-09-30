@@ -330,35 +330,53 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                   Disponibilidad sincronizada con Google Calendar
                 </div>
 
-                {servicio.modalidades.length > 1 && (
-                  <fieldset className="mb-5">
-                    <legend className="mb-2 font-titulo text-[0.9rem] font-semibold">
-                      Modalidad de atención
-                    </legend>
-                    <div className="flex flex-wrap gap-2">
-                      {servicio.modalidades.map((m) => (
+                {/* Siempre a la vista, aunque el servicio admita una sola
+                    modalidad: así queda claro de entrada si la atención es
+                    presencial u online. La que no aplica se ve deshabilitada
+                    en vez de desaparecer. */}
+                <fieldset className="mb-5">
+                  <legend className="mb-2 font-titulo text-[0.9rem] font-semibold">
+                    Modalidad de atención
+                  </legend>
+                  <div className="flex flex-wrap gap-2">
+                    {(["presencial", "online"] as const).map((m) => {
+                      const disponible = servicio.modalidades.includes(m);
+                      return (
                         <button
                           key={m}
                           type="button"
-                          onClick={() => setModalidad(m)}
+                          disabled={!disponible}
+                          onClick={() => disponible && setModalidad(m)}
                           aria-pressed={modalidad === m}
-                          className={`rounded-full border-2 px-4 py-2 text-[0.85rem] font-semibold transition-colors ${
-                            modalidad === m
-                              ? "border-magenta-500 bg-magenta-500 text-white"
-                              : "border-gris-claro bg-white text-carbon hover:border-magenta-500"
+                          className={`min-h-11 rounded-full border-2 px-4 text-[0.85rem] font-semibold transition-colors ${
+                            !disponible
+                              ? "cursor-not-allowed border-gris-claro bg-gris-claro text-gris"
+                              : modalidad === m
+                                ? "border-magenta-500 bg-magenta-500 text-white"
+                                : "border-gris-claro bg-white text-carbon hover:border-magenta-500"
                           }`}
                         >
                           {ETIQUETA_MODALIDAD[m]}
                         </button>
-                      ))}
-                    </div>
-                  </fieldset>
-                )}
+                      );
+                    })}
+                  </div>
+                  {servicio.modalidades.length === 1 && (
+                    <p className="mt-2 text-[0.82rem] text-gris">
+                      {servicio.modalidades[0] === "presencial"
+                        ? "Este servicio requiere atención presencial."
+                        : "Este servicio se realiza solo por videollamada."}
+                    </p>
+                  )}
+                </fieldset>
 
                 {modalidad === "presencial" && (
                   <fieldset className="mb-5">
                     <legend className="mb-2 font-titulo text-[0.9rem] font-semibold">
-                      ¿Dónde prefieres atenderte?
+                      ¿En qué consulta te atiendes?
+                      <span className="ml-1 font-normal text-gris">
+                        · el valor cambia según la ciudad
+                      </span>
                     </legend>
                     <div className="flex flex-wrap gap-2">
                       {SEDES.map((x) => (
