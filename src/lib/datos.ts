@@ -140,8 +140,10 @@ export type Servicio = {
   modalidades: ("presencial" | "online")[];
   /** Advertencia o requisito que la paciente debe conocer antes de agendar. */
   aviso?: string;
-  /** Beneficio incluido, se muestra destacado en verde. */
+  /** Nota destacada en verde: un beneficio, un requisito o una credencial. */
   incluye?: string;
+  /** false cuando la nota no es un beneficio incluido en el valor. */
+  etiquetaIncluye?: boolean;
 };
 
 export const SERVICIOS: Servicio[] = [
@@ -155,7 +157,8 @@ export const SERVICIOS: Servicio[] = [
       "Evaluación de tu salud ginecológica, con orientación e indicación de exámenes cuando corresponda.",
     precio: 30000,
     modalidades: ["presencial", "online"],
-    aviso: "No incluye el procesamiento de exámenes por el laboratorio.",
+    aviso:
+      "No realizo ecografías, pero entrego la orden en la consulta. No incluye el procesamiento de exámenes por el laboratorio.",
   },
   {
     id: "control-embarazo",
@@ -180,6 +183,7 @@ export const SERVICIOS: Servicio[] = [
     precio: 30000,
     modalidades: ["presencial", "online"],
     incluye: "Puedes venir acompañada de tu pareja.",
+    etiquetaIncluye: false,
   },
   {
     id: "control-diada",
@@ -277,6 +281,7 @@ export const SERVICIOS: Servicio[] = [
     modalidades: ["presencial"],
     aviso: "No incluye el dispositivo. Requiere consejería previa.",
     incluye: "El procedimiento se realiza con anestesia local.",
+    etiquetaIncluye: false,
   },
   {
     id: "extraccion-diu",
@@ -330,6 +335,7 @@ export const SERVICIOS: Servicio[] = [
     modalidades: ["presencial", "online"],
     incluye:
       "Consejera certificada en VIH e ITS por la Seremi de Salud del Maule.",
+    etiquetaIncluye: false,
   },
   {
     id: "lactancia",
@@ -350,7 +356,7 @@ export const SERVICIOS: Servicio[] = [
     icono: "✨",
     categoria: "Procedimientos",
     descripcion:
-      "Eliminación de verrugas genitales. Rápido, con resultados inmediatos y bajo anestesia local.",
+      "Eliminación de verrugas genitales, acrocordones y molusco contagioso. Rápido, con resultados inmediatos y bajo anestesia local.",
     precio: 35000,
     precioNota: "Desde $35.000 · varía según la cantidad de lesiones",
     modalidades: ["presencial"],
@@ -577,7 +583,7 @@ export const FAQS = [
   },
   {
     p: "¿Atiendes por Fonasa o Isapre?",
-    r: "La atención es particular: no cuento con convenio Fonasa. Emito boleta por cada atención para que puedas presentarla a tu Isapre, pero el reembolso no es automático ni parejo: depende del convenio y de la cobertura que tenga tu plan para consultas de matronería. Algunos planes reembolsan una parte, otros no cubren esta prestación. Consúltalo con tu Isapre antes de tu hora, así sabes con qué contar.",
+    r: "La atención es particular: no cuento con convenio Fonasa. Emito boleta por cada atención para que puedas presentarla a tu Isapre, pero el reembolso no es automático ni estándar: depende del convenio y de la cobertura que tenga tu plan para consultas de matronería. Algunos planes reembolsan una parte, otros no cubren esta prestación. Consúltalo con tu Isapre antes de tu hora, así sabes con qué contar.",
   },
   {
     p: "¿Realizas ecografías en tu consulta?",
