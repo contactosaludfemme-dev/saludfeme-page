@@ -119,7 +119,12 @@
 
 /* ---------- Base ---------- */
 html {
-  scroll-behavior: smooth;
+  /* `smooth` solo para los saltos con ancla dentro de una misma página.
+     Aplicado a todo el documento, también animaba el salto al tope que
+     hace Next al cambiar de página: la animación arrancaba desde donde
+     estabas y quedaba a medias, así que un artículo abierto desde el
+     final de la lista aparecía ya empezado. */
+  scroll-behavior: auto;
   scroll-padding-top: 5.5rem;
   /* Blindaje: ningún hijo puede desplazar la página a los lados.
      Safari de iOS propaga el scroll de contenedores internos al body
@@ -168,6 +173,12 @@ h1, h2, h3, h4 {
 }
 .sin-barra::-webkit-scrollbar {   /* Chrome, Safari */
   display: none;
+}
+
+/* El desplazamiento suave se activa solo al saltar a un ancla: el
+   :target es el elemento al que apunta el # de la URL. */
+html:has(:target) {
+  scroll-behavior: smooth;
 }
 
 @media (prefers-reduced-motion: reduce) {
