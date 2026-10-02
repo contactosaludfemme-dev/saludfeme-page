@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import CabeceraSimple from "@/components/CabeceraSimple";
 import Footer from "@/components/Footer";
 import ListaBlog from "@/components/ListaBlog";
@@ -23,6 +24,13 @@ export default function Blog() {
     <>
       <CabeceraSimple />
       <main className="mx-auto max-w-4xl px-5 py-14">
+        <Link
+          href="/"
+          className="mb-6 -ml-1 inline-flex min-h-11 items-center gap-1.5 px-1 text-[0.9rem] font-semibold text-magenta-600 no-underline hover:underline"
+        >
+          <span aria-hidden>←</span> Volver al inicio
+        </Link>
+
         <div className="mb-10 text-center">
           <span className="mb-2 inline-block font-titulo text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-coral-500">
             Información que sirve

@@ -22,7 +22,7 @@ export default function CabeceraSimple() {
         <nav className="flex items-center gap-4">
           <Link
             href="/blog"
-            className="hidden min-h-11 items-center text-[0.9rem] font-medium text-carbon transition-colors hover:text-magenta-600 sm:inline-flex"
+            className="inline-flex min-h-11 items-center text-[0.9rem] font-medium text-carbon transition-colors hover:text-magenta-600"
           >
             Blog
           </Link>
