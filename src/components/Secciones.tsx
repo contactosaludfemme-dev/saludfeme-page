@@ -155,6 +155,34 @@ function ExamenesEnConsulta() {
   );
 }
 
+/**
+ * Lo que la paciente no debe pasar por alto, en negrita.
+ *
+ * El aviso es texto plano —se edita en datos.ts, sin markup—, así que el
+ * resalte se decide aquí: son frases que, leídas en diagonal, cambian lo
+ * que alguien espera de la consulta.
+ */
+const FRASES_DESTACADAS = [
+  "No realizo ecografías",
+  "No incluye el implante",
+  "No incluye el dispositivo",
+  "Obligatoria antes de agendar",
+  "Requiere consejería previa",
+];
+
+function resaltar(texto: string): React.ReactNode {
+  const patron = new RegExp(`(${FRASES_DESTACADAS.join("|")})`, "g");
+  return texto.split(patron).map((parte, i) =>
+    FRASES_DESTACADAS.includes(parte) ? (
+      <strong key={i} className="font-semibold text-carbon">
+        {parte}
+      </strong>
+    ) : (
+      parte
+    )
+  );
+}
+
 function TarjetaServicio({ servicio: s }: { servicio: Servicio }) {
   const { abrir } = useAgenda();
 
@@ -186,13 +214,17 @@ function TarjetaServicio({ servicio: s }: { servicio: Servicio }) {
 
       {s.aviso && (
         <p className="mt-3 rounded-lg bg-rosa-50 px-3 py-2 text-[0.8rem] leading-snug text-gris">
-          {s.aviso}
+          {resaltar(s.aviso)}
         </p>
       )}
 
       {s.incluye && (
         <p className="mt-3 rounded-lg bg-wsp-100 px-3 py-2 text-[0.8rem] leading-snug text-wsp-700">
-          <strong className="font-titulo">Incluido: </strong>
+          {/* "Incluido" solo cuando lo es de verdad: una certificación o un
+              acompañante no son algo que venga incluido en el valor. */}
+          {s.etiquetaIncluye !== false && (
+            <strong className="font-titulo">Incluido: </strong>
+          )}
           {s.incluye}
         </p>
       )}
