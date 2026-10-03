@@ -156,6 +156,7 @@ export const SERVICIOS: Servicio[] = [
     descripcion:
       "Evaluación de tu salud ginecológica, con orientación e indicación de exámenes cuando corresponda.",
     precio: 30000,
+    precioOnline: 25000,
     modalidades: ["presencial", "online"],
     aviso:
       "No realizo ecografías, pero entrego la orden en la consulta. No incluye el procesamiento de exámenes por el laboratorio.",
@@ -168,6 +169,7 @@ export const SERVICIOS: Servicio[] = [
     descripcion:
       "Seguimiento de tu embarazo con acompañamiento cercano en cada etapa.",
     precio: 30000,
+    precioOnline: 25000,
     modalidades: ["presencial", "online"],
     aviso: "No realizo ecografías, pero entrego la orden en la consulta.",
     incluye:
@@ -181,6 +183,7 @@ export const SERVICIOS: Servicio[] = [
     descripcion:
       "Preparación de tu salud antes de buscar un embarazo: exámenes, suplementación y resolución de dudas.",
     precio: 30000,
+    precioOnline: 25000,
     modalidades: ["presencial", "online"],
     incluye: "Puedes venir acompañada de tu pareja.",
     etiquetaIncluye: false,
@@ -204,6 +207,7 @@ export const SERVICIOS: Servicio[] = [
     descripcion:
       "Acompañamiento en esta etapa: manejo de síntomas, salud ósea y bienestar general.",
     precio: 30000,
+    precioOnline: 25000,
     modalidades: ["presencial", "online"],
   },
   {
@@ -239,6 +243,7 @@ export const SERVICIOS: Servicio[] = [
     descripcion:
       "Elegimos juntas el método que mejor se adapta a tu cuerpo, tu etapa y tu proyecto de vida.",
     precio: 30000,
+    precioOnline: 25000,
     modalidades: ["presencial", "online"],
   },
   {
@@ -280,7 +285,7 @@ export const SERVICIOS: Servicio[] = [
     precio: 60000,
     modalidades: ["presencial"],
     aviso: "No incluye el dispositivo. Requiere consejería previa.",
-    incluye: "El procedimiento se realiza con anestesia local.",
+    incluye: "El procedimiento se realiza con protocolo de anestesia.",
     etiquetaIncluye: false,
   },
   {
@@ -311,6 +316,8 @@ export const SERVICIOS: Servicio[] = [
     descripcion: "Intramuscular o subcutánea.",
     precio: 25000,
     modalidades: ["presencial"],
+    incluye: "Consultar por disponibilidad de anticonceptivo.",
+    etiquetaIncluye: false,
   },
 
   // ---------- Salud sexual ----------
@@ -321,7 +328,7 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Salud sexual",
     descripcion:
       "Un espacio para conversar sobre tu sexualidad sin prejuicios, desde una mirada profesional e integral.",
-    precio: 40000,
+    precio: 45000,
     modalidades: ["presencial", "online"],
   },
   {
@@ -332,6 +339,7 @@ export const SERVICIOS: Servicio[] = [
     descripcion:
       "Evaluación de síntomas, indicación de tratamiento y orientación sobre prevención.",
     precio: 30000,
+    precioOnline: 25000,
     modalidades: ["presencial", "online"],
     incluye:
       "Consejera certificada en VIH e ITS por la Seremi de Salud del Maule.",
@@ -345,7 +353,6 @@ export const SERVICIOS: Servicio[] = [
     descripcion:
       "Revisión de técnica y acople, manejo del dolor y acompañamiento en el proceso.",
     precio: 40000,
-    precioOnline: 30000,
     modalidades: ["presencial", "online"],
   },
 
