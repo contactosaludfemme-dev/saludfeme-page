@@ -360,6 +360,56 @@ export function Areas() {
         >
           Agendar mi hora
         </button>
+
+        {/* Anuncio de la formación en curso. Se quita de aquí cuando esté
+            lista: es un aviso temporal, no una sección del sitio.
+            Usa el degradado de marca —el mismo del cierre— porque tiene
+            que destacar sobre el blanco de esta sección sin inventar
+            colores nuevos. */}
+        <aside className="relative mx-auto mt-12 max-w-2xl overflow-hidden rounded-3xl bg-[linear-gradient(168deg,var(--hero-rosa-claro)_0%,var(--hero-rosa)_38%,var(--hero-rosa-hondo)_100%)] px-6 py-8 shadow-fuerte sm:px-10 sm:py-9">
+          {/* Destellos blancos: luz difusa en las esquinas y unos puntos
+              pequeños que laten, para que el recuadro no quede plano. */}
+          <span
+            aria-hidden
+            className="animate-brillo-lento pointer-events-none absolute -right-12 -top-14 size-48 rounded-full bg-white/40 blur-2xl"
+          />
+          <span
+            aria-hidden
+            className="animate-brillo pointer-events-none absolute -bottom-16 -left-14 size-44 rounded-full bg-white/30 blur-2xl"
+          />
+          <span
+            aria-hidden
+            className="animate-brillo pointer-events-none absolute right-[18%] top-5 size-2 rounded-full bg-white/90"
+          />
+          <span
+            aria-hidden
+            className="animate-brillo-lento pointer-events-none absolute left-[12%] top-[28%] size-1.5 rounded-full bg-white/80"
+          />
+          <span
+            aria-hidden
+            className="animate-brillo pointer-events-none absolute bottom-7 right-[12%] size-1.5 rounded-full bg-white/80"
+          />
+
+          <div className="relative text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/90 px-4 py-1.5 font-titulo text-[0.72rem] font-bold uppercase tracking-[0.16em] text-rosa-650 backdrop-blur-sm">
+              <span aria-hidden className="animate-respirar">🌿</span>
+              Próximamente
+            </span>
+
+            <p className="texto-hero-grande mx-auto mt-5 max-w-lg font-titulo text-[clamp(1.3rem,2.6vw,1.75rem)] font-bold leading-snug text-white">
+              Algo nuevo está por comenzar en {CONTACTO.marca}
+            </p>
+
+            <p className="texto-hero mx-auto mt-3 max-w-md text-[1rem] font-semibold leading-relaxed text-white">
+              Me estoy formando para acompañarte desde una mirada aún más
+              integral, consciente y natural de tu salud.
+            </p>
+
+            <p className="texto-hero mt-5 font-mano text-[1.45rem] leading-tight text-white">
+              Muy pronto te cuento más ✨
+            </p>
+          </div>
+        </aside>
       </div>
     </section>
   );
