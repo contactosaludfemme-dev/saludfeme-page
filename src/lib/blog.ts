@@ -84,7 +84,7 @@ export const ARTICULOS: Articulo[] = [
           "El ácido fólico previene defectos del tubo neural, y actúa en las primeras semanas de gestación.",
           "La ecografía entre las 11 y 14 semanas es la que mejor determina tu fecha probable de parto.",
           "Los exámenes de sangre iniciales detectan anemia, infecciones y tu grupo sanguíneo a tiempo.",
-          "Si tienes alguna condición previa —diabetes, hipertensión, tiroides— hay que ajustar tratamientos cuanto antes.",
+          "Si tienes alguna condición previa —diabetes, hipertensión, etc.— hay que ajustar tratamientos cuanto antes.",
         ],
       },
       { tipo: "subtitulo", texto: "Qué pasa en tu primera consulta" },
