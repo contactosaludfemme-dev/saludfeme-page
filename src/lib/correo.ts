@@ -11,7 +11,7 @@
  */
 
 import {
-  CONTACTO, SEDES, DATOS_TRANSFERENCIA, hayDatosTransferencia, precioCLP,
+  CONTACTO, SEDES, DATOS_TRANSFERENCIA, precioCLP,
 } from "./datos";
 import { fechaLarga } from "./calendario";
 
@@ -279,7 +279,7 @@ export function correoPorPagar(
 ) {
   const t = DATOS_TRANSFERENCIA;
   const wa = `https://wa.me/${CONTACTO.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
-    `Hola Francisca, te envío el comprobante de mi hora ${datos.codigoReserva} 🌸`
+    `Hola Francisca, quiero pagar mi hora ${datos.codigoReserva}. ¿Me envías los datos para la transferencia? 🌸`
   )}`;
   const fila = (k: string, v: string) =>
     `<tr><td style="padding:7px 0;color:#6B6264;font-size:14px;">${k}</td>
@@ -297,45 +297,29 @@ export function correoPorPagar(
          envíame el comprobante.
        </p>
 
-       ${
-         hayDatosTransferencia()
-           ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-                 style="background:#FDF2F4;border-radius:12px;padding:16px 20px;margin:0 0 20px;">
-                ${fila("Titular", t.titular)}
-                ${fila("RUT", t.rut)}
-                ${fila("Banco", t.banco)}
-                ${fila("Tipo de cuenta", t.tipoCuenta)}
-                ${fila("N° de cuenta", t.numeroCuenta)}
-                ${fila("Correo", t.email)}
-                ${fila("Monto", precioCLP(datos.precio))}
-                ${fila("Código de reserva", datos.codigoReserva)}
-              </table>
-              <p style="margin:0 0 12px;font-size:15px;line-height:1.6;">
-                Al transferir, <strong>escribe tu código de reserva</strong> en
-                el mensaje para que la identifique.
-              </p>`
-           : `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-                 style="background:#FDF2F4;border-radius:12px;padding:16px 20px;margin:0 0 20px;">
-                ${fila("Monto", precioCLP(datos.precio))}
-                ${fila("Código de reserva", datos.codigoReserva)}
-              </table>
-              <p style="margin:0 0 12px;font-size:15px;line-height:1.6;">
-                Escríbeme por WhatsApp y te envío los datos para la
-                transferencia.
-              </p>`
-       }
+       <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+              style="background:#FDF2F4;border-radius:12px;padding:16px 20px;margin:0 0 20px;">
+         ${fila("Servicio", datos.servicio)}
+         ${fila("Monto", precioCLP(datos.precio))}
+         ${fila("Código de reserva", datos.codigoReserva)}
+       </table>
+
+       <p style="margin:0 0 12px;font-size:15px;line-height:1.6;">
+         <strong>Escríbeme por WhatsApp</strong> y te envío los datos para la
+         transferencia. Menciona tu código de reserva para que ubique tu hora.
+       </p>
 
        <p style="margin:0 0 20px;">
          <a href="${esc(wa)}" style="display:inline-block;padding:14px 28px;border-radius:999px;
             background:#25D366;color:#fff;font-weight:700;font-size:15px;text-decoration:none;">
-           Enviar comprobante por WhatsApp
+           Pedir los datos por WhatsApp
          </a>
        </p>
 
        <p style="margin:0;font-size:14px;color:#6B6264;line-height:1.6;">
-         Tienes <strong>${t.plazoHoras} horas</strong> para enviarlo. Pasado ese
-         plazo libero la hora para otra paciente. Si necesitas más tiempo,
-         escríbeme y lo vemos.
+         Tienes <strong>${t.plazoHoras} horas</strong> para transferir y enviarme
+         el comprobante. Pasado ese plazo libero la hora para otra paciente. Si
+         necesitas más tiempo, escríbeme y lo vemos.
        </p>`
     ),
   };

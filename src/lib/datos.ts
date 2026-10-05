@@ -433,36 +433,17 @@ export const MEDIOS_PAGO = [
 ];
 
 /**
- * Datos para la transferencia.
+ * Condiciones del pago.
  *
- * Se envían por correo recién cuando Francisca acepta la hora, no antes: así
- * nadie transfiere por un cupo que no estaba disponible.
- *
- * PENDIENTE: reemplazar por los datos reales antes de publicar.
+ * Los datos de la cuenta no viven aquí: se entregan por WhatsApp cuando la
+ * paciente los pide, para no publicarlos en un correo que puede reenviarse.
  */
 export const DATOS_TRANSFERENCIA = {
   titular: CONTACTO.nombre,
-  rut: "—",
-  banco: "—",
-  tipoCuenta: "—",
-  numeroCuenta: "—",
   email: CONTACTO.email,
   /** Horas para pagar antes de que la hora se libere. */
   plazoHoras: 24,
 };
-
-/**
- * ¿Están cargados los datos bancarios reales?
- *
- * Mientras no lo estén, el correo de pago pide coordinar por WhatsApp en vez
- * de mostrar una cuenta con guiones.
- */
-export function hayDatosTransferencia(): boolean {
-  const t = DATOS_TRANSFERENCIA;
-  return [t.rut, t.banco, t.tipoCuenta, t.numeroCuenta].every(
-    (v) => v && v !== "—"
-  );
-}
 
 /**
  * Testimonios reales de pacientes, recopilados por Francisca.
