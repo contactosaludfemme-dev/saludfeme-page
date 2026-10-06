@@ -80,8 +80,14 @@ export function bloqueSirvePara(
   sede: string
 ): boolean {
   const declarada = sedeDelBloque(titulo);
+  // Sin sede en el título sirve para todo: es lo razonable cuando ella no
+  // quiere distinguir.
   if (declarada === null) return true;
-  if (modalidad === "online") return true;
+  // Un bloque marcado "ONLINE" es solo para telemedicina, y uno con ciudad
+  // es solo presencial en esa ciudad. Antes cualquier bloque valía para
+  // online, así que una hora abierta para atender en Talca se ofrecía
+  // además por videollamada.
+  if (modalidad === "online") return declarada === "online";
   return declarada === sede;
 }
 

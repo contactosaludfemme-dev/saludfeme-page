@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { crearToken } from "@/lib/firma";
-import { crearEvento } from "@/lib/google-calendar";
+import { crearEvento, obtenerDisponibilidad } from "@/lib/google-calendar";
 import { enviarSolicitud } from "@/lib/correo";
 import { SERVICIOS, baseDelSitio, duracionDe, precioDe } from "@/lib/datos";
-import { bloquesDelDia } from "@/lib/calendario";
 import { estaTomada, tomar, liberar } from "@/lib/reservas";
 import {
   normalizarTelefono, formatearTelefono, emailValido,
@@ -67,10 +66,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Datos inválidos", errores }, { status: 400 });
   }
 
-  // Revalidación de disponibilidad en el servidor (evita reservas dobles)
-  const enHorario = bloquesDelDia(body.fecha, duracionDe(servicio!, body.modalidadId ?? body.modalidad)).some(
-    (b) => b.hora === body.hora && b.libre
+  // Revalidación en el servidor, contra la misma fuente que vio la paciente:
+  // el calendario real cuando está conectado, y las reglas de respaldo si no.
+  // Antes se comparaba siempre contra el horario genérico, así que una hora
+  // abierta fuera de él —18:30, o cualquiera a las 20:00— se ofrecía en la
+  // web y después se rechazaba al reservar.
+  const disponibles = await obtenerDisponibilidad(
+    body.fecha,
+    duracionDe(servicio!, body.modalidadId ?? body.modalidad),
+    body.modalidadId ?? body.modalidad,
+    body.sede ?? "talca"
   );
+  const enHorario = disponibles.some((b) => b.hora === body.hora && b.libre);
   if (!enHorario || estaTomada(body.fecha, body.hora)) {
     return NextResponse.json(
       { error: "Ese horario ya no está disponible. Elige otro, por favor." },
