@@ -279,7 +279,7 @@ export function correoPorPagar(
 ) {
   const t = DATOS_TRANSFERENCIA;
   const wa = `https://wa.me/${CONTACTO.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
-    `Hola Francisca, quiero pagar mi hora ${datos.codigoReserva}. ¿Me envías los datos para la transferencia? 🌸`
+    `Hola Francisca, quiero pagar mi hora ${datos.codigoReserva}. ¿Me envías los datos para la transferencia?`
   )}`;
   const fila = (k: string, v: string) =>
     `<tr><td style="padding:7px 0;color:#6B6264;font-size:14px;">${k}</td>
