@@ -1,7 +1,7 @@
-import { NextResponse, after } from "next/server";
+import { NextResponse } from "next/server";
 import { crearToken } from "@/lib/firma";
 import { crearEvento, obtenerDisponibilidad } from "@/lib/google-calendar";
-import { enviarSolicitud, envioActivo } from "@/lib/correo";
+import { enviarSolicitud } from "@/lib/correo";
 import { SERVICIOS, baseDelSitio, duracionDe, precioDe } from "@/lib/datos";
 import { estaTomada, tomar, liberar } from "@/lib/reservas";
 import {
@@ -125,41 +125,38 @@ export async function POST(req: Request) {
     // enlaces firmados, sin necesidad de cuenta ni panel de administración.
     const cita = { id: evento.eventoId, fecha: body.fecha, hora: body.hora };
     const base = baseDelSitio();
-    // Los correos salen después de responder: la hora ya quedó tomada y el
-    // evento creado, así que la paciente no gana nada esperando a que Resend
-    // conteste. Si fallan, el fallo queda en los logs y la cita sigue en pie.
-    after(async () => {
-      const correos = await enviarSolicitud(
-        {
-          paciente,
-          servicio: servicio!.nombre,
-          precio: valor,
-          modalidad: body.modalidad,
-          fecha: body.fecha,
-          hora: body.hora,
-          duracionMin: duracionDe(servicio!, body.modalidadId ?? body.modalidad),
-          meetUrl: evento.meetUrl,
-          codigoReserva: codigo,
-        },
-        {
-          confirmar: `${base}/cita/confirmar/${crearToken(cita, "confirmar")}`,
-          rechazar: `${base}/cita/rechazar/${crearToken(cita, "rechazar")}`,
-        }
-      );
-      if (!correos.enviados) {
-        console.error("[RESERVA] correos no enviados para", codigo);
+    // Los correos se esperan antes de responder. Se probó despacharlos con
+    // after() para contestar un segundo antes, y dejaron de llegar cuando la
+    // reserva venía del navegador: la respuesta cerraba la petición y el
+    // envío quedaba a medias. Un segundo de espera vale menos que un correo
+    // que no sale.
+    const correos = await enviarSolicitud(
+      {
+        paciente,
+        servicio: servicio!.nombre,
+        precio: valor,
+        modalidad: body.modalidad,
+        fecha: body.fecha,
+        hora: body.hora,
+        duracionMin: duracionDe(servicio!, body.modalidadId ?? body.modalidad),
+        meetUrl: evento.meetUrl,
+        codigoReserva: codigo,
+      },
+      {
+        confirmar: `${base}/cita/confirmar/${crearToken(cita, "confirmar")}`,
+        rechazar: `${base}/cita/rechazar/${crearToken(cita, "rechazar")}`,
       }
-    });
+    );
+    if (!correos.enviados) {
+      console.error("[RESERVA] correos no enviados para", codigo);
+    }
 
     return NextResponse.json({
       ok: true,
       codigoReserva: codigo,
       eventoId: evento.eventoId,
       meetUrl: evento.meetUrl,
-      // El envío ya no se espera, así que no se puede afirmar que salió.
-      // `envioActivo()` dice si hay credenciales de correo configuradas,
-      // que es lo que necesita la pantalla para elegir el mensaje.
-      correosEnviados: envioActivo(),
+      correosEnviados: correos.enviados,
     });
   } catch {
     // La reserva no se concretó: devolvemos el bloque a la disponibilidad
