@@ -165,19 +165,19 @@ export default function Hero() {
         </div>
 
         {/* Ilustración */}
-        <div className="relative mx-auto mb-8 w-full max-w-[20rem] md:mb-0 md:max-w-none lg:max-w-sm">
+        <div className="relative mx-auto mb-8 w-full max-w-[20rem] md:mb-0 md:max-w-[20rem] lg:max-w-[20rem]">
           <div
             aria-hidden
             className="absolute inset-0 -z-10 translate-y-4 rounded-[3rem] bg-white/10 blur-2xl"
           />
           <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] border-4 border-white/70 bg-gradient-to-b from-white/70 to-white/25 shadow-fuerte backdrop-blur-sm">
             <Image
-              src="/profile-page.jpeg"
+              src="/perfil-sf.png"
               alt={`${CONTACTO.nombre}, matrona`}
               fill
               priority
-              sizes="(min-width: 1024px) 24rem, (min-width: 768px) 20rem, 20rem"
-              className="object-cover object-top"
+              sizes="25rem"
+              className="object-cover object-[center_28%]"
             />
           </div>
 
