@@ -143,7 +143,7 @@ export function correoMatrona(d: DatosCorreo) {
 export function correoSolicitudPaciente(d: DatosCorreo) {
   return {
     para: d.paciente.email,
-    asunto: `Recibimos tu solicitud de hora — ${CONTACTO.marca}`,
+    asunto: `Recibí tu solicitud de hora — ${CONTACTO.marca}`,
     html: envoltorio(
       "Solicitud recibida",
       `<h1 style="margin:0 0 12px;font-size:22px;">Hola ${esc(d.paciente.nombre)} 🩷</h1>
@@ -279,7 +279,7 @@ export function correoPorPagar(
 ) {
   const t = DATOS_TRANSFERENCIA;
   const wa = `https://wa.me/${CONTACTO.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
-    `Hola Francisca, quiero pagar mi hora ${datos.codigoReserva}. ¿Me envías los datos para la transferencia?`
+    `Hola Francisca, soy ${paciente.nombre}. Quiero pagar mi hora del ${fechaLarga(datos.fecha)} a las ${datos.hora}. ¿Me envías los datos para la transferencia?`
   )}`;
   const fila = (k: string, v: string) =>
     `<tr><td style="padding:7px 0;color:#6B6264;font-size:14px;">${k}</td>

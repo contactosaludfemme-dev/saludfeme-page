@@ -727,30 +727,38 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
             {/* ---------- Paso 4: confirmación ---------- */}
             {paso === 3 && resultado && servicio && dia && hora && (
               <div className="animate-aparecer text-center">
-                <span aria-hidden className="mx-auto mb-5 grid size-16 place-items-center rounded-full bg-exito-50 text-3xl">
-                  ✓
+                {/* Reservado no es confirmado: la hora queda tomada, pero
+                    todavía falta que ella la acepte y que llegue el pago.
+                    El ✓ se reservaba para ese momento. */}
+                <span aria-hidden className="mx-auto mb-5 grid size-16 place-items-center rounded-full bg-rosa-100 text-3xl">
+                  📩
                 </span>
-                <h3 className="text-2xl">¡Solicitud enviada!</h3>
+                <h3 className="text-2xl">Recibí tu solicitud</h3>
                 <p className="mx-auto mt-2 max-w-md text-[0.95rem] text-gris">
                   {resultado.correosEnviados ? (
                     <>
                       Te escribí a <strong>{form.email}</strong> con el detalle.
-                      Revisaré tu solicitud y te confirmo por ese mismo correo.
-                      🩷
+                      Guardé tu horario mientras la reviso. 🩷
                     </>
                   ) : (
                     <>
-                      Guarda tu código de reserva. Revisaré tu solicitud y te
-                      contactaré a la brevedad para confirmarte la hora. 🩷
+                      Guarda tu código de reserva. Guardé tu horario mientras
+                      reviso la solicitud. 🩷
                     </>
                   )}
                 </p>
 
-                <p className="mx-auto mt-4 max-w-md rounded-xl border border-coral-500/30 bg-coral-500/10 px-4 py-3 text-[0.88rem] leading-snug text-carbon">
-                  <strong>Tu hora aún no está confirmada.</strong> Cuando revise
-                  tu solicitud te envío los datos para transferir: la hora queda
-                  firme al recibir el comprobante.
-                </p>
+                <div className="mx-auto mt-5 max-w-md rounded-xl border border-coral-500/30 bg-coral-500/10 px-4 py-3.5 text-left text-[0.88rem] leading-relaxed text-carbon">
+                  <p className="mb-2 font-titulo font-bold">Qué sigue ahora</p>
+                  <ol className="space-y-1.5 pl-5" style={{ listStyle: "decimal" }}>
+                    <li>Reviso tu solicitud y te respondo al correo.</li>
+                    <li>Si la acepto, te envío los datos para transferir.</li>
+                    <li>
+                      Tu hora queda <strong>confirmada</strong> cuando recibo el
+                      comprobante.
+                    </li>
+                  </ol>
+                </div>
 
                 <div className="mx-auto mt-6 max-w-md rounded-2xl bg-rosa-50 p-5 text-left">
                   <dl className="space-y-2 text-[0.9rem]">
