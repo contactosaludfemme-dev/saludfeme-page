@@ -76,7 +76,7 @@ export default function Terminos() {
         La atención online es apta para consejerías, seguimiento e interpretación
         de exámenes. Si durante la consulta se determina que requieres examen
         físico o un procedimiento, se coordinará una atención presencial en
-        Talca o Linares.
+        Talca.
       </P>
 
       <H>6. Alcance de la atención</H>

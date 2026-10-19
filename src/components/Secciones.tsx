@@ -119,7 +119,7 @@ function ExamenesEnConsulta() {
             Toma de exámenes en consulta
           </h3>
           <p className="mt-0.5 text-[0.88rem] text-gris">
-            Disponible en Talca y en Linares.
+            Disponible en la consulta de Talca.
           </p>
         </div>
       </div>
@@ -447,19 +447,13 @@ const CONSULTAS = [
     centro: "Centro Kuyentun",
     alt: "Box de atención en el Centro Kuyentun, Talca",
   },
-  {
-    src: "/consulta-linares.jpg",
-    ciudad: "Linares",
-    centro: "Fix Salud",
-    alt: "Sala de espera de Fix Salud, Linares",
-  },
 ];
 
 export function SobreMi() {
   return (
     <section className="bg-rosa-50 py-20 lg:py-24">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="mx-auto grid w-full max-w-sm gap-4 md:max-w-none md:grid-cols-2 lg:max-w-sm lg:grid-cols-1">
+        <div className="mx-auto grid w-full max-w-sm gap-4">
           {CONSULTAS.map((c) => (
             <figure
               key={c.src}

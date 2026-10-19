@@ -27,14 +27,13 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITIO),
   title: {
-    default: `${CONTACTO.marca} — Matrona en Talca y Linares`,
+    default: `${CONTACTO.marca} — Matrona en Talca`,
     template: `%s | ${CONTACTO.marca}`,
   },
   description:
-    "Matrona en Talca y Linares. Salud ginecológica, sexología, anticoncepción, control de embarazo, climaterio y procedimientos. Atención online a todo Chile.",
+    "Matrona en Talca. Salud ginecológica, sexología, anticoncepción, control de embarazo, climaterio y procedimientos. Atención online a todo Chile.",
   keywords: [
     "matrona Talca",
-    "matrona Linares",
     "sexóloga Talca",
     "inserción DIU Talca",
     "implante anticonceptivo Talca",
@@ -50,9 +49,9 @@ export const metadata: Metadata = {
     locale: "es_CL",
     url: SITIO,
     siteName: CONTACTO.marca,
-    title: `${CONTACTO.marca} — Matrona en Talca y Linares`,
+    title: `${CONTACTO.marca} — Matrona en Talca`,
     description:
-      "Tu salud, tu espacio, tus decisiones. Atención en Talca, Linares y online.",
+      "Tu salud, tu espacio, tus decisiones. Atención en Talca y online.",
     images: [
       {
         url: "/og.png",

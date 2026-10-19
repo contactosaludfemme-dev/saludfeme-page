@@ -129,10 +129,6 @@ export default function Hero() {
                 Talca
               </li>
               <li className="flex items-center gap-1.5">
-                <MapPin size={16} strokeWidth={2.5} aria-hidden />
-                Linares
-              </li>
-              <li className="flex items-center gap-1.5">
                 <Monitor size={16} strokeWidth={2.5} aria-hidden />
                 Online a todo Chile
               </li>

@@ -47,9 +47,12 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
     const h = new Date();
     return new Date(h.getFullYear(), h.getMonth(), 1);
   });
-  // Sin elegir: el valor y la disponibilidad dependen de la sede, así que
-  // no se muestran hasta que la paciente diga dónde quiere atenderse.
-  const [sede, setSede] = useState<string | null>(null);
+  // Con una sola consulta no hay nada que elegir, así que va preseleccionada
+  // y el valor aparece de inmediato. Si vuelven a abrirse más sedes, esto
+  // arranca en null para que la paciente diga dónde quiere atenderse.
+  const [sede, setSede] = useState<string | null>(
+    SEDES.length === 1 ? SEDES[0].id : null
+  );
   const [dia, setDia] = useState<string | null>(null);
   const [hora, setHora] = useState<string | null>(null);
   /** Hora tomada que la paciente acaba de pulsar, para explicar por qué no puede. */
@@ -369,10 +372,7 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                 {modalidad === "presencial" && (
                   <fieldset className="mb-5">
                     <legend className="mb-2 font-titulo text-[0.9rem] font-semibold">
-                      ¿En qué consulta te atiendes?
-                      <span className="ml-1 font-normal text-gris">
-                        · el valor cambia según la ciudad
-                      </span>
+                      {SEDES.length > 1 ? "¿En qué consulta te atiendes?" : "Dónde te atiendes"}
                     </legend>
                     <div className="flex flex-wrap gap-2">
                       {SEDES.map((x) => (

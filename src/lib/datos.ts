@@ -61,17 +61,6 @@ export const SEDES: Sede[] = [
       "https://maps.google.com/?q=Edificio+Espacio+Talca&cid=5844557774143970886",
     coordenadas: { lat: -35.428327, lng: -71.666021 },
   },
-  {
-    id: "linares",
-    ciudad: "Linares",
-    centro: "Fix Salud",
-    direccion: "Av. León Bustos esquina Mariano Latorre #24",
-    referencia: "A pasos de Espacio Urbano",
-    // Enlace al lugar exacto en Google Maps, no a una búsqueda por texto.
-    mapaUrl:
-      "https://maps.google.com/?q=Mariano+Latorre+24,+Linares,+Maule&cid=12720233520895686011",
-    coordenadas: { lat: -35.8442818, lng: -71.6053829 },
-  },
 ];
 
 /**
@@ -86,7 +75,7 @@ export const MODALIDADES_ATENCION = [
     duracion: 60,
     precio: 30000,
     control: { precio: 25000, duracion: 20 },
-    descripcion: "En Talca o Linares, en un espacio confidencial y cómodo.",
+    descripcion: "En mi consulta en Talca, en un espacio confidencial y cómodo.",
   },
   {
     id: "online",
@@ -476,7 +465,6 @@ export const TESTIMONIOS: Testimonio[] = [
     texto:
       "Me explicó todo de forma muy clara y sencilla, incluso con dibujos, y llevó distintos métodos anticonceptivos para mostrarme cómo funcionaba cada uno. Pudimos elegir juntas el que mejor se adaptaba a mi estilo de vida. He podido preguntar cualquier inquietud sin sentir vergüenza.",
     contexto: "Consejería en anticonceptivos",
-    ciudad: "Linares",
   },
   {
     texto:
@@ -511,7 +499,6 @@ export const TESTIMONIOS: Testimonio[] = [
   {
     texto:
       "Antes había tenido malas experiencias, así que llegué con cierta inseguridad. Pero me encontré con una atención cercana, respetuosa y muy profesional. Me sentí realmente escuchada y acompañada. Agradezco poder contar con una atención tan humana y de calidad acá.",
-    ciudad: "Linares",
   },
   {
     texto:
@@ -563,7 +550,7 @@ export const FAQS = [
   },
   {
     p: "¿Atiendes presencialmente?",
-    r: "Sí, en Talca (Centro Kuyentun, Edificio Espacio Talca) y en Linares (Fix Salud, Av. León Bustos esquina Mariano Latorre #24).",
+    r: "Sí, en Talca: Centro Kuyentun, Edificio Espacio Talca, 2 Sur con 2 Oriente, piso 13, oficina 1315.",
   },
   {
     p: "¿Realizas consultas online?",
@@ -595,7 +582,7 @@ export const FAQS = [
   },
   {
     p: "¿Qué exámenes puedes tomarme en la consulta?",
-    r: "En Talca y Linares tomo Papanicolau, tipificación de VPH, panel de ITS, cultivo de flujo vaginal y SGB en embarazada. La toma no tiene costo adicional dentro de la consulta, pero el análisis lo cobra el laboratorio. Escríbeme por WhatsApp para conocer el valor y la disponibilidad.",
+    r: "En consulta tomo Papanicolau, tipificación de VPH, panel de ITS, cultivo de flujo vaginal y SGB en embarazada. La toma no tiene costo adicional dentro de la consulta, pero el análisis lo cobra el laboratorio. Escríbeme por WhatsApp para conocer el valor y la disponibilidad.",
   },
   {
     p: "¿Revisas los exámenes solicitados de manera gratuita?",
@@ -630,25 +617,19 @@ export function duracionDe(servicio: Servicio, modalidad: string): number {
   return m?.duracion ?? 60;
 }
 
-/** Valor mínimo de una atención presencial en Linares. */
-export const MINIMO_LINARES = 30000;
-
 /**
- * Valor de una atención según modalidad y sede.
+ * Valor de una atención según la modalidad.
  *
- * En Linares ninguna atención presencial baja de $30.000: las que valen
- * menos se cobran a ese mínimo. La telemedicina no depende de la sede.
+ * `sede` se mantiene en la firma porque las llamadas la pasan, pero hoy
+ * no cambia el valor: hay una sola consulta presencial.
  */
 export function precioDe(
   servicio: Servicio,
   modalidad: string,
-  sede?: string | null
+  _sede?: string | null
 ): number {
   if (modalidad === "online") {
     return servicio.precioOnline ?? servicio.precio;
-  }
-  if (sede === "linares") {
-    return Math.max(servicio.precio, MINIMO_LINARES);
   }
   return servicio.precio;
 }

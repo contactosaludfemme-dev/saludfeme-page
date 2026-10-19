@@ -54,6 +54,10 @@ export function esBloqueDisponible(titulo: string | null | undefined): boolean {
  *
  * Un bloque sin sede se ofrece en todas, que es lo razonable cuando ella
  * no quiere distinguir.
+ *
+ * Linares se reconoce aunque ya no sea una sede del sitio: así los bloques
+ * antiguos que sigan en el calendario quedan fuera, en vez de ofrecerse
+ * como horas de Talca.
  */
 export function sedeDelBloque(titulo: string | null | undefined): string | null {
   if (!titulo) return null;
