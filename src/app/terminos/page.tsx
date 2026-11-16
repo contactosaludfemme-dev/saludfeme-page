@@ -64,7 +64,7 @@ export default function Terminos() {
       <UL items={[
         "Los valores publicados están en pesos chilenos e incluyen impuestos.",
         "El pago se realiza por transferencia electrónica, de forma anticipada.",
-        "La atención es particular: no cuento con convenio Fonasa.",
+        "La atención es particular. El valor rebajado para pacientes Fonasa es un beneficio de Salud Femme, no un bono ni un convenio con Fonasa, y requiere presentar el certificado de afiliación vigente.",
         "Se emite boleta por cada atención, que la paciente puede presentar a su Isapre para solicitar reembolso. El reembolso depende del convenio y de la cobertura del plan de cada paciente: puede ser parcial o no proceder. Verificarlo con la Isapre es responsabilidad de la paciente y no condiciona el pago de la atención.",
         "Se considera control hasta 60 días después de la atención; pasado ese plazo corresponde agendar como primera consulta.",
         "La revisión de exámenes es gratuita hasta 7 días corridos desde la entrega de las órdenes.",

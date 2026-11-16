@@ -44,10 +44,15 @@ export const CONTACTO = {
 export type Sede = {
   id: string;
   ciudad: string;
-  centro: string;
-  direccion: string;
-  mapaUrl: string;
-  coordenadas: { lat: number; lng: number };
+  /** Valor particular de una consulta. Los procedimientos van aparte. */
+  valorConsulta: number;
+  /** Valor rebajado para quien acredite afiliación a Fonasa. */
+  valorFonasa: number;
+  /** Solo las sedes con consulta propia publican estos tres. */
+  centro?: string;
+  direccion?: string;
+  mapaUrl?: string;
+  coordenadas?: { lat: number; lng: number };
   referencia?: string;
 };
 
@@ -58,23 +63,58 @@ export type Sede = {
  * hora y el lugar se coordinan por WhatsApp. Anunciarlas igual importa,
  * porque alguien de ahí no buscaría a una matrona de Talca.
  */
-export const CIUDADES_SIN_DIRECCION = ["Linares"];
-
 export const SEDES: Sede[] = [
   {
     id: "talca",
     ciudad: "Talca",
+    valorConsulta: 32000,
+    valorFonasa: 30000,
     centro: "Centro Kuyentun",
     direccion: "Edificio Espacio Talca, 2 Sur con 2 Oriente, piso 13, of. 1315",
     mapaUrl:
       "https://maps.google.com/?q=Edificio+Espacio+Talca&cid=5844557774143970886",
     coordenadas: { lat: -35.428327, lng: -71.666021 },
   },
+  {
+    // Sin dirección publicada: el lugar se coordina por WhatsApp.
+    id: "linares",
+    ciudad: "Linares",
+    valorConsulta: 30000,
+    valorFonasa: 25000,
+  },
 ];
+
+/** Valores de una consulta por telemedicina, sin importar la ciudad. */
+export const VALOR_CONSULTA_ONLINE = 30000;
+export const VALOR_FONASA_ONLINE = 25000;
+
+/**
+ * El valor diferenciado es un beneficio de Salud Femme, no un bono ni un
+ * convenio con Fonasa: se aplica presentando el certificado de afiliación.
+ */
+export const NOTA_FONASA =
+  "El valor diferenciado para pacientes Fonasa es un beneficio de atención en Salud Femme; no corresponde a un bono ni a un convenio con Fonasa. Para acceder debes presentar tu certificado de afiliación.";
+
+/** El más bajo de todos, para anunciar "desde" sin listar cada sede. */
+export const VALOR_MINIMO_CONSULTA = Math.min(
+  VALOR_FONASA_ONLINE,
+  ...SEDES.map((s) => s.valorFonasa)
+);
+
+/** Sedes que no publican dirección: se anuncian, pero sin mapa. */
+export const CIUDADES_SIN_DIRECCION = SEDES.filter((s) => !s.direccion).map(
+  (s) => s.ciudad
+);
 
 /**
  * Modalidades de atención. Cada una incluye el valor de la consulta y el
  * del control, que es la atención de seguimiento dentro de los 60 días.
+ */
+/**
+ * Modalidades de atención: solo definen la duración.
+ *
+ * El valor ya no vive aquí —lo fija la sede o la telemedicina—, así que
+ * mantener precios en este objeto significaba tenerlos en dos sitios.
  */
 export const MODALIDADES_ATENCION = [
   {
@@ -82,17 +122,14 @@ export const MODALIDADES_ATENCION = [
     icono: "🏥",
     nombre: "Presencial",
     duracion: 60,
-    precio: 30000,
-    control: { precio: 25000, duracion: 20 },
-    descripcion: "En mi consulta en Talca o coordinando en Linares, en un espacio confidencial y cómodo.",
+    descripcion:
+      "En mi consulta en Talca o coordinando en Linares, en un espacio confidencial y cómodo.",
   },
   {
     id: "online",
     icono: "💻",
     nombre: "Telemedicina",
     duracion: 45,
-    precio: 25000,
-    control: { precio: 20000, duracion: 20 },
     descripcion: "Por videollamada, a todo Chile.",
   },
 ] as const;
@@ -129,9 +166,12 @@ export type Servicio = {
   icono: string;
   categoria: Categoria;
   descripcion: string;
-  precio: number;
-  /** Valor distinto según modalidad, cuando aplica. */
-  precioOnline?: number;
+  /**
+   * Las consultas y consejerías cobran el valor de la sede, no uno propio.
+   * Los procedimientos lo declaran aquí y se cotizan al pedir la hora,
+   * porque dependen del insumo y de cuánto trabajo requieran.
+   */
+  valorPropio?: boolean;
   /** Texto libre cuando el valor no es fijo. */
   precioNota?: string;
   duracion?: number;
@@ -153,7 +193,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Consultas y controles",
     descripcion:
       "Evaluación de tu salud ginecológica, con orientación e indicación de exámenes cuando corresponda.",
-    precio: 25000,
     modalidades: ["presencial", "online"],
     aviso:
       "No realizo ecografías, pero entrego la orden en la consulta. No incluye el procesamiento de exámenes por el laboratorio.",
@@ -165,7 +204,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Consultas y controles",
     descripcion:
       "Seguimiento de tu embarazo con acompañamiento cercano en cada etapa.",
-    precio: 25000,
     modalidades: ["presencial", "online"],
     aviso: "No realizo ecografías, pero entrego la orden en la consulta.",
     incluye:
@@ -178,7 +216,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Consultas y controles",
     descripcion:
       "Preparación de tu salud antes de buscar un embarazo: exámenes, suplementación y resolución de dudas.",
-    precio: 25000,
     modalidades: ["presencial", "online"],
     incluye: "Puedes venir acompañada de tu pareja.",
     etiquetaIncluye: false,
@@ -190,7 +227,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Consultas y controles",
     descripcion:
       "Evaluación conjunta de madre, recién nacido y lactancia materna, con tiempo suficiente para revisarlo todo.",
-    precio: 45000,
     duracion: 90,
     modalidades: ["presencial"],
   },
@@ -201,8 +237,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Consultas y controles",
     descripcion:
       "Acompañamiento en esta etapa: manejo de síntomas, salud ósea y bienestar general.",
-    precio: 30000,
-    precioOnline: 25000,
     modalidades: ["presencial", "online"],
   },
   {
@@ -212,7 +246,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Consultas y controles",
     descripcion:
       "Entender tu ciclo, reconocer sus fases y saber qué es normal y qué no.",
-    precio: 30000,
     modalidades: ["presencial", "online"],
   },
   {
@@ -222,8 +255,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Consultas y controles",
     descripcion:
       "Revisión de tus resultados con indicaciones, educación y derivación cuando corresponda.",
-    precio: 25000,
-    precioOnline: 20000,
     modalidades: ["presencial", "online"],
     aviso:
       "La revisión es gratuita dentro de los 7 días corridos desde que se entregó la orden.",
@@ -237,8 +268,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Anticoncepción",
     descripcion:
       "Elegimos juntas el método que mejor se adapta a tu cuerpo, tu etapa y tu proyecto de vida.",
-    precio: 30000,
-    precioOnline: 25000,
     modalidades: ["presencial", "online"],
   },
   {
@@ -248,7 +277,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Anticoncepción",
     descripcion:
       "Coordinamos la fecha, los exámenes necesarios y la compra del anticonceptivo antes de la inserción.",
-    precio: 25000,
     modalidades: ["presencial", "online"],
     aviso: "Obligatoria antes de agendar una inserción.",
   },
@@ -258,7 +286,7 @@ export const SERVICIOS: Servicio[] = [
     icono: "💉",
     categoria: "Procedimientos",
     descripcion: "Implanon o Jadelle, en consulta y con anestesia local.",
-    precio: 55000,
+    valorPropio: true,
     modalidades: ["presencial"],
     aviso: "No incluye el implante. Requiere consejería previa.",
   },
@@ -268,7 +296,7 @@ export const SERVICIOS: Servicio[] = [
     icono: "💉",
     categoria: "Procedimientos",
     descripcion: "Retiro de Implanon o Jadelle.",
-    precio: 55000,
+    valorPropio: true,
     modalidades: ["presencial"],
   },
   {
@@ -277,7 +305,7 @@ export const SERVICIOS: Servicio[] = [
     icono: "📌",
     categoria: "Procedimientos",
     descripcion: "T de cobre, Asertia o Mirena.",
-    precio: 60000,
+    valorPropio: true,
     modalidades: ["presencial"],
     aviso: "No incluye el dispositivo. Requiere consejería previa.",
     incluye: "El procedimiento se realiza con protocolo de anestesia.",
@@ -289,7 +317,7 @@ export const SERVICIOS: Servicio[] = [
     icono: "📌",
     categoria: "Procedimientos",
     descripcion: "T de cobre, Asertia, Mirena o Kyleena.",
-    precio: 35000,
+    valorPropio: true,
     modalidades: ["presencial"],
   },
   {
@@ -299,8 +327,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Anticoncepción",
     descripcion:
       "Seguimiento posterior a la indicación: implantes, DIU, píldoras, anillo, inyecciones o parche.",
-    precio: 25000,
-    precioOnline: 20000,
     modalidades: ["presencial", "online"],
   },
   {
@@ -309,7 +335,7 @@ export const SERVICIOS: Servicio[] = [
     icono: "💉",
     categoria: "Procedimientos",
     descripcion: "Intramuscular o subcutánea.",
-    precio: 25000,
+    valorPropio: true,
     modalidades: ["presencial"],
     incluye: "Consultar por disponibilidad de anticonceptivo.",
     etiquetaIncluye: false,
@@ -323,7 +349,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Salud sexual",
     descripcion:
       "Un espacio para conversar sobre tu sexualidad sin prejuicios, desde una mirada profesional e integral.",
-    precio: 45000,
     modalidades: ["presencial", "online"],
   },
   {
@@ -333,8 +358,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Salud sexual",
     descripcion:
       "Evaluación de síntomas, indicación de tratamiento y orientación sobre prevención.",
-    precio: 30000,
-    precioOnline: 25000,
     modalidades: ["presencial", "online"],
     incluye:
       "Consejera certificada en VIH e ITS por la Seremi de Salud del Maule.",
@@ -347,7 +370,6 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Salud sexual",
     descripcion:
       "Revisión de técnica y acople, manejo del dolor y acompañamiento en el proceso.",
-    precio: 40000,
     modalidades: ["presencial", "online"],
   },
 
@@ -359,8 +381,8 @@ export const SERVICIOS: Servicio[] = [
     categoria: "Procedimientos",
     descripcion:
       "Eliminación de verrugas genitales, acrocordones y molusco contagioso. Rápido, con resultados inmediatos y bajo anestesia local.",
-    precio: 35000,
     precioNota: "Desde $35.000 · varía según la cantidad de lesiones",
+    valorPropio: true,
     modalidades: ["presencial"],
   },
 ];
@@ -564,7 +586,7 @@ export const FAQS = [
   },
   {
     p: "¿Atiendes por Fonasa o Isapre?",
-    r: "La atención es particular: no cuento con convenio Fonasa. Emito boleta por cada atención para que puedas presentarla a tu Isapre, pero el reembolso no es automático ni estándar: depende del convenio y de la cobertura que tenga tu plan para consultas de matronería. Algunos planes reembolsan una parte, otros no cubren esta prestación. Consúltalo con tu Isapre antes de tu hora, así sabes con qué contar.",
+    r: "La atención es particular, pero tengo un valor rebajado para pacientes Fonasa: es un beneficio mío, no un bono ni un convenio con Fonasa, y para acceder debes presentar tu certificado de afiliación. Si tienes Isapre, emito boleta por cada atención para que la presentes, aunque el reembolso no es automático ni estándar: depende de la cobertura que tenga tu plan para consultas de matronería. Consúltalo con tu Isapre antes de tu hora, así sabes con qué contar.",
   },
   {
     p: "¿Realizas ecografías en tu consulta?",
@@ -629,15 +651,31 @@ export function duracionDe(servicio: Servicio, modalidad: string): number {
  * `sede` se mantiene en la firma porque las llamadas la pasan, pero hoy
  * no cambia el valor: hay una sola consulta presencial.
  */
+/**
+ * Valor de una atención.
+ *
+ * Una consulta cuesta lo mismo sea cual sea el motivo: lo que cambia es
+ * dónde se atiende. Los procedimientos no entran aquí —devuelven null—
+ * porque su valor se cotiza al pedir la hora.
+ */
+export type Valores = { fonasa: number; particular: number };
+
 export function precioDe(
   servicio: Servicio,
   modalidad: string,
-  _sede?: string | null
-): number {
+  sede?: string | null
+): Valores | null {
+  if (servicio.valorPropio) return null;
   if (modalidad === "online") {
-    return servicio.precioOnline ?? servicio.precio;
+    return { fonasa: VALOR_FONASA_ONLINE, particular: VALOR_CONSULTA_ONLINE };
   }
-  return servicio.precio;
+  const s = SEDES.find((x) => x.id === sede) ?? SEDES[0];
+  return { fonasa: s.valorFonasa, particular: s.valorConsulta };
+}
+
+/** ¿Este servicio se cotiza al pedir la hora en vez de publicar su valor? */
+export function seCotiza(servicio: Servicio): boolean {
+  return servicio.valorPropio === true;
 }
 
 /** Formatea un monto en pesos chilenos. */

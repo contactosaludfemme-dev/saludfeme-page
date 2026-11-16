@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useAgenda } from "./AgendaProvider";
 import {
-  SERVICIOS, CATEGORIAS, NOTAS_SERVICIOS, MODALIDADES_ATENCION, EXAMENES, TALLERES,
+  SERVICIOS, CATEGORIAS, NOTAS_SERVICIOS, EXAMENES, TALLERES,
+  seCotiza, VALOR_MINIMO_CONSULTA, SEDES, VALOR_CONSULTA_ONLINE,
+  VALOR_FONASA_ONLINE, NOTA_FONASA,
   AREAS, TESTIMONIOS, CONTACTO, precioCLP, type Servicio,
 } from "@/lib/datos";
 
@@ -198,11 +200,15 @@ function TarjetaServicio({ servicio: s }: { servicio: Servicio }) {
         <div className="min-w-0 flex-1">
           <h3 className="text-[0.98rem] leading-snug">{s.nombre}</h3>
           <p className="mt-0.5 font-titulo text-[1.02rem] font-bold text-magenta-600">
-            {s.precioNota ?? precioCLP(s.precio)}
-            {s.precioOnline && (
-              <span className="ml-1.5 text-[0.8rem] font-normal text-gris">
-                presencial · {precioCLP(s.precioOnline)} online
-              </span>
+            {seCotiza(s) ? (
+              <span className="text-[0.92rem]">Valor según procedimiento</span>
+            ) : (
+              <>
+                Desde {precioCLP(VALOR_MINIMO_CONSULTA)}
+                <span className="ml-1.5 text-[0.8rem] font-normal text-gris">
+                  según previsión y sede
+                </span>
+              </>
             )}
           </p>
         </div>
@@ -254,49 +260,56 @@ export function Modalidades() {
     <section id="modalidades" className="bg-rosa-100 py-16 lg:py-24">
       <div className="mx-auto max-w-5xl px-5">
         <Encabezado
-          eyebrow="Cómo nos vemos"
-          titulo="Modalidades de atención"
-          texto="Elige la que mejor se acomode a tu momento. Todas con la misma dedicación."
+          eyebrow="Cuánto cuesta"
+          titulo="Valores de atención"
+          texto="Un valor único por consulta, según tu previsión y dónde quieras atenderte."
         />
 
-        <div className="mx-auto grid max-w-3xl gap-5 sm:grid-cols-2">
-          {MODALIDADES_ATENCION.map((m) => (
+        {/* Una consulta cuesta lo mismo sea cual sea el motivo: antes cada
+            servicio traía su propio valor y la misma atención aparecía con
+            precios distintos en dos lugares de la página. */}
+        <div className="mx-auto grid max-w-3xl gap-4 sm:grid-cols-3">
+          {[
+            ...SEDES.map((s) => ({
+              clave: s.id,
+              icono: "📍",
+              nombre: s.ciudad,
+              fonasa: s.valorFonasa,
+              particular: s.valorConsulta,
+              nota: s.centro ?? "Lugar a coordinar",
+            })),
+            {
+              clave: "online",
+              icono: "💻",
+              nombre: "Online",
+              fonasa: VALOR_FONASA_ONLINE,
+              particular: VALOR_CONSULTA_ONLINE,
+              nota: "A todo Chile",
+            },
+          ].map((x) => (
             <article
-              key={m.id}
-              className="flex flex-col rounded-2xl border border-gris-claro bg-white p-6 text-center shadow-suave transition-all hover:-translate-y-1 hover:shadow-media md:rounded-3xl md:p-7"
+              key={x.clave}
+              className="rounded-2xl border border-gris-claro bg-white p-5 shadow-suave md:rounded-3xl md:p-6"
             >
-              <span aria-hidden className="mb-2 block text-4xl">{m.icono}</span>
-              <h3 className="mb-1 text-[1.15rem]">{m.nombre}</h3>
-              <p className="mb-5 text-[0.88rem] leading-relaxed text-gris">
-                {m.descripcion}
-              </p>
+              <div className="text-center">
+                <span aria-hidden className="block text-2xl">
+                  {x.icono}
+                </span>
+                <h3 className="mt-1 text-[1.05rem]">{x.nombre}</h3>
+                <p className="text-[0.8rem] text-gris">{x.nota}</p>
+              </div>
 
-              <dl className="mt-auto space-y-3 border-t border-gris-claro pt-4 text-left">
-                <div className="flex items-baseline justify-between gap-3">
-                  <dt>
-                    <span className="block font-titulo text-[0.92rem] font-semibold">
-                      Consulta
-                    </span>
-                    <span className="text-[0.78rem] text-gris">
-                      {m.duracion} minutos
-                    </span>
-                  </dt>
-                  <dd className="font-titulo text-[1.15rem] font-bold text-magenta-600">
-                    {precioCLP(m.precio)}
+              <dl className="mt-4 space-y-2 border-t border-gris-claro pt-3">
+                <div className="flex items-baseline justify-between gap-2">
+                  <dt className="text-[0.86rem] font-semibold">Fonasa</dt>
+                  <dd className="font-titulo text-[1.2rem] font-bold text-magenta-600">
+                    {precioCLP(x.fonasa)}
                   </dd>
                 </div>
-
-                <div className="flex items-baseline justify-between gap-3">
-                  <dt>
-                    <span className="block font-titulo text-[0.92rem] font-semibold">
-                      Control
-                    </span>
-                    <span className="text-[0.78rem] text-gris">
-                      {m.control.duracion} minutos
-                    </span>
-                  </dt>
-                  <dd className="font-titulo text-[1.15rem] font-bold text-magenta-600">
-                    {precioCLP(m.control.precio)}
+                <div className="flex items-baseline justify-between gap-2">
+                  <dt className="text-[0.86rem] text-gris">Particular</dt>
+                  <dd className="font-titulo text-[1.2rem] font-bold text-carbon">
+                    {precioCLP(x.particular)}
                   </dd>
                 </div>
               </dl>
@@ -304,22 +317,38 @@ export function Modalidades() {
           ))}
         </div>
 
-        <p className="mx-auto mt-5 max-w-2xl text-center text-[0.86rem] leading-relaxed text-gris">
-          El control es la atención de seguimiento, disponible hasta 60 días
-          después de tu consulta. Pasado ese plazo corresponde agendar como
-          primera consulta.
-        </p>
+        {/* Sin esta aclaración, el valor rebajado se lee como un convenio
+            con Fonasa, que no existe: es un beneficio de la consulta. */}
+        <div className="mx-auto mt-6 max-w-3xl rounded-2xl border border-gris-claro bg-white p-5 md:rounded-3xl md:p-6">
+          <p className="mb-2 flex items-center gap-2 font-titulo text-[0.95rem] font-bold">
+            <span aria-hidden>🩺</span> Sobre el valor Fonasa
+          </p>
+          <p className="text-[0.9rem] leading-relaxed text-gris">{NOTA_FONASA}</p>
+        </div>
 
-        <div className="mx-auto mt-8 max-w-3xl rounded-2xl bg-rojo-600 p-5 text-center shadow-media md:rounded-3xl md:p-7">
+        <div className="mx-auto mt-4 max-w-3xl rounded-2xl border border-gris-claro bg-white p-5 md:rounded-3xl md:p-6">
+          <p className="mb-2 flex items-center gap-2 font-titulo text-[0.95rem] font-bold">
+            <span aria-hidden>✨</span> Procedimientos
+          </p>
+          <p className="text-[0.9rem] leading-relaxed text-gris">
+            Plasmapen, inserción y retiro de implante o DIU, e inyección
+            anticonceptiva tienen otros valores, porque dependen del insumo y
+            del procedimiento.{" "}
+            <strong className="font-semibold text-carbon">
+              Consúltalos al momento de solicitar tu hora.
+            </strong>
+          </p>
+        </div>
+
+        <div className="mx-auto mt-6 max-w-3xl rounded-2xl bg-rojo-600 p-5 text-center shadow-media md:rounded-3xl md:p-7">
           <p className="mb-2 font-titulo text-[1.05rem] font-bold text-white">
             Atención particular
           </p>
           <p className="mx-auto max-w-xl text-[0.92rem] leading-relaxed text-white/95">
             Pago por <strong className="font-semibold text-white">transferencia</strong>:
-            tu hora se confirma con el comprobante. No tengo convenio Fonasa.
-            Emito boleta por cada atención, y el reembolso dependerá de la
-            cobertura que tenga tu plan de Isapre: conviene que lo consultes
-            con ellos antes.
+            tu hora se confirma con el comprobante. Emito boleta por cada
+            atención, y el reembolso dependerá de la cobertura que tenga tu
+            plan de Isapre: conviene que lo consultes con ellos antes.
           </p>
         </div>
       </div>

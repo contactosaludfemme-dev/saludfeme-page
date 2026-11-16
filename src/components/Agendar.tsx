@@ -426,9 +426,23 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                           key={sede}
                           className="animate-valor font-titulo text-lg font-bold text-magenta-600"
                         >
-                          {servicio.precioNota
-                            ? `Desde ${precioCLP(precioDe(servicio, modalidad, sede))}`
-                            : precioCLP(precioDe(servicio, modalidad, sede))}
+                          {(() => {
+                            const v = precioDe(servicio, modalidad, sede);
+                            if (v === null) return "A convenir";
+                            return (
+                              <>
+                                {precioCLP(v.fonasa)}
+                                <span className="ml-1 text-[0.7rem] font-normal text-gris">
+                                  Fonasa
+                                </span>
+                                <span className="mx-1.5 text-gris">·</span>
+                                {precioCLP(v.particular)}
+                                <span className="ml-1 text-[0.7rem] font-normal text-gris">
+                                  particular
+                                </span>
+                              </>
+                            );
+                          })()}
                         </span>
                       </p>
                     )}
@@ -441,9 +455,23 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                       Valor por telemedicina
                     </span>
                     <span className="font-titulo text-lg font-bold text-magenta-600">
-                      {servicio.precioNota
-                        ? `Desde ${precioCLP(precioDe(servicio, modalidad))}`
-                        : precioCLP(precioDe(servicio, modalidad))}
+                      {(() => {
+                        const v = precioDe(servicio, modalidad);
+                        if (v === null) return "A convenir";
+                        return (
+                          <>
+                            {precioCLP(v.fonasa)}
+                            <span className="ml-1 text-[0.7rem] font-normal text-gris">
+                              Fonasa
+                            </span>
+                            <span className="mx-1.5 text-gris">·</span>
+                            {precioCLP(v.particular)}
+                            <span className="ml-1 text-[0.7rem] font-normal text-gris">
+                              particular
+                            </span>
+                          </>
+                        );
+                      })()}
                     </span>
                   </p>
                 )}
@@ -607,7 +635,13 @@ export default function Agendar({ enModal, servicioInicial, onCerrar }: Props = 
                     <div className="flex justify-between gap-4 border-t border-gris-claro pt-2">
                       <dt className="text-gris">Valor</dt>
                       <dd className="font-titulo text-lg font-bold text-magenta-600">
-                        {precioCLP(precioDe(servicio, modalidad, sede))}
+                        {(() => {
+                          const v = precioDe(servicio, modalidad, sede);
+                          if (v === null) return "A convenir";
+                          return `${precioCLP(v.fonasa)} Fonasa · ${precioCLP(
+                            v.particular
+                          )} particular`;
+                        })()}
                       </dd>
                     </div>
                   </dl>

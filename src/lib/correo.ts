@@ -79,7 +79,7 @@ function tablaCita(d: DatosCorreo): string {
     ${fila("Fecha", esc(fechaLarga(d.fecha)))}
     ${fila("Hora", esc(`${d.hora} hrs (${d.duracionMin} min)`))}
     ${fila("Modalidad", esc(d.modalidad))}
-    ${fila("Valor", esc(precioCLP(d.precio)))}
+    ${fila("Valor", esc(d.precio > 0 ? precioCLP(d.precio) : "Se confirma al agendar"))}
     ${fila("Código", esc(d.codigoReserva))}
   </table>`;
 }
@@ -300,7 +300,7 @@ export function correoPorPagar(
        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
               style="background:#FDF2F4;border-radius:12px;padding:16px 20px;margin:0 0 20px;">
          ${fila("Servicio", datos.servicio)}
-         ${fila("Monto", precioCLP(datos.precio))}
+         ${fila("Monto", datos.precio > 0 ? precioCLP(datos.precio) : "Se confirma contigo")}
          ${fila("Código de reserva", datos.codigoReserva)}
        </table>
 

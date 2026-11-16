@@ -159,9 +159,7 @@ export default async function Articulo({ params }: Params) {
             href="/#agendar"
             className="mt-5 inline-block rounded-full bg-white px-7 py-3 font-titulo font-semibold text-magenta-600 no-underline transition-transform hover:-translate-y-0.5"
           >
-            {servicio
-              ? `Agendar · ${precioCLP(servicio.precio)}`
-              : "Agendar mi hora"}
+            {servicio ? `Agendar ${servicio.nombre.toLowerCase()}` : "Agendar mi hora"}
           </Link>
         </aside>
 

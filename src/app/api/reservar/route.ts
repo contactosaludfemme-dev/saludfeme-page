@@ -116,8 +116,9 @@ export async function POST(req: Request) {
       hora: body.hora,
       paciente,
       modalidad: body.modalidad,
-      // Se guardan en el evento para poder enviarlos al aceptar la hora
-      precio: valor,
+      // Se guarda el valor particular: es el que la paciente paga salvo
+      // que acredite Fonasa en consulta. Un procedimiento no trae valor.
+      precio: valor?.particular ?? undefined,
       codigoReserva: codigo,
     });
 
@@ -134,7 +135,7 @@ export async function POST(req: Request) {
       {
         paciente,
         servicio: servicio!.nombre,
-        precio: valor,
+        precio: valor?.particular ?? 0,
         modalidad: body.modalidad,
         fecha: body.fecha,
         hora: body.hora,

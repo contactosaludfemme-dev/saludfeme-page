@@ -42,14 +42,24 @@ export default function Contacto() {
   }, []);
   const sede = SEDES.find((x) => x.id === sedeActiva) ?? SEDES[0];
 
-  // Recuadro del mapa alrededor de la sede elegida
-  const { lat, lng } = sede.coordenadas;
+  // Recuadro del mapa alrededor de la sede elegida. Linares no publica
+  // dirección, así que ahí no hay coordenadas ni mapa que mostrar.
   const d = 0.012;
-  const bbox = [lng - d, lat - d, lng + d, lat + d].join(",");
-  const mapaSrc =
-    `https://www.openstreetmap.org/export/embed.html` +
-    `?bbox=${encodeURIComponent(bbox)}&layer=mapnik` +
-    `&marker=${encodeURIComponent(`${lat},${lng}`)}`;
+  const bbox = sede.coordenadas
+    ? [
+        sede.coordenadas.lng - d,
+        sede.coordenadas.lat - d,
+        sede.coordenadas.lng + d,
+        sede.coordenadas.lat + d,
+      ].join(",")
+    : "";
+  const mapaSrc = sede.coordenadas
+    ? `https://www.openstreetmap.org/export/embed.html` +
+      `?bbox=${encodeURIComponent(bbox)}&layer=mapnik` +
+      `&marker=${encodeURIComponent(
+        `${sede.coordenadas.lat},${sede.coordenadas.lng}`
+      )}`
+    : "";
 
   const wa = `https://wa.me/${CONTACTO.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
     "Hola Francisca, vengo de tu página web y quiero agendar una hora 🌸"
